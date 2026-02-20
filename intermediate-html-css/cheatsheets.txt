@@ -1,0 +1,3 @@
+- HMTL: https://htmlcheatsheet.com/
+- CSS: https://htmlcheatsheet.com/css/
+- JS: https://htmlcheatsheet.com/js/
