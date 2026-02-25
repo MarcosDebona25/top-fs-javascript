@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario HTML con Validaciones</title>
+    <style>
+        input:user-valid,
+        select:user-valid,
+        textarea:user-valid {
+            border: 2px solid green;
+        }
+
+        input:user-invalid,
+        select:user-invalid,
+        textarea:user-invalid {
+            border: 2px solid red;
+        }
+
+        div {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Formulario Completo con Validaciones HTML</h1>
+
+    <form>
+
+        <fieldset>
+            <legend>Datos Personales</legend>
+
+            <div>
+                <label>Nombre completo *</label>
+                <input type="text" name="nombre" required minlength="3" maxlength="40" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+"
+                    placeholder="Ej: Juan Pérez" title="Solo letras y espacios, entre 3 y 40 caracteres">
+            </div>
+
+            <div>
+                <label>Usuario *</label>
+                <input type="text" name="usuario" required minlength="4" maxlength="12" pattern="[a-zA-Z0-9_]+"
+                    title="Entre 4 y 12 caracteres: letras, números y guión bajo">
+            </div>
+
+            <div>
+                <label>Contraseña *</label>
+                <input type="password" name="password" required minlength="8" maxlength="20"
+                    pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+"
+                    title="Entre 8 y 20 caracteres, debe incluir mayúscula, minúscula y número">
+            </div>
+
+            <div>
+                <label>Confirmar contraseña *</label>
+                <input type="password" name="password2" required minlength="8" maxlength="20"
+                    pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+" title="Debe coincidir con la contraseña anterior">
+            </div>
+
+            <div>
+                <label>Email *</label>
+                <input type="email" name="email" required placeholder="correo@ejemplo.com"
+                    title="Ingresá un email válido">
+            </div>
+
+            <div>
+                <label>Teléfono (opcional)</label>
+                <input type="tel" name="telefono" pattern="\d{10}" title="Exactamente 10 dígitos numéricos">
+            </div>
+
+            <div>
+                <label>Edad *</label>
+                <input type="number" name="edad" required min="18" max="120" step="1"
+                    title="Debe ser mayor de 18 y menor de 120">
+            </div>
+
+            <div>
+                <label>Fecha de nacimiento *</label>
+                <input type="date" name="fecha" required min="1900-01-01" max="2007-12-31"
+                    title="Ingresá una fecha válida entre 1900 y 2007">
+            </div>
+
+            <div>
+                <label>Hora preferida de contacto (opcional)</label>
+                <input type="time" name="hora" min="08:00" max="20:00" title="Entre las 08:00 y las 20:00">
+            </div>
+
+        </fieldset>
+
+        <fieldset>
+            <legend>Preferencias</legend>
+
+            <div>
+                <p>Género *</p>
+                <label><input type="radio" name="genero" value="m" required> Masculino</label>
+                <label><input type="radio" name="genero" value="f"> Femenino</label>
+                <label><input type="radio" name="genero" value="nb"> No binario</label>
+                <label><input type="radio" name="genero" value="o"> Prefiero no decirlo</label>
+            </div>
+
+            <div>
+                <p>Intereses * (seleccione al menos 1)</p>
+                <label><input type="checkbox" name="intereses" value="programacion" required> Programación</label>
+                <label><input type="checkbox" name="intereses" value="musica"> Música</label>
+                <label><input type="checkbox" name="intereses" value="deporte"> Deporte</label>
+                <label><input type="checkbox" name="intereses" value="viajes"> Viajes</label>
+                <label><input type="checkbox" name="intereses" value="cocina"> Cocina</label>
+            </div>
+
+            <div>
+                <label>País *</label>
+                <select name="pais" required title="Seleccioná tu país">
+                    <option value="">Seleccione</option>
+                    <option value="ar">Argentina</option>
+                    <option value="mx">México</option>
+                    <option value="es">España</option>
+                    <option value="co">Colombia</option>
+                    <option value="cl">Chile</option>
+                    <option value="uy">Uruguay</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Provincia/Estado *</label>
+                <select name="provincia" required title="Seleccioná tu provincia">
+                    <option value="">Seleccione</option>
+                    <option value="ba">Buenos Aires</option>
+                    <option value="cb">Córdoba</option>
+                    <option value="sf">Santa Fe</option>
+                    <option value="mza">Mendoza</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Lenguaje de programación favorito (opcional)</label>
+                <input list="lenguajes" name="lenguaje" pattern="[A-Za-z#+ ]+"
+                    title="Solo letras, #, + y espacios">
+                <datalist id="lenguajes">
+                    <option value="JavaScript">
+                    <option value="Python">
+                    <option value="Java">
+                    <option value="C#">
+                    <option value="C++">
+                    <option value="TypeScript">
+                    <option value="Go">
+                    <option value="Rust">
+                </datalist>
+            </div>
+
+            <div>
+                <label>Nivel de satisfacción: <output name="valorSatisfaccion">5</output>/10</label>
+                <input type="range" name="satisfaccion" min="1" max="10" step="1" value="5"
+                    oninput="this.previousElementSibling.querySelector('output').value = this.value">
+            </div>
+
+            <div>
+                <label>Cantidad de proyectos realizados</label>
+                <input type="number" name="proyectos" min="0" max="9999" step="1" value="0"
+                    title="Entre 0 y 9999 proyectos">
+            </div>
+
+        </fieldset>
+
+        <fieldset>
+            <legend>Información Adicional</legend>
+
+            <div>
+                <label>Biografía * (entre 20 y 300 caracteres)</label>
+                <textarea name="bio" required minlength="20" maxlength="300"
+                    title="Mínimo 20, máximo 300 caracteres"></textarea>
+            </div>
+
+            <div>
+                <label>Sitio web personal (opcional)</label>
+                <input type="url" name="web" placeholder="https://ejemplo.com" pattern="https?://.+"
+                    title="Debe comenzar con http:// o https://">
+            </div>
+
+            <div>
+                <label>Código postal *</label>
+                <input type="text" name="postal" required pattern="\d{4,5}" placeholder="4 o 5 dígitos"
+                    title="El código postal debe tener 4 o 5 dígitos">
+            </div>
+
+            <div>
+                <label>CUIL/DNI (opcional)</label>
+                <input type="text" name="dni" pattern="\d{7,8}" placeholder="7 u 8 dígitos"
+                    title="DNI de 7 u 8 dígitos numéricos">
+            </div>
+
+            <div>
+                <label>Color favorito (opcional)</label>
+                <input type="color" name="color" value="#3498db">
+            </div>
+
+            <div>
+                <label>Subir CV o imagen de perfil (PDF o imagen, opcional)</label>
+                <input type="file" name="archivo" accept=".pdf,image/*" title="Solo se aceptan archivos PDF e imágenes">
+            </div>
+
+            <div>
+                <label>
+                    <input type="checkbox" name="terminos" required>
+                    Acepto los términos y condiciones *
+                </label>
+            </div>
+
+            <div>
+                <label>
+                    <input type="checkbox" name="newsletter">
+                    Quiero recibir el newsletter (opcional)
+                </label>
+            </div>
+
+        </fieldset>
+
+        <div>
+            <button type="submit">Enviar</button>
+            <button type="reset">Restablecer</button>
+        </div>
+
+    </form>
+
+</body>
+
+</html>
