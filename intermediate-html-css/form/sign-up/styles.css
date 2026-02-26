@@ -13,7 +13,7 @@
     overflow: hidden;
 }
 
-/* COLUMNA IZQUIERDA */
+/* LEFT COLUMN */
 
 #container-izquierda {
     position: relative;
@@ -62,7 +62,7 @@
     padding: 6px 8px;
 }
 
-/* COLUMNA DERECHA */
+/* RIGHT COLUMN */
 
 #container-derecha {
     width: 60%;

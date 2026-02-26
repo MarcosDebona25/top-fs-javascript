@@ -8,6 +8,8 @@
     <link href="reset.css" rel="stylesheet" type="text/css">
     <link href="styles.css" rel="stylesheet" type="text/css">
 
+    <script src="code.js" defer></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -36,7 +38,8 @@
         <main id="container-derecha">
             <header id="intro">
                 <p>
-                    This is not a real online service! You know you need something like this in your real life to help you realize your deepest dreams. <br> Sign up now to get started.
+                    This is not a real online service! You know you need something like this in your real life to help
+                    you realize your deepest dreams. <br> Sign up now to get started.
                 </p>
                 <p>
                     You <em>know</em> you want to.
@@ -44,38 +47,48 @@
             </header>
 
             <section id="form-section">
-                <form id="signup-form" action="" method="post">
+                <form id="signup-form" action="none" method="#">
                     <h1>Let's do this!</h1>
 
                     <div>
                         <label for="first-name">FIRST NAME</label>
-                        <input type="text" name="firstName" id="first-name" minlength="10" maxlength="50" required>
+                        <input type="text" name="firstName" id="first-name" minlength="5" maxlength="30"
+                            pattern="^[A-Za-z]+( [A-Za-z]+)*$"
+                            title="Between 5 and 30 characters, letters only (no accents)" required>
 
                         <label for="last-name">LAST NAME</label>
-                        <input type="text" name="lastName" id="last-name">
+                        <input type="text" name="lastName" id="last-name" minlength="5" maxlength="30"
+                            pattern="^[A-Za-z]+( [A-Za-z]+)*$"
+                            title="Between 5 and 30 characters, letters only (no accents)" required>
                     </div>
 
                     <div>
                         <label for="email">EMAIL</label>
-                        <input type="email" name="email" id="email">
+                        <input type="email" name="email" id="email" placeholder="example@email.com" required>
 
                         <label for="phone-number">PHONE NUMBER</label>
-                        <input type="tel" name="phoneNumber" id="phone-number">
+                        <input type="tel" name="phoneNumber" id="phone-number" placeholder="0000-000000"
+                            title="Must have 4 numbers, a hyphen and 6 numbers" pattern="^\d{4}-\d{6}$" required>
                     </div>
 
                     <div>
                         <label for="password">PASSWORD</label>
-                        <input type="password" name="password" id="password">
+                        <input type="password" name="password" id="password" minlength="8"
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%&]).*"
+                            title="Must have at least 8 characters, include 1 uppercase letter, 1 lowercase letter, 1 number and 1 special symbol (! @ # $ % &)"
+                            required>
 
                         <label for="confirm-password">CONFIRM PASSWORD</label>
-                        <input type="password" name="confirmPassword" id="confirm-password">
+                        <input type="password" name="confirmPassword" id="confirm-password"
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%&]).*"
+                            title="Please re-enter your password" required>
                     </div>
                 </form>
             </section>
 
             <div id="account-login">
                 <button type="submit" form="signup-form">Create Account</button>
-                <p>Already have an account? <a href="#">Log in</a></p>
+                <p>Already have an account? <a id="log-in-anchor" href="#">Log in</a></p>
             </div>
         </main>
 
