@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign-up Form</title>
+    <link href="reset.css" rel="stylesheet" type="text/css">
+    <link href="styles.css" rel="stylesheet" type="text/css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div id="flex-container">
+
+        <aside id="container-izquierda">
+            <figure>
+                <img id="left-background-img" src="img/sebastien-goldberg-vgGjc_jHyfU-unsplash.jpg"
+                    alt="A beautiful mountain landscape from Norway" title="Mountain from Norway">
+
+                <div id="odin-img">
+                    <img src="img/odin-lined.png" alt="Odin Project basic logo" title="TOP logo">
+                </div>
+
+                <figcaption>Photo by Sebastien Goldberg on <a
+                        href="https://unsplash.com/es/fotos/foto-de-paisaje-montanoso-y-oceanico-vgGjc_jHyfU"
+                        target="_blank" rel="noopener noreferrer">Unsplash</a></figcaption>
+            </figure>
+        </aside>
+
+        <main id="container-derecha">
+            <header id="intro">
+                <p>
+                    This is not a real online service! You know you need something like this in your real life to help you realize your deepest dreams. <br> Sign up now to get started.
+                </p>
+                <p>
+                    You <em>know</em> you want to.
+                </p>
+            </header>
+
+            <section id="form-section">
+                <form id="signup-form" action="" method="post">
+                    <h1>Let's do this!</h1>
+
+                    <div>
+                        <label for="first-name">FIRST NAME</label>
+                        <input type="text" name="firstName" id="first-name" minlength="10" maxlength="50" required>
+
+                        <label for="last-name">LAST NAME</label>
+                        <input type="text" name="lastName" id="last-name">
+                    </div>
+
+                    <div>
+                        <label for="email">EMAIL</label>
+                        <input type="email" name="email" id="email">
+
+                        <label for="phone-number">PHONE NUMBER</label>
+                        <input type="tel" name="phoneNumber" id="phone-number">
+                    </div>
+
+                    <div>
+                        <label for="password">PASSWORD</label>
+                        <input type="password" name="password" id="password">
+
+                        <label for="confirm-password">CONFIRM PASSWORD</label>
+                        <input type="password" name="confirmPassword" id="confirm-password">
+                    </div>
+                </form>
+            </section>
+
+            <div id="account-login">
+                <button type="submit" form="signup-form">Create Account</button>
+                <p>Already have an account? <a href="#">Log in</a></p>
+            </div>
+        </main>
+
+    </div>
+</body>
+
+</html>
