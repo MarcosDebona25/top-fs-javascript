@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <aside id="sidebar">
+        <h1>Dashboard</h1>
+
+        <nav aria-label="Main navigation">
+            <ul>
+                <li>
+                    <img src="img/home.svg" alt="">
+                    <a href="#">Home</a>
+                </li>
+                <li>
+                    <img src="img/profile.svg" alt="">
+                    <a href="#">Profile</a>
+                </li>
+                <li>
+                    <img src="img/messages.svg" alt="">
+                    <a href="#">Messages</a>
+                </li>
+                <li>
+                    <img src="img/history.svg" alt="">
+                    <a href="#">History</a>
+                </li>
+                <li>
+                    <img src="img/tasks.svg" alt="">
+                    <a href="#">Tasks</a>
+                </li>
+                <li>
+                    <img src="img/communities.svg" alt="">
+                    <a href="#">Communities</a>
+                </li>
+            </ul>
+        </nav>
+
+        <nav aria-label="Settings navigation">
+            <ul>
+                <li>
+                    <img src="img/config.svg" alt="">
+                    <a href="#">Settings</a>
+                </li>
+                <li>
+                    <img src="img/support.svg" alt="">
+                    <a href="#">Support</a>
+                </li>
+                <li>
+                    <img src="img/privacy.svg" alt="">
+                    <a href="#">Privacy</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div id="content-wrapper">
+
+        <header>
+            <div id="search-bar">
+                <button type="button" aria-label="Search"><img src="img/search.svg" alt=""></button>
+                <input type="search" id="search-input" name="search" placeholder="Search projects, users, tasks…">
+            </div>
+
+            <div id="user-bar">
+                <div id="profile-info">
+                    <img src="img/face-man.svg" alt="John Doe's profile picture" title="John Doe">
+                    <p>Hi there, John Doe <span>(@johndoe)</span></p>
+                </div>
+                <div id="user-actions">
+                    <button type="button" class="btn-action">New</button>
+                    <button type="button" class="btn-action">Upload</button>
+                    <button type="button" class="btn-action">Share</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <section id="projects-section">
+                <h2>Your Projects</h2>
+
+                <div id="cards">
+
+                    <article class="card">
+                        <header>
+                            <h3>E-commerce Platform Redesign</h3>
+                        </header>
+                        <p>Complete overhaul of the storefront UI with a focus on mobile-first design, improved
+                            checkout flow, and A/B tested product pages. Target delivery: Q3 2026.</p>
+                        <footer class="card-actions">
+                            <button type="button" aria-label="Star project">&#9733; Star</button>
+                            <button type="button" aria-label="Watch project">&#128065; Watch</button>
+                            <button type="button" aria-label="Fork project">&#128296; Fork</button>
+                        </footer>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h3>Mobile App v2.0</h3>
+                        </header>
+                        <p>Second major release of the cross-platform mobile app. Includes push notifications,
+                            offline mode, and a redesigned dashboard widget for iOS and Android.</p>
+                        <footer class="card-actions">
+                            <button type="button" aria-label="Star project">&#9733; Star</button>
+                            <button type="button" aria-label="Watch project">&#128065; Watch</button>
+                            <button type="button" aria-label="Fork project">&#128296; Fork</button>
+                        </footer>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h3>Data Analytics Dashboard</h3>
+                        </header>
+                        <p>Real-time reporting panel integrating sales, traffic, and support metrics. Built on
+                            Chart.js with exportable CSV/PDF reports and role-based access control.</p>
+                        <footer class="card-actions">
+                            <button type="button" aria-label="Star project">&#9733; Star</button>
+                            <button type="button" aria-label="Watch project">&#128065; Watch</button>
+                            <button type="button" aria-label="Fork project">&#128296; Fork</button>
+                        </footer>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h3>Customer Support Portal</h3>
+                        </header>
+                        <p>Unified ticketing system with live chat, knowledge base, and SLA tracking. Reduces
+                            average response time by 40% through automated routing and canned responses.</p>
+                        <footer class="card-actions">
+                            <button type="button" aria-label="Star project">&#9733; Star</button>
+                            <button type="button" aria-label="Watch project">&#128065; Watch</button>
+                            <button type="button" aria-label="Fork project">&#128296; Fork</button>
+                        </footer>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h3>API Gateway Migration</h3>
+                        </header>
+                        <p>Moving all microservices behind a centralised API gateway with rate limiting, JWT
+                            authentication, and traffic monitoring. Zero-downtime migration plan in progress.</p>
+                        <footer class="card-actions">
+                            <button type="button" aria-label="Star project">&#9733; Star</button>
+                            <button type="button" aria-label="Watch project">&#128065; Watch</button>
+                            <button type="button" aria-label="Fork project">&#128296; Fork</button>
+                        </footer>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h3>Marketing Automation Tool</h3>
+                        </header>
+                        <p>Drag-and-drop campaign builder with email, SMS, and social scheduling. Features
+                            audience segmentation, conversion tracking, and integration with major CRM platforms.</p>
+                        <footer class="card-actions">
+                            <button type="button" aria-label="Star project">&#9733; Star</button>
+                            <button type="button" aria-label="Watch project">&#128065; Watch</button>
+                            <button type="button" aria-label="Fork project">&#128296; Fork</button>
+                        </footer>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h3>CI/CD Pipeline Overhaul</h3>
+                        </header>
+                        <p>Replacing legacy Jenkins setup with GitHub Actions and ArgoCD. Reduces average
+                            build time from 18 min to under 4 min and enables per-PR environment deployments.</p>
+                        <footer class="card-actions">
+                            <button type="button" aria-label="Star project">&#9733; Star</button>
+                            <button type="button" aria-label="Watch project">&#128065; Watch</button>
+                            <button type="button" aria-label="Fork project">&#128296; Fork</button>
+                        </footer>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h3>Inventory Management System</h3>
+                        </header>
+                        <p>Real-time stock tracking across 12 warehouses with barcode scanning, automatic
+                            reorder alerts, and supplier integration via REST API. Built with React and Node.js.</p>
+                        <footer class="card-actions">
+                            <button type="button" aria-label="Star project">&#9733; Star</button>
+                            <button type="button" aria-label="Watch project">&#128065; Watch</button>
+                            <button type="button" aria-label="Fork project">&#128296; Fork</button>
+                        </footer>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h3>User Onboarding Redesign</h3>
+                        </header>
+                        <p>Step-by-step interactive onboarding flow for new users. Includes progress tracking,
+                            contextual tooltips, and a personalised checklist. Targets a 30% drop in churn.</p>
+                        <footer class="card-actions">
+                            <button type="button" aria-label="Star project">&#9733; Star</button>
+                            <button type="button" aria-label="Watch project">&#128065; Watch</button>
+                            <button type="button" aria-label="Fork project">&#128296; Fork</button>
+                        </footer>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h3>Payment Gateway Integration</h3>
+                        </header>
+                        <p>Adding Stripe and PayPal support alongside the existing processor. Implements
+                            3D-Secure, webhook reconciliation, and a unified transaction dashboard for finance.</p>
+                        <footer class="card-actions">
+                            <button type="button" aria-label="Star project">&#9733; Star</button>
+                            <button type="button" aria-label="Watch project">&#128065; Watch</button>
+                            <button type="button" aria-label="Fork project">&#128296; Fork</button>
+                        </footer>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h3>Accessibility Audit &amp; Fixes</h3>
+                        </header>
+                        <p>Full WCAG 2.1 AA compliance pass across all public-facing pages. Covers keyboard
+                            navigation, ARIA labelling, colour contrast, and screen-reader testing on iOS and Android.</p>
+                        <footer class="card-actions">
+                            <button type="button" aria-label="Star project">&#9733; Star</button>
+                            <button type="button" aria-label="Watch project">&#128065; Watch</button>
+                            <button type="button" aria-label="Fork project">&#128296; Fork</button>
+                        </footer>
+                    </article>
+
+                </div>
+            </section>
+
+        </main>
+
+        <aside id="right-panel">
+
+            <section id="announcements">
+                <h2>Announcements</h2>
+
+                <article>
+                    <h3>Scheduled Maintenance – March 10</h3>
+                    <p>The platform will be offline for approximately 2 hours on March 10 from 02:00 to 04:00 UTC
+                        for infrastructure upgrades. Plan accordingly.</p>
+                </article>
+                <hr>
+                <article>
+                    <h3>New Feature: Real-Time Collaboration</h3>
+                    <p>Co-editing is now available on all project cards. Multiple team members can comment and
+                        update tasks simultaneously. Enable it in Project Settings.</p>
+                </article>
+                <hr>
+                <article>
+                    <h3>Updated Security Policy</h3>
+                    <p>Two-factor authentication will be mandatory for all admin accounts starting April 1.
+                        Review the updated policy in the Privacy section and set up your authenticator app.</p>
+                </article>
+            </section>
+
+            <section id="trending">
+                <h2>Trending</h2>
+
+                <div class="trending-item">
+                    <div>
+                        <img src="img/face-man.svg" alt="Alex Smith's profile picture" title="Alex Smith">
+                        <p><strong>@alexsmith</strong></p>
+                    </div>
+                    <p>Launched the mobile app beta — 500 sign-ups in 24 h</p>
+                </div>
+
+                <div class="trending-item">
+                    <div>
+                        <img src="img/face-woman.svg" alt="Sara Jones's profile picture" title="Sara Jones">
+                        <p><strong>@sara_jones</strong></p>
+                    </div>
+                    <p>Top contributor this month — 38 commits merged</p>
+                </div>
+
+                <div class="trending-item">
+                    <div>
+                        <img src="img/face-man.svg" alt="Mike Dev's profile picture" title="Mike Dev">
+                        <p><strong>@dev_mike</strong></p>
+                    </div>
+                    <p>Closed 15 critical bug reports in the support portal</p>
+                </div>
+
+                <div class="trending-item">
+                    <div>
+                        <img src="img/face-woman.svg" alt="Laura Tech's profile picture" title="Laura Tech">
+                        <p><strong>@laura_tech</strong></p>
+                    </div>
+                    <p>Published the new API Gateway docs — 200+ views today</p>
+                </div>
+
+            </section>
+
+        </aside>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 - Marcos Debona. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>
