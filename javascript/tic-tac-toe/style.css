@@ -1,0 +1,216 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: #f4f6f8;
+    color: #1f2933;
+    height: 100%;
+}
+
+body {
+    max-width: 700px;
+    margin: auto;
+    padding: 1.5rem 1rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+header h1 {
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+#users-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#container {
+    width: min(100%, 420px);
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    padding: 0.4rem;
+    background: #dfe5ec;
+    border-radius: 8px;
+}
+
+.cell {
+    width: 100%;
+    aspect-ratio: 1/1;
+    font-size: 2.4rem;
+    font-weight: 600;
+    position: relative;
+    background: white;
+    color: #1f2933;
+    border: 1px solid #cfd6df;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.cell:hover:not(:disabled) {
+    background: #d9dee5;
+    border-color: #b7c0cb;
+}
+
+body.turn-x .cell:enabled:hover::after,
+body.turn-o .cell:enabled:hover::after {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 2.2rem;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+body.turn-x .cell:enabled:hover::after {
+    content: "X";
+    color: rgba(26, 127, 55, 0.35);
+    text-shadow: 0 0 6px rgba(26, 127, 55, 0.28);
+}
+
+body.turn-o .cell:enabled:hover::after {
+    content: "O";
+    color: rgba(37, 99, 235, 0.35);
+    text-shadow: 0 0 6px rgba(37, 99, 235, 0.28);
+}
+
+.cell:disabled {
+    background: #f7f9fb;
+    cursor: default;
+}
+
+.cell.x-mark {
+    color: #166534;
+}
+
+.cell.o-mark {
+    color: #1d4ed8;
+}
+
+#game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.7rem 0.9rem;
+}
+
+#info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+#info h2 {
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+}
+
+#game-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+button {
+    font-size: 0.9rem;
+    padding: 0.45rem 0.8rem;
+    border-radius: 5px;
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #c4c4c4;
+}
+
+dialog {
+    border: none;
+    border-radius: 8px;
+    padding: 1.3rem 1.4rem;
+    background: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+#players-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 260px;
+}
+
+#players-form h2 {
+    text-align: center;
+    margin-bottom: 0.4rem;
+}
+
+#players-form input {
+    padding: 0.35rem 0.4rem;
+    border-radius: 4px;
+    border: 1px solid #ccd2da;
+}
+
+#players-form button {
+    margin-top: 0.5rem;
+}
+
+#turn-info {
+    font-size: 0.9rem;
+}
+
+#turn-info.winner-x {
+    color: #1a7f37;
+    font-weight: 600;
+}
+
+#turn-info.winner-o {
+    color: #2563eb;
+    font-weight: 600;
+}
+
+#turn-info.draw {
+    color: #b45309;
+    font-weight: 600;
+}
+
+footer {
+    margin-top: auto;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #6b7280;
+    padding-top: 1rem;
+}

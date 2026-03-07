@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic tac toe</title>
+
+    <link rel="stylesheet" href="style.css" src="text/css">
+    <script src="code.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <h1>Tic tac toe</h1>
+    </header>
+
+    <dialog id="players-dialog">
+        <form id="players-form" method="dialog">
+            <h2>Players</h2>
+
+            <label for="player-x">Player X</label>
+            <input id="player-x" name="playerX" type="text" minlength="3" maxlength="20" required>
+
+            <label for="player-o">Player O</label>
+            <input id="player-o" name="playerO" type="text" minlength="3" maxlength="20" required>
+
+            <button type="submit">Start game</button>
+        </form>
+    </dialog>
+
+    <div id="users-info">
+        <p id="player-x-label">Player X: -</p>
+        <p id="player-o-label">Player O: -</p>
+    </div>
+
+    <main>
+        <div id="container">
+            <div class="game">
+                <button id="0" class="cell" type="button"></button>
+            </div>
+            <div class="game">
+                <button id="1" class="cell" type="button"></button>
+            </div>
+            <div class="game">
+                <button id="2" class="cell" type="button"></button>
+            </div>
+            <div class="game">
+                <button id="3" class="cell" type="button"></button>
+            </div>
+            <div class="game">
+                <button id="4" class="cell" type="button"></button>
+            </div>
+            <div class="game">
+                <button id="5" class="cell" type="button"></button>
+            </div>
+            <div class="game">
+                <button id="6" class="cell" type="button"></button>
+            </div>
+            <div class="game">
+                <button id="7" class="cell" type="button"></button>
+            </div>
+            <div class="game">
+                <button id="8" class="cell" type="button"></button>
+            </div>
+        </div>
+
+        <div id="game-info">
+            <div id="info">
+                <h2>Score</h2>
+                <p id="score-x">Player X: 0</p>
+                <p id="score-o">Player O: 0</p>
+                <p id="turn-info">Turn: X</p>
+            </div>
+
+            <div id="game-actions">
+                <button id="reset-game" type="button">Reset game</button>
+                <button id="reset-all" type="button">Reset all</button>
+            </div>
+        </div>
+    </main>
+    <footer>Made by Marcos Debona. All rights reserved</footer>
+</body>
+
+</html>
