@@ -1,0 +1,2 @@
+node_modules
+# dist --> para seguir teniendo todos los demás proyectos en el mismo repositorio (no cambiar la rama)
