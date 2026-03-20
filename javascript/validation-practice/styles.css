@@ -1,0 +1,34 @@
+body {
+    font-family: sans-serif;
+    padding: 20px;
+}
+
+div {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input {
+    padding: 5px;
+}
+
+input:user-invalid {
+    border: 2px solid red;
+    background-color: #ffdddd;
+}
+
+input:focus:user-invalid {
+    outline: none;
+    border-color: darkred;
+}
+
+.error-msg {
+    display: block;
+    color: red;
+    font-size: 0.85em;
+    margin-top: 5px;
+}
