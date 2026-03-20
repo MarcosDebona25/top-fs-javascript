@@ -150,7 +150,7 @@ document.getElementById('container').addEventListener('click', (e) => {
     if (e.target.classList.contains('btn-delete')) deleteBook(id);
 });
 
-// New feature (Form Validation with JavaScript)
+// New feature (Form Validation with JavaScript 20-03-26)
 const titleInput = document.getElementById('title');
 const authorInput = document.getElementById('author');
 
