@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List App</title>
+
+    <script type="module" src="code.js" defer></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>Todo List</h1>
+    </header>
+
+    <div id="app-container">
+        <nav id="sidebar">
+            <h2>Projects</h2>
+            <ul id="projects-list"></ul>
+        </nav>
+
+        <main>
+            <h2 id="current-project-title">Project Title</h2>
+            <ul id="todo-list"></ul>
+            <button id="add-todo-btn">Add todo</button>
+        </main>
+    </div>
+
+    <dialog id="todo-modal">
+        <form id="todo-form">
+            <h3>New Todo</h3>
+            <input type="text" id="todo-title" placeholder="Title" required>
+            <input type="text" id="todo-desc" placeholder="Description">
+            <input type="date" id="todo-date" required>
+            <div class="modal-actions">
+                <button type="button" id="close-modal-btn">Cancel</button>
+                <button type="submit">Save</button>
+            </div>
+        </form>
+    </dialog>
+
+    <footer>
+        <p>Created by <a href="https://github.com/MarcosDebona25" target="_blank">MarcosDebona25</a>
+        </p>
+    </footer>
+</body>
+
+</html>
