@@ -130,12 +130,13 @@ modal.addEventListener('click', (e) => {
 
 bookForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const title = document.getElementById('title').value.trim();
-    const author = document.getElementById('author').value.trim();
-    const pages = parseInt(document.getElementById('pages').value);
-    const read = document.getElementById('read').checked;
 
-    addBookToLibrary(title, author, pages, read);
+    const titleValue = document.getElementById('title').value.trim();
+    const authorValue = document.getElementById('author').value.trim();
+    const pagesValue = parseInt(document.getElementById('pages').value);
+    const readValue = document.getElementById('read').checked;
+
+    addBookToLibrary(titleValue, authorValue, pagesValue, readValue);
     displayBooks();
     updateStats();
     modal.close();
@@ -147,4 +148,20 @@ document.getElementById('container').addEventListener('click', (e) => {
     if (!id) return;
     if (e.target.classList.contains('btn-read')) toggleRead(id);
     if (e.target.classList.contains('btn-delete')) deleteBook(id);
+});
+
+// New feature (Form Validation with JavaScript 20-03-26)
+const titleInput = document.getElementById('title');
+const authorInput = document.getElementById('author');
+
+titleInput.addEventListener('invalid', () => {
+    if (titleInput.value.trim().length === 0) {
+        titleInput.setCustomValidity("Title field is empty. Write something on it!");
+    } else titleInput.setCustomValidity("");
+});
+
+authorInput.addEventListener('invalid', () => {
+    if (authorInput.value.trim().length === 0) {
+        authorInput.setCustomValidity("Author field is empty. Write something on it!");
+    } else authorInput.setCustomValidity("");
 });
