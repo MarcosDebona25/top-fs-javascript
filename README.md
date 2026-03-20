@@ -8,4 +8,4 @@ Repositorio con los proyectos del módulo Full Stack Javascript de [The Odin Pro
 3. [Book Library](https://marcosdebona25.github.io/top-fs-javascript/javascript/library)
 4. [Tic tac toe](https://marcosdebona25.github.io/top-fs-javascript/javascript/tic-tac-toe)
 5. [Restaurant Page](https://marcosdebona25.github.io/top-fs-javascript/javascript/restaurant-page/dist/)
-6. [To Do list](https://marcosdebona25.github.io/top-fs-javascript/javascript/todo-list)
+6. [Todo List](https://marcosdebona25.github.io/top-fs-javascript/javascript/todo-list)
