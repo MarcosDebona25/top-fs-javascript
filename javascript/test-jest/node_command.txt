@@ -1,0 +1,162 @@
+================================================================
+  JEST — SETUP, COMANDOS Y CONSIDERACIONES
+================================================================
+
+────────────────────────────────────────────────────────────────
+ 1. INSTALACIÓN DE JEST
+────────────────────────────────────────────────────────────────
+
+  npm install --save-dev jest
+
+  → Se instala como dependencia de desarrollo (devDependencies).
+  → Jest busca archivos con patrón: *.test.js o *.spec.js
+
+
+────────────────────────────────────────────────────────────────
+ 2. CONFIGURAR SCRIPT EN package.json
+────────────────────────────────────────────────────────────────
+
+  Agregar al package.json:
+
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watchAll"
+  }
+
+  → npm test           : ejecuta todos los tests una vez.
+  → npm run test:watch : ejecuta los tests y queda observando
+                         cambios. Al guardar un archivo, se
+                         re-ejecutan automáticamente.
+
+  NOTA sobre --watch vs --watchAll:
+    --watch    : solo re-ejecuta tests de archivos modificados
+                 desde el último commit de Git. Requiere Git.
+    --watchAll : re-ejecuta TODOS los tests ante cualquier cambio.
+                 No requiere Git.
+
+
+────────────────────────────────────────────────────────────────
+ 3. USAR import/export (ESM) CON JEST
+────────────────────────────────────────────────────────────────
+
+  Por defecto Jest usa CommonJS (require/module.exports).
+  Para usar import/export (ES Modules) se necesita Babel:
+
+  a) Instalar Babel:
+
+     npm install --save-dev @babel/preset-env
+
+  b) Crear archivo babel.config.js en la raíz del proyecto:
+
+     export default {
+       presets: [["@babel/preset-env", { targets: { node: "current" } }]],
+     };
+
+  → Babel transpila el código ESM a CommonJS para que Jest
+    pueda entenderlo.
+
+
+────────────────────────────────────────────────────────────────
+ 4. SINTAXIS DE import / export
+────────────────────────────────────────────────────────────────
+
+  ── Export default (una exportación principal por archivo) ───
+
+  Archivo: sum.js
+    function sum(a, b) { return a + b; }
+    export default sum;
+
+  Archivo: sum.test.js
+    import sum from './sum';
+
+
+  ── Named exports (múltiples exportaciones por archivo) ─────
+
+  Archivo: math.js
+    export function sum(a, b) { return a + b; }
+    export function multiply(a, b) { return a * b; }
+
+  Archivo: math.test.js
+    import { sum, multiply } from './math';
+
+
+  ── Combinar default + named ────────────────────────────────
+
+  Archivo: utils.js
+    export default function main() { ... }
+    export function helper() { ... }
+
+  Archivo: utils.test.js
+    import main, { helper } from './utils';
+
+
+  ── CommonJS (sin Babel, la forma clásica de Node) ──────────
+
+  Archivo: sum.js
+    function sum(a, b) { return a + b; }
+    module.exports = sum;
+
+  Archivo: sum.test.js
+    const sum = require('./sum');
+
+
+────────────────────────────────────────────────────────────────
+ 5. CONVENCIONES DE ARCHIVOS
+────────────────────────────────────────────────────────────────
+
+  → Los archivos de test deben llamarse:
+      archivo.test.js   o   archivo.spec.js
+
+  → Jest los detecta automáticamente por el patrón.
+
+  → Estructura recomendada:
+      proyecto/
+      ├── sum.js            ← código fuente
+      ├── sum.test.js       ← tests
+      ├── package.json
+      ├── babel.config.js   ← solo si se usa import/export
+      └── node_modules/
+
+
+────────────────────────────────────────────────────────────────
+ 6. RESUMEN DE MATCHERS (referencia rápida)
+────────────────────────────────────────────────────────────────
+
+  IGUALDAD:
+    .toBe(valor)              → igualdad exacta (Object.is)
+    .toEqual(valor)           → igualdad profunda (objetos)
+    .toStrictEqual(valor)     → igual que toEqual pero estricto
+
+  TRUTHINESS:
+    .toBeNull()               → es null
+    .toBeUndefined()          → es undefined
+    .toBeDefined()            → NO es undefined
+    .toBeTruthy()             → es truthy
+    .toBeFalsy()              → es falsy
+
+  NÚMEROS:
+    .toBeGreaterThan(n)       → mayor que n
+    .toBeGreaterThanOrEqual(n)→ mayor o igual que n
+    .toBeLessThan(n)          → menor que n
+    .toBeLessThanOrEqual(n)   → menor o igual que n
+    .toBeCloseTo(n)           → cercano a n (para floats)
+
+  STRINGS:
+    .toMatch(/regex/)         → coincide con regex
+
+  ARRAYS / ITERABLES:
+    .toContain(item)          → contiene el item
+
+  EXCEPCIONES:
+    .toThrow()                → lanza cualquier error
+    .toThrow(Error)           → lanza un Error específico
+    .toThrow('msg')           → mensaje contiene 'msg'
+    .toThrow(/regex/)         → mensaje coincide con regex
+
+  MODIFICADOR:
+    .not.matcher()            → invierte cualquier matcher
+
+
+================================================================
+  Para ver los ejemplos de cada matcher → sum.test.js
+================================================================
