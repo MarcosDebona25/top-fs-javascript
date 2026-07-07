@@ -1,10 +1,3 @@
-// ============================================================
-//  JEST — GUÍA RÁPIDA DE MATCHERS
-//  Archivo: sum.test.js
-//  Cada test demuestra un matcher o concepto de Jest.
-//  Para setup, comandos y consideraciones → ver node_command.txt
-// ============================================================
-
 import sum from './sum';
 
 // ────────────────────────────────────────────────────────────
@@ -14,7 +7,7 @@ import sum from './sum';
 
 test('toBe — compara primitivos con igualdad exacta', () => {
     expect(sum(1, 2)).toBe(3);
-    expect(2 + 2).toBe(4);
+    expect(sum(2, 2)).toBe(4);
 });
 
 // ────────────────────────────────────────────────────────────
@@ -86,8 +79,8 @@ test('comparaciones numéricas — greater, less, equal', () => {
 
 test('toBeCloseTo — para floats (evita errores de redondeo)', () => {
     const value = 0.1 + 0.2;
-    // expect(value).toBe(0.3);        // ❌ Falla por error de redondeo
-    expect(value).toBeCloseTo(0.3);    // ✅ Funciona correctamente
+    // expect(value).toBe(0.3);        // Falla por error de redondeo
+    expect(value).toBeCloseTo(0.3);    // Funciona correctamente
 });
 
 // ────────────────────────────────────────────────────────────
