@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Visualise the shortest path a knight can take across a chessboard using BFS." />
+  <title>Knight's Travails</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h1>♞ Knight's Travails</h1>
+  <p id="instruction">Select the starting square</p>
+
+  <div class="board-wrapper">
+    <div id="board"></div>
+  </div>
+
+  <div class="controls">
+    <button id="reset-btn">Reset</button>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch start"></span> Start</div>
+    <div class="legend-item"><span class="legend-swatch end"></span> End</div>
+    <div class="legend-item"><span class="legend-swatch path"></span> Path</div>
+  </div>
+
+  <script src="knight.js"></script>
+</body>
+</html>
