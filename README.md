@@ -10,4 +10,4 @@ Repositorio con los proyectos del módulo Full Stack Javascript de [The Odin Pro
 5. [Restaurant Page](https://marcosdebona25.github.io/top-fs-javascript/javascript/restaurant-page/dist/)
 6. [Todo List](https://marcosdebona25.github.io/top-fs-javascript/javascript/todo-list)
 7. [Weather App](https://marcosdebona25.github.io/top-fs-javascript/javascript/weather-app)
-8. [Knights Travails](https://marcosdebona25.github.io/top-fs-javascript/javascript/weather-app)
+8. [Knights Travails](https://marcosdebona25.github.io/top-fs-javascript/javascript/knights-travails)
