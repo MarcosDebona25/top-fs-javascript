@@ -8,12 +8,10 @@ class Node {
 
 class Tree {
   constructor(array) {
-    // Sort and remove duplicates before building
     const sorted = [...new Set(array)].sort((a, b) => a - b);
     this.root = this.#buildTree(sorted);
   }
 
-  // Takes a sorted, deduplicated array and returns the root of a balanced BST
   #buildTree(array) {
     if (array.length === 0) return null;
 
@@ -26,7 +24,6 @@ class Tree {
     return node;
   }
 
-  // Returns true if value exists in the tree, false otherwise
   includes(value) {
     let current = this.root;
 
@@ -42,7 +39,6 @@ class Tree {
     return false;
   }
 
-  // Inserts a new node preserving BST property. Does nothing if value already exists.
   insert(value) {
     if (this.root === null) {
       this.root = new Node(value);
@@ -71,7 +67,6 @@ class Tree {
     }
   }
 
-  // Removes the node with the given value. Handles leaf, one-child, and two-children cases.
   deleteItem(value) {
     this.root = this.#deleteNode(this.root, value);
   }
@@ -102,7 +97,6 @@ class Tree {
     return node;
   }
 
-  // Returns the node with the smallest value in the given subtree
   #findMin(node) {
     let current = node;
     while (current.left !== null) {
@@ -181,8 +175,6 @@ class Tree {
     callback(node.data);
   }
 
-  // Returns the height (edges to deepest leaf) of the node containing value.
-  // Returns undefined if value is not found.
   height(value) {
     const node = this.#findNode(this.root, value);
     if (node === null) return undefined;
@@ -198,7 +190,6 @@ class Tree {
     return this.#findNode(node.right, value);
   }
 
-  // Computes the height of a given node (number of edges to deepest leaf)
   #nodeHeight(node) {
     if (node === null) return -1;
 
@@ -208,8 +199,6 @@ class Tree {
     return 1 + Math.max(leftHeight, rightHeight);
   }
 
-  // Returns the depth (edges from root to node) of the node containing value.
-  // Returns undefined if value is not found.
   depth(value) {
     let current = this.root;
     let edges = 0;
@@ -228,12 +217,10 @@ class Tree {
     return undefined;
   }
 
-  // Returns true if the tree is balanced (every node's subtree heights differ by at most 1)
   isBalanced() {
     return this.#checkBalance(this.root) !== -1;
   }
 
-  // Returns the height of node if balanced, or -1 if any subtree is unbalanced
   #checkBalance(node) {
     if (node === null) return 0;
 
@@ -255,7 +242,6 @@ class Tree {
     this.root = this.#buildTree(values);
   }
 
-  // Visual console output of the tree structure
   prettyPrint(node = this.root, prefix = '', isLeft = true) {
     if (node === null || node === undefined) return;
 
@@ -265,7 +251,7 @@ class Tree {
   }
 }
 
-// ─────────────────────── Driver Script ───────────────────────
+// ================= Driver Script =================
 
 function randomArray(size) {
   return Array.from({ length: size }, () => Math.floor(Math.random() * 100));
@@ -284,40 +270,24 @@ function printAllOrders(tree) {
   console.log('Post order: ', collectTraversal(tree, 'postOrderForEach').join(', '));
 }
 
-// 1. Create a BST from random numbers < 100
 const data = randomArray(15);
 console.log('Input array:', data.join(', '));
 const tree = new Tree(data);
 
 console.log('\n── Initial tree ──');
 tree.prettyPrint();
-
-// 2. Confirm balanced
-console.log('\nIs balanced:', tree.isBalanced()); // true
-
-// 3. Print all traversal orders
+console.log('\nIs balanced:', tree.isBalanced());
 console.log('');
 printAllOrders(tree);
 
-// 4. Unbalance the tree by inserting numbers > 100
 const bigNumbers = [150, 200, 250, 300, 350, 400];
 bigNumbers.forEach((n) => tree.insert(n));
-
 console.log('\n── After inserting', bigNumbers.join(', '), '──');
 tree.prettyPrint();
-
-// 5. Confirm unbalanced
 console.log('\nIs balanced:', tree.isBalanced()); // false
-
-// 6. Rebalance
 tree.rebalance();
-
 console.log('\n── After rebalance ──');
 tree.prettyPrint();
-
-// 7. Confirm balanced again
 console.log('\nIs balanced:', tree.isBalanced()); // true
-
-// 8. Print all traversal orders again
 console.log('');
 printAllOrders(tree);
