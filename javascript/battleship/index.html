@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BATTLESHIP</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%230d3b66'/%3E%3Cpath d='M12 36 L52 36 L48 22 L16 22 Z' fill='%23fafafa'/%3E%3Crect x='20' y='14' width='4' height='10' fill='%23fafafa'/%3E%3Crect x='28' y='14' width='4' height='10' fill='%23fafafa'/%3E%3Crect x='36' y='14' width='4' height='10' fill='%23fafafa'/%3E%3Crect x='20' y='44' width='24' height='6' rx='1' fill='%234a6fa5'/%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@500;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <img class="header__logo" src="imgs/battleship_banner.png" alt="Battleship" width="180" height="180" />
+  </header>
+
+  <main class="main">
+    <section class="game" aria-label="Juego de Batalla Naval">
+
+      <div id="phase-banner" class="phase-banner" aria-live="polite"></div>
+
+      <!-- 4-column layout -->
+      <div class="boards-row">
+
+        <!-- LEFT: human dock + legend -->
+        <aside class="board-sidebar board-sidebar--left">
+          <div id="ship-dock" class="ship-dock" hidden>
+            <span class="ship-dock__label">Arrastra al tablero</span>
+            <button id="btn-rotate" class="btn btn--tiny" type="button">Girar (H)</button>
+            <div class="ship-dock__items"></div>
+          </div>
+          <div class="legend" id="human-legend" aria-label="Tu flota"></div>
+        </aside>
+
+        <!-- Human board -->
+        <div class="board-col">
+          <h2 class="board-col__title">Tu Flota</h2>
+          <div class="board" id="human-board" role="grid" aria-label="Tablero propio"></div>
+        </div>
+
+        <!-- Computer board -->
+        <div class="board-col">
+          <h2 class="board-col__title">Flota Enemiga</h2>
+          <div class="board-container">
+            <div class="board" id="computer-board" role="grid" aria-label="Tablero enemigo"></div>
+            <div id="computer-overlay" class="board-overlay" hidden>
+              <span>Coloca tu flota para comenzar</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: computer legend -->
+        <aside class="board-sidebar board-sidebar--right">
+          <div class="legend" id="computer-legend" aria-label="Flota enemiga"></div>
+        </aside>
+
+      </div>
+
+      <p id="placement-msg" class="placement-msg" hidden>
+        Coloca los 5 barcos. Arrastra desde la izquierda, usa <strong>Aleatorio</strong> o clic en un barco para quitarlo.
+      </p>
+
+      <div class="controls">
+        <button id="btn-randomize" class="btn btn--primary" type="button">Aleatorio</button>
+        <button id="btn-start" class="btn btn--accent" type="button" disabled>Iniciar Combate</button>
+        <button id="btn-restart" class="btn btn--secondary" type="button">Nueva Partida</button>
+      </div>
+
+      <div id="message" class="message message--info" role="status" aria-live="assertive"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a class="footer__link" href="https://github.com/MarcosDebona25" target="_blank" rel="noopener noreferrer">
+      <svg class="footer__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+      </svg>
+      Marcos Debona — GitHub
+    </a>
+  </footer>
+
+  <script src="src/Ship.js"></script>
+  <script src="src/Gameboard.js"></script>
+  <script src="src/Player.js"></script>
+  <script src="src/shipPlacement.js"></script>
+  <script src="src/gameController.js"></script>
+  <script src="src/domController.js"></script>
+  <script src="src/index.js"></script>
+</body>
+</html>
