@@ -1,10 +1,6 @@
 # TOP FS JavaScript
 Repositorio con los proyectos del módulo Full Stack Javascript de [The Odin Project](https://www.theodinproject.com/paths/full-stack-javascript). 
 
-## Portfolio
-
-[Portfolio Homepage](https://marcosdebona25.github.io/top-fs-javascript/advanced-html-css/homepage/)
-
 ## Proyectos
 
 1. [Sign-up Form](https://marcosdebona25.github.io/top-fs-javascript/intermediate-html-css/form/sign-up/)
@@ -16,3 +12,4 @@ Repositorio con los proyectos del módulo Full Stack Javascript de [The Odin Pro
 7. [Weather App](https://marcosdebona25.github.io/top-fs-javascript/javascript/weather-app)
 8. [Knights Travails](https://marcosdebona25.github.io/top-fs-javascript/javascript/knights-travails)
 9. [Battleship](https://marcosdebona25.github.io/top-fs-javascript/javascript/battleship)
+10. [Portfolio Homepage](https://marcosdebona25.github.io/top-fs-javascript/advanced-html-css/homepage/)
