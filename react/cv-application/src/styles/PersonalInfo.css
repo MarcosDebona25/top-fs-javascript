@@ -1,0 +1,85 @@
+.personal-info {
+  padding: 24px;
+  margin-bottom: 24px;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.personal-info h2 {
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.personal-info form {
+  display: flex;
+  flex-direction: column;
+}
+
+.personal-info form label,
+.personal-info .tag-input {
+  margin-top: 16px;
+}
+
+.personal-info form label:first-child {
+  margin-top: 0;
+}
+
+.personal-info .tag-input label {
+  margin-top: 0;
+}
+
+.personal-info p {
+  margin: 0 0 8px;
+}
+
+.personal-info h3 {
+  margin: 16px 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.empty-note {
+  color: #6b7280;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background-color: #eff6ff;
+  color: #2563eb;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.tag-remove {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #2563eb;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.tag-remove:hover {
+  transform: scale(1.2);
+}
+
+.tag-input input {
+  margin-top: 4px;
+}

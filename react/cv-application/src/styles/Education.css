@@ -1,0 +1,46 @@
+.education {
+  padding: 24px;
+  margin-bottom: 24px;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.education h2 {
+  margin: 0 0 8px;
+  padding-bottom: 12px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.education-item {
+  padding: 20px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.education-item:first-of-type {
+  border-top: none;
+}
+
+.education-item p {
+  margin: 8px 0 0;
+}
+
+.education-item form {
+  display: flex;
+  flex-direction: column;
+}
+
+.education-item form label {
+  margin-top: 16px;
+}
+
+.education-item form label:first-child {
+  margin-top: 0;
+}
+
+.education > .btn {
+  margin-top: 8px;
+}
