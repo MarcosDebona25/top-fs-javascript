@@ -13,3 +13,4 @@ Repositorio con los proyectos del módulo Full Stack Javascript de [The Odin Pro
 8. [Knights Travails](https://marcosdebona25.github.io/top-fs-javascript/javascript/knights-travails)
 9. [Battleship](https://marcosdebona25.github.io/top-fs-javascript/javascript/battleship)
 10. [Portfolio Homepage](https://marcosdebona25.github.io/top-fs-javascript/advanced-html-css/homepage/)
+11. [CV Application](https://top-fs-javascript.vercel.app/)
