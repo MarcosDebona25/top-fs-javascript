@@ -1,19 +1,28 @@
 :root {
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   color-scheme: light;
 
-  --bg: #f4f4f5;
-  --card-bg: #ffffff;
-  --text: #18181b;
-  --muted: #71717a;
-  --border: #e4e4e7;
-  --accent: #e11d48;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.14);
+  --marvel-red: #ed1d24;
+  --marvel-red-dark: #c41118;
+  --marvel-blue: #2750a0;
+  --marvel-gold: #f2b90d;
+  --ink: #131318;
+  --paper: #f7f2e7;
+  --panel: #ffffff;
+  --muted: #6f6d78;
+
+  --font-display: 'Bangers', 'Impact', 'Arial Black', sans-serif;
+  --font-body: 'Comic Neue', 'Segoe UI', 'Comic Sans MS', sans-serif;
+
+  --shadow-comic: 4px 4px 0 rgba(19, 19, 24, 0.85);
+  --shadow-comic-sm: 2px 2px 0 rgba(19, 19, 24, 0.85);
 }
 
 * {
   box-sizing: border-box;
+}
+
+button {
+  touch-action: manipulation;
 }
 
 html,
@@ -24,8 +33,11 @@ body {
 
 body {
   min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
+  font-family: var(--font-body);
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image: radial-gradient(rgba(19, 19, 24, 0.08) 1.4px, transparent 1.4px);
+  background-size: 16px 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

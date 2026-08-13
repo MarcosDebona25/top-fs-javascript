@@ -1,18 +1,23 @@
 function Header({ score, bestScore, onReset }) {
   return (
     <header className="header">
-      <h1 className="title">Memory Card</h1>
+      <div className="masthead">
+        <img src="/marvel-logo.png" alt="Marvel" className="header-logo" />
+        <h1 className="header-subtitle">Memory Card</h1>
+      </div>
+
       <div className="header-actions">
         <div className="scores">
           <div className="score">
             <span className="score-label">Score</span>
             <span className="score-value">{score}</span>
           </div>
-          <div className="score">
+          <div className="score score--best">
             <span className="score-label">Best</span>
             <span className="score-value">{bestScore}</span>
           </div>
         </div>
+
         <button
           type="button"
           className="reset"

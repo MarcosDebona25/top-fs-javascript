@@ -4,6 +4,7 @@ import Header from './components/Header.jsx'
 import CardGrid from './components/CardGrid.jsx'
 import Overlay from './components/Overlay.jsx'
 import Footer from './components/Footer.jsx'
+import InfoButton from './components/InfoButton.jsx'
 import './App.css'
 
 function shuffle(array) {
@@ -66,16 +67,12 @@ function App() {
     <div className="app">
       <Header score={score} bestScore={bestScore} onReset={handleReset} />
 
-      <p className="instructions">
-        Click a card to score a point. Cards shuffle after every click. Don&apos;t
-        click the same card twice!
-      </p>
-
       <main className="board">
         <CardGrid cards={deck} onCardClick={handleCardClick} />
       </main>
 
       <Footer />
+      <InfoButton />
 
       {status !== 'playing' && (
         <Overlay
