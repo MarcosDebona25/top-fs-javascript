@@ -1,27 +1,26 @@
 import { useState, useEffect } from 'react';
 
-const Bio = ({ delay }) => {
-  const [bioText, setBioText] = useState(null);
+// const Bio = ({ delay }) => {
+//   const [bioText, setBioText] = useState(null);
 
-  useEffect(() => {
-    setTimeout(() => {
-      fetch('https://jsonplaceholder.typicode.com/photos', { mode: 'cors' })
-        .then((response) => response.json())
-        .then(() => setBioText('I like long walks on the beach and JavaScript'))
-        .catch((error) => console.error(error));
-    }, delay);
-  }, [delay]);
+//   useEffect(() => {
+//     setTimeout(() => {
+//       fetch('https://jsonplaceholder.typicode.com/photos', { mode: 'cors' })
+//         .then((response) => response.json())
+//         .then(() => setBioText('I like long walks on the beach and JavaScript'))
+//         .catch((error) => console.error(error));
+//     }, delay);
+//   }, [delay]);
 
-  return (
-    bioText && (
-      <>
-        <p>{bioText}</p>
-      </>
-    )
-  );
-};
+//   return (
+//     bioText && (
+//       <>
+//         <p>{bioText}</p>
+//       </>
+//     )
+//   );
+// };
 
-/*
 const Bio = ({ bioText }) => {
   return (
     bioText && (
@@ -31,6 +30,5 @@ const Bio = ({ bioText }) => {
     )
   );
 };
-*/
 
 export default Bio;
