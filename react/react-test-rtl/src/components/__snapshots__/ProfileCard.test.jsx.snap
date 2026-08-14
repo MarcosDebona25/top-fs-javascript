@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ProfileCard > matches the snapshot 1`] = `
+<div>
+  <article>
+    <h2>
+      Marcos Debona
+    </h2>
+    <p>
+      Developer
+    </p>
+    <a
+      href="mailto:marcos@example.com"
+    >
+      marcos@example.com
+    </a>
+  </article>
+</div>
+`;
