@@ -3,6 +3,9 @@ node_modules/
 
 # Build output
 dist/
+# Restaurant Page se sirve desde dist/ en GitHub Pages (branch principal, sin workflow)
+!javascript/restaurant-page/dist/
+!javascript/restaurant-page/dist/**
 dist-ssr/
 build/
 out/
