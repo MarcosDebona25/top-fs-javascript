@@ -41,7 +41,7 @@ function updateStats() {
         statsEl.textContent =
             total === 0
                 ? 'No books in the library yet.'
-                : `${totalRead} of ${total} books read — ${percentage}%`;
+                : `${totalRead} of ${total} books read - ${percentage}%`;
     }
 }
 
