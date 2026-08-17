@@ -1,5 +1,5 @@
 # TOP FS JavaScript
-Repositorio con los proyectos del módulo Full Stack Javascript de [The Odin Project](https://www.theodinproject.com/paths/full-stack-javascript). 
+Repositorio con los proyectos realizados del módulo Full Stack Javascript de [The Odin Project](https://www.theodinproject.com/paths/full-stack-javascript). 
 
 ## Proyectos
 
