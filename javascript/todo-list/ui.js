@@ -1,4 +1,4 @@
-import { Todo } from './code.js';
+import { Project, Todo } from './code.js';
 
 export class UI {
     constructor(store) {
@@ -7,6 +7,12 @@ export class UI {
         this.projectsList = document.getElementById('projects-list');
         this.todoList = document.getElementById('todo-list');
         this.currentProjectTitle = document.getElementById('current-project-title');
+
+        this.addProjectBtn = document.getElementById('add-project-btn');
+        this.projectModal = document.getElementById('project-modal');
+        this.projectForm = document.getElementById('project-form');
+        this.closeProjectModalBtn = document.getElementById('close-project-modal-btn');
+        this.projectTitleInput = document.getElementById('project-title');
 
         this.addTodoBtn = document.getElementById('add-todo-btn');
         this.todoModal = document.getElementById('todo-modal');
@@ -27,6 +33,20 @@ export class UI {
     }
 
     setupEventListeners() {
+        this.addProjectBtn.addEventListener('click', () => {
+            this.projectForm.reset();
+            this.projectModal.showModal();
+        });
+
+        this.closeProjectModalBtn.addEventListener('click', () => {
+            this.projectModal.close();
+        });
+
+        this.projectForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleAddProject();
+        });
+
         this.addTodoBtn.addEventListener('click', () => {
             this.todoForm.reset();
             this.todoModal.showModal();
@@ -141,6 +161,19 @@ export class UI {
 
             this.todoList.appendChild(li);
         });
+    }
+
+    handleAddProject() {
+        const title = this.projectTitleInput.value.trim();
+
+        if (!title) return;
+
+        const newProject = new Project(title);
+        this.store.addProject(newProject);
+        this.store.setActiveProject(this.store.projects.length - 1);
+        this.renderProjects();
+        this.renderTodos();
+        this.projectModal.close();
     }
 
     handleAddTodo() {
