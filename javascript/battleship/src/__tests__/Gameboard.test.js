@@ -181,6 +181,30 @@ describe("Gameboard", function () {
     });
   });
 
+  describe("placeShip() with a ship name", function () {
+    test("persists the name on the entry", function () {
+      var ship = Ship(3);
+      board.placeShip(ship, [[0, 0], [0, 1], [0, 2]], "Submarine");
+      expect(board.getShipEntries()[0].name).toBe("Submarine");
+    });
+
+    test("getShipName returns the name for a placed ship", function () {
+      var ship = Ship(3);
+      board.placeShip(ship, [[0, 0], [0, 1], [0, 2]], "Submarine");
+      expect(board.getShipName(ship)).toBe("Submarine");
+    });
+
+    test("getShipName returns null when no name was provided", function () {
+      var ship = Ship(2);
+      board.placeShip(ship, [[0, 0], [0, 1]]);
+      expect(board.getShipName(ship)).toBeNull();
+    });
+
+    test("getShipName returns null for a ship that is not on the board", function () {
+      expect(board.getShipName(Ship(1))).toBeNull();
+    });
+  });
+
   describe("wasCellAttacked() and wasCellHit()", function () {
     test("returns false for untouched cells", function () {
       expect(board.wasCellAttacked(0, 0)).toBe(false);

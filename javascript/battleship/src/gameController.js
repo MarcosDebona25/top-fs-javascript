@@ -48,8 +48,8 @@ window.Battleship = window.Battleship || {};
       _notify("phase-changed", { phase: _phase });
     }
 
-    function placeHumanShip(ship, coordinates) {
-      _human.gameboard.placeShip(ship, coordinates);
+    function placeHumanShip(ship, name, coordinates) {
+      _human.gameboard.placeShip(ship, coordinates, name);
     }
 
     function removeHumanShip(ship) {
@@ -95,7 +95,7 @@ window.Battleship = window.Battleship || {};
         return { valid: false, message: e.message };
       }
 
-      var shipName = _getShipName(result.ship);
+      var shipName = _getShipName(result.ship, _computer.gameboard);
 
       _message = result.hit
         ? result.sunk
@@ -156,7 +156,7 @@ window.Battleship = window.Battleship || {};
         return { valid: false, message: e.message };
       }
 
-      var shipName = _getShipName(result.ship);
+      var shipName = _getShipName(result.ship, _human.gameboard);
 
       _message = result.hit
         ? result.sunk
@@ -205,8 +205,12 @@ window.Battleship = window.Battleship || {};
       };
     }
 
-    function _getShipName(ship) {
+    function _getShipName(ship, board) {
       if (!ship) return null;
+      if (board) {
+        var name = board.getShipName(ship);
+        if (name) return window.Battleship.SHIP_NAMES_ES[name] || name;
+      }
       var map = { 5: "Portaaviones", 4: "Acorazado", 3: "Crucero/Submarino", 2: "Destructor" };
       return map[ship.length] || "Nave (" + ship.length + ")";
     }

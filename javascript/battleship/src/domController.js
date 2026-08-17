@@ -199,7 +199,7 @@ window.Battleship = window.Battleship || {};
 
       var entries = gameboard.getShipEntries();
       var images = window.Battleship.SHIP_IMAGES;
-      var nameMap = { 5: "Carrier", 4: "Battleship", 3: "Cruiser", 2: "Destroyer" };
+      var nameMap = { 5: "Carrier", 4: "Battleship", 2: "Destroyer" };
       var threeCount = 0;
 
       for (var e = 0; e < entries.length; e++) {
@@ -209,12 +209,14 @@ window.Battleship = window.Battleship || {};
         if (!coords.length) continue;
 
         var len = ship.length;
-        var shipName;
-        if (len === 3) {
-          shipName = threeCount === 0 ? "Cruiser" : "Submarine";
-          threeCount++;
-        } else {
-          shipName = nameMap[len] || "Ship";
+        var shipName = entry.name;
+        if (!shipName) {
+          if (len === 3) {
+            shipName = threeCount === 0 ? "Cruiser" : "Submarine";
+            threeCount++;
+          } else {
+            shipName = nameMap[len] || "Ship";
+          }
         }
         var imgSrc = images[shipName] || "";
 
@@ -304,7 +306,7 @@ window.Battleship = window.Battleship || {};
         }
       }
       try {
-        game.placeHumanShip(ship, coords);
+        game.placeHumanShip(ship, _dragState.shipName, coords);
         _dragState.shipLength = 0;
         render(game);
       } catch (err) {
@@ -379,17 +381,23 @@ window.Battleship = window.Battleship || {};
     function _renderLegend(container, gameboard) {
       var entries = gameboard.getShipEntries();
       var info = [
-        { name: "Portaaviones", len: 5, img: "imgs/Aircraft_Carrier-removebg-preview.png" },
-        { name: "Acorazado",   len: 4, img: "imgs/Battleship-removebg-preview.png" },
-        { name: "Crucero",     len: 3, img: "imgs/Cruiser-removebg-preview.png" },
-        { name: "Submarino",   len: 3, img: "imgs/Submarine-removebg-preview.png" },
-        { name: "Destructor",  len: 2, img: "imgs/Destroyer-removebg-preview.png" },
+        { name: "Portaaviones", key: "Carrier", len: 5, img: "imgs/Aircraft_Carrier-removebg-preview.png" },
+        { name: "Acorazado", key: "Battleship", len: 4, img: "imgs/Battleship-removebg-preview.png" },
+        { name: "Crucero", key: "Cruiser", len: 3, img: "imgs/Cruiser-removebg-preview.png" },
+        { name: "Submarino", key: "Submarine", len: 3, img: "imgs/Submarine-removebg-preview.png" },
+        { name: "Destructor", key: "Destroyer", len: 2, img: "imgs/Destroyer-removebg-preview.png" },
       ];
       var cards = [], used = {};
       for (var i = 0; i < info.length; i++) {
         for (var j = 0; j < entries.length; j++) {
           if (used[j]) continue;
-          if (entries[j].ship.length === info[i].len) { used[j] = true; cards.push({ name: info[i].name, img: info[i].img, entry: entries[j] }); break; }
+          var entry = entries[j];
+          var matches = entry.name ? entry.name === info[i].key : entry.ship.length === info[i].len;
+          if (matches) {
+            used[j] = true;
+            cards.push({ name: info[i].name, img: info[i].img, entry: entry });
+            break;
+          }
         }
       }
       container.innerHTML = cards.map(function (crd) {

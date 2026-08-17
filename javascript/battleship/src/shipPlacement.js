@@ -23,6 +23,14 @@ window.Battleship = window.Battleship || {};
     Destroyer: "imgs/Destroyer-removebg-preview.png",
   };
 
+  var SHIP_NAMES_ES = {
+    Carrier: "Portaaviones",
+    Battleship: "Acorazado",
+    Cruiser: "Crucero",
+    Submarine: "Submarino",
+    Destroyer: "Destructor",
+  };
+
   function placeShipRandomly(board, name, length, maxAttempts) {
     maxAttempts = maxAttempts || 200;
     var size = board.size;
@@ -47,7 +55,7 @@ window.Battleship = window.Battleship || {};
       if (!inBounds) continue;
 
       try {
-        board.placeShip(ship, coordinates);
+        board.placeShip(ship, coordinates, name);
         return { ship: ship, coordinates: coordinates, name: name };
       } catch (e) {
         // overlap — retry
@@ -67,6 +75,7 @@ window.Battleship = window.Battleship || {};
 
   window.Battleship.FLEET = FLEET;
   window.Battleship.SHIP_IMAGES = SHIP_IMAGES;
+  window.Battleship.SHIP_NAMES_ES = SHIP_NAMES_ES;
   window.Battleship.placeShipRandomly = placeShipRandomly;
   window.Battleship.placeFleetRandomly = placeFleetRandomly;
 })();

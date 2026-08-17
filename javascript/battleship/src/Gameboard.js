@@ -21,7 +21,7 @@ window.Battleship = window.Battleship || {};
     var _attackedCoords = {};
     var _hitCoords = {};
 
-    function placeShip(ship, coordinates) {
+    function placeShip(ship, coordinates, name) {
       if (!Array.isArray(coordinates) || coordinates.length !== ship.length) {
         throw new Error(
           "Expected " + ship.length + " coordinates, got " + (coordinates ? coordinates.length : 0),
@@ -44,6 +44,7 @@ window.Battleship = window.Battleship || {};
 
       _ships.push({
         ship: ship,
+        name: name || null,
         coordinates: coordinates.map(function (c) {
           return [c[0], c[1]];
         }),
@@ -92,11 +93,19 @@ window.Battleship = window.Battleship || {};
       return _ships.map(function (entry) {
         return {
           ship: entry.ship,
+          name: entry.name,
           coordinates: entry.coordinates.map(function (c) {
             return [c[0], c[1]];
           }),
         };
       });
+    }
+
+    function getShipName(ship) {
+      for (var i = 0; i < _ships.length; i++) {
+        if (_ships[i].ship === ship) return _ships[i].name || null;
+      }
+      return null;
     }
 
     function getGrid() {
@@ -150,6 +159,7 @@ window.Battleship = window.Battleship || {};
       getMissedAttacks: getMissedAttacks,
       areAllShipsSunk: areAllShipsSunk,
       getShipEntries: getShipEntries,
+      getShipName: getShipName,
       getGrid: getGrid,
       wasCellAttacked: wasCellAttacked,
       wasCellHit: wasCellHit,
