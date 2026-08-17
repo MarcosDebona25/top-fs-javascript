@@ -1,42 +1,69 @@
-* {
+*, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+:root {
+    --bg:          #f5f0e8;
+    --surface:     #fffdf7;
+    --border:      #d4c4a8;
+    --board-bg:    #7a4f2e;
+    --cell-bg:     #fdf8f0;
+    --cell-hover:  #ede5d2;
+    --x-color:     #b83232;
+    --o-color:     #1a4f8a;
+    --text-dark:   #2c1a0e;
+    --text-mid:    #5a4030;
+    --text-muted:  #9a8070;
+    --btn-bg:      #5c7a4e;
+    --btn-hover:   #4a6340;
+    --btn-danger:  #8b3a2a;
+    --btn-danger-hover: #6d2d20;
+}
+
 html {
     font-size: 16px;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    background: #f4f6f8;
-    color: #1f2933;
-    height: 100%;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg);
+    color: var(--text-dark);
+    min-height: 100%;
 }
 
 body {
     max-width: 700px;
     margin: auto;
-    padding: 1.5rem 1rem;
+    padding: 2rem 1rem 1.5rem;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.4rem;
+}
+
+header {
+    text-align: center;
 }
 
 header h1 {
-    text-align: center;
-    font-weight: 600;
-    letter-spacing: 1px;
+    font-size: clamp(1.8rem, 5vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--text-dark);
 }
 
 #users-info {
     display: flex;
     justify-content: space-between;
-    padding: 0.6rem 0.8rem;
-    font-size: 0.95rem;
-    background: white;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
 }
+
+#player-x-label { color: var(--x-color); }
+#player-o-label { color: var(--o-color); }
 
 main {
     display: flex;
@@ -49,28 +76,28 @@ main {
     margin: auto;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.4rem;
-    padding: 0.4rem;
-    background: #dfe5ec;
-    border-radius: 8px;
+    gap: 5px;
+    padding: 5px;
+    background: var(--board-bg);
+    border-radius: 12px;
 }
 
 .cell {
     width: 100%;
-    aspect-ratio: 1/1;
-    font-size: 2.4rem;
-    font-weight: 600;
-    position: relative;
-    background: white;
-    color: #1f2933;
-    border: 1px solid #cfd6df;
-    border-radius: 6px;
+    aspect-ratio: 1 / 1;
+    font-family: 'Roboto', sans-serif;
+    font-size: clamp(2rem, 9vw, 3rem);
+    font-weight: 700;
+    background: var(--cell-bg);
+    color: var(--text-dark);
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
+    transition: background 0.12s ease;
 }
 
 .cell:hover:not(:disabled) {
-    background: #d9dee5;
-    border-color: #b7c0cb;
+    background: var(--cell-hover);
 }
 
 body.turn-x .cell:enabled:hover::after,
@@ -79,57 +106,70 @@ body.turn-o .cell:enabled:hover::after {
     inset: 0;
     display: grid;
     place-items: center;
-    font-size: 2.2rem;
+    font-size: clamp(1.8rem, 8vw, 2.6rem);
     font-weight: 700;
     pointer-events: none;
 }
 
 body.turn-x .cell:enabled:hover::after {
     content: "X";
-    color: rgba(26, 127, 55, 0.35);
-    text-shadow: 0 0 6px rgba(26, 127, 55, 0.28);
+    color: rgba(184, 50, 50, 0.25);
 }
 
 body.turn-o .cell:enabled:hover::after {
     content: "O";
-    color: rgba(37, 99, 235, 0.35);
-    text-shadow: 0 0 6px rgba(37, 99, 235, 0.28);
+    color: rgba(26, 79, 138, 0.25);
+}
+
+.cell {
+    position: relative;
 }
 
 .cell:disabled {
-    background: #f7f9fb;
     cursor: default;
 }
 
-.cell.x-mark {
-    color: #166534;
-}
-
-.cell.o-mark {
-    color: #1d4ed8;
-}
+.cell.x-mark { color: var(--x-color); }
+.cell.o-mark { color: var(--o-color); }
 
 #game-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 0.7rem 0.9rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1.1rem;
 }
 
 #info {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.2rem;
 }
 
 #info h2 {
-    font-size: 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-mid);
     margin-bottom: 0.2rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
+
+#score-x { color: var(--x-color); font-weight: 500; font-size: 0.9rem; }
+#score-o { color: var(--o-color); font-weight: 500; font-size: 0.9rem; }
+
+#turn-info {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-top: 0.1rem;
+}
+
+#turn-info.winner-x { color: var(--x-color); font-weight: 600; }
+#turn-info.winner-o { color: var(--o-color); font-weight: 600; }
+#turn-info.draw      { color: #b45309;        font-weight: 600; }
 
 #game-actions {
     display: flex;
@@ -137,80 +177,158 @@ body.turn-o .cell:enabled:hover::after {
 }
 
 button {
-    font-size: 0.9rem;
-    padding: 0.45rem 0.8rem;
-    border-radius: 5px;
-    border: 1px solid #2563eb;
-    background: #2563eb;
-    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.5rem 0.9rem;
+    border-radius: 6px;
+    border: none;
+    background: var(--btn-bg);
+    color: #fff;
     cursor: pointer;
+    transition: background 0.12s ease;
 }
 
 button:hover {
-    background: #c4c4c4;
+    background: var(--btn-hover);
+}
+
+#reset-all {
+    background: var(--btn-danger);
+}
+
+#reset-all:hover {
+    background: var(--btn-danger-hover);
 }
 
 dialog {
     border: none;
-    border-radius: 8px;
-    padding: 1.3rem 1.4rem;
-    background: white;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    padding: 1.8rem 1.6rem;
+    background: var(--surface);
+    box-shadow: 0 8px 28px rgba(60, 30, 10, 0.18);
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    min-width: 280px;
+    max-width: 340px;
+    width: 90%;
 }
 
 dialog::backdrop {
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(30, 15, 5, 0.5);
 }
 
 #players-form {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    min-width: 260px;
+    gap: 0.6rem;
 }
 
 #players-form h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
     text-align: center;
-    margin-bottom: 0.4rem;
+    color: var(--text-dark);
+    margin-bottom: 0.3rem;
+}
+
+#players-form label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-mid);
 }
 
 #players-form input {
-    padding: 0.35rem 0.4rem;
-    border-radius: 4px;
-    border: 1px solid #ccd2da;
-}
-
-#players-form button {
-    margin-top: 0.5rem;
-}
-
-#turn-info {
+    padding: 0.5rem 0.65rem;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-family: 'Roboto', sans-serif;
     font-size: 0.9rem;
+    color: var(--text-dark);
+    transition: border-color 0.12s ease;
 }
 
-#turn-info.winner-x {
-    color: #1a7f37;
-    font-weight: 600;
+#players-form input:focus {
+    outline: none;
+    border-color: var(--board-bg);
 }
 
-#turn-info.winner-o {
-    color: #2563eb;
-    font-weight: 600;
+#start-game-btn {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    padding: 0.6rem;
+    background: var(--board-bg);
 }
 
-#turn-info.draw {
-    color: #b45309;
-    font-weight: 600;
+#start-game-btn:hover {
+    background: #5c3820;
+}
+
+#victory-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.7rem;
+    text-align: center;
+}
+
+#victory-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+#victory-message {
+    font-size: 1rem;
+    color: var(--text-mid);
+}
+
+#victory-next {
+    margin-top: 0.4rem;
+    font-size: 0.9rem;
+    padding: 0.6rem 1.4rem;
+    background: var(--board-bg);
+}
+
+#victory-next:hover {
+    background: #5c3820;
 }
 
 footer {
     margin-top: auto;
     text-align: center;
     font-size: 0.85rem;
-    color: #6b7280;
-    padding-top: 1rem;
+    color: var(--text-muted);
+    padding-top: 0.8rem;
+}
+
+#footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.12s ease;
+}
+
+#footer-link:hover {
+    color: var(--text-dark);
+}
+
+.github-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+    body { padding: 1.2rem 0.75rem 1rem; gap: 1rem; }
+    #game-info { flex-direction: column; align-items: flex-start; }
+    #game-actions { width: 100%; }
+    #game-actions button { flex: 1; }
 }

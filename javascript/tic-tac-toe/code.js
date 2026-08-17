@@ -8,30 +8,27 @@ const winningConditions = [
 const gameState = {
     currentPlayer: "X",
     gameActive: false,
-    players: {
-        X: "Player X",
-        O: "Player O"
-    },
-    score: {
-        X: 0,
-        O: 0
-    }
+    players: { X: "Player X", O: "Player O" },
+    score: { X: 0, O: 0 }
 };
 
-const playersDialog = document.querySelector("#players-dialog");
-const playersForm = document.querySelector("#players-form");
-const playerXInput = document.querySelector("#player-x");
-const playerOInput = document.querySelector("#player-o");
-
-const playerXLabel = document.querySelector("#player-x-label");
-const playerOLabel = document.querySelector("#player-o-label");
-const scoreX = document.querySelector("#score-x");
-const scoreO = document.querySelector("#score-o");
-const turnInfo = document.querySelector("#turn-info");
-
+const playersDialog  = document.querySelector("#players-dialog");
+const playersForm    = document.querySelector("#players-form");
+const playerXInput   = document.querySelector("#player-x");
+const playerOInput   = document.querySelector("#player-o");
+const playerXLabel   = document.querySelector("#player-x-label");
+const playerOLabel   = document.querySelector("#player-o-label");
+const scoreX         = document.querySelector("#score-x");
+const scoreO         = document.querySelector("#score-o");
+const turnInfo       = document.querySelector("#turn-info");
 const resetGameButton = document.querySelector("#reset-game");
-const resetAllButton = document.querySelector("#reset-all");
-const cells = [...document.querySelectorAll("#container .cell")];
+const resetAllButton  = document.querySelector("#reset-all");
+const cells          = [...document.querySelectorAll("#container .cell")];
+
+const victoryDialog  = document.querySelector("#victory-dialog");
+const victoryTitle   = document.querySelector("#victory-title");
+const victoryMessage = document.querySelector("#victory-message");
+const victoryNext    = document.querySelector("#victory-next");
 
 function setTurnHoverClass() {
     document.body.classList.remove("turn-x", "turn-o");
@@ -40,10 +37,7 @@ function setTurnHoverClass() {
 
 function setTurnStateClass(className) {
     turnInfo.classList.remove("winner-x", "winner-o", "draw");
-
-    if (className) {
-        turnInfo.classList.add(className);
-    }
+    if (className) turnInfo.classList.add(className);
 }
 
 function updatePlayersUI() {
@@ -56,20 +50,15 @@ function updatePlayersUI() {
 function updateTurnUI(message, className) {
     setTurnStateClass(className);
     setTurnHoverClass();
-
     if (message) {
         turnInfo.textContent = message;
         return;
     }
-
     turnInfo.textContent = `Turn: ${gameState.players[gameState.currentPlayer]} (${gameState.currentPlayer})`;
 }
 
 function clearBoard() {
-    for (let index = 0; index < board.length; index++) {
-        board[index] = "";
-    }
-
+    for (let i = 0; i < board.length; i++) board[i] = "";
     cells.forEach((cell) => {
         cell.textContent = "";
         cell.disabled = false;
@@ -86,31 +75,32 @@ function startGame() {
 }
 
 function getWinner() {
-    for (let index = 0; index < winningConditions.length; index++) {
-        const [a, b, c] = winningConditions[index];
+    for (let i = 0; i < winningConditions.length; i++) {
+        const [a, b, c] = winningConditions[i];
         if (board[a] && board[a] === board[b] && board[a] === board[c]) {
             return board[a];
         }
     }
-
     return null;
 }
 
 function endRound(message, className) {
     gameState.gameActive = false;
-    cells.forEach((cell) => {
-        cell.disabled = true;
-    });
+    cells.forEach((cell) => { cell.disabled = true; });
     updateTurnUI(message, className);
+}
+
+function showVictoryModal(title, message) {
+    victoryTitle.textContent = title;
+    victoryMessage.textContent = message;
+    victoryDialog.showModal();
 }
 
 function handleCellClick(event) {
     const cell = event.currentTarget;
     const index = Number(cell.id);
 
-    if (!gameState.gameActive || board[index]) {
-        return;
-    }
+    if (!gameState.gameActive || board[index]) return;
 
     board[index] = gameState.currentPlayer;
     cell.textContent = gameState.currentPlayer;
@@ -121,12 +111,20 @@ function handleCellClick(event) {
     if (winner) {
         gameState.score[winner] += 1;
         updatePlayersUI();
-        endRound(`Winner: ${gameState.players[winner]} (${winner})`, winner === "X" ? "winner-x" : "winner-o");
+        endRound(
+            `Winner: ${gameState.players[winner]} (${winner})`,
+            winner === "X" ? "winner-x" : "winner-o"
+        );
+        showVictoryModal(
+            `${gameState.players[winner]} wins!`,
+            `Score: ${gameState.players.X}: ${gameState.score.X} · ${gameState.players.O}: ${gameState.score.O}`
+        );
         return;
     }
 
     if (!board.includes("")) {
         endRound("Draw!", "draw");
+        showVictoryModal("Draw!", "Nobody wins this round.");
         return;
     }
 
@@ -143,10 +141,8 @@ function resetAll() {
     gameState.score.O = 0;
     gameState.players.X = "Player X";
     gameState.players.O = "Player O";
-
     updatePlayersUI();
     updateTurnUI("Enter players to start");
-
     playerXInput.value = "";
     playerOInput.value = "";
     playersDialog.showModal();
@@ -154,18 +150,20 @@ function resetAll() {
 
 playersForm.addEventListener("submit", (event) => {
     event.preventDefault();
-
     gameState.players.X = playerXInput.value.trim();
     gameState.players.O = playerOInput.value.trim();
-
     playersDialog.close();
     startGame();
 });
 
 playersDialog.addEventListener("cancel", (event) => event.preventDefault());
 
-cells.forEach((cell) => cell.addEventListener("click", handleCellClick));
+victoryNext.addEventListener("click", () => {
+    victoryDialog.close();
+    startGame();
+});
 
+cells.forEach((cell) => cell.addEventListener("click", handleCellClick));
 resetGameButton.addEventListener("click", resetGame);
 resetAllButton.addEventListener("click", resetAll);
 
