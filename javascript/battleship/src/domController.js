@@ -250,6 +250,9 @@ window.Battleship = window.Battleship || {};
           img.style.height = w + "px";
           img.style.transformOrigin = "top left";
           img.style.transform = "rotate(90deg) translate(0, -100%)";
+        } else {
+          // Mirror the ship so the bow faces right (toward the enemy fleet)
+          img.style.transform = "scaleX(-1)";
         }
 
         container.appendChild(img);
