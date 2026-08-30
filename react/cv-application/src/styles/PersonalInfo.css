@@ -1,91 +1,24 @@
-.personal-info {
-  padding: 24px;
-  margin-bottom: 24px;
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--transition), transform var(--transition);
-}
-
-.personal-info:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-
-.personal-info h2 {
-  margin: 0 0 20px;
-  padding-bottom: 12px;
-  font-size: 1.25rem;
-  font-weight: 600;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.personal-info form {
-  display: flex;
-  flex-direction: column;
-}
-
-.personal-info form label,
-.personal-info .tag-input {
-  margin-top: 16px;
-}
-
-.personal-info form label:first-child {
-  margin-top: 0;
-}
-
-.personal-info .tag-input label {
-  margin-top: 0;
-}
-
-.personal-info p {
-  margin: 0 0 8px;
+.personal-info .profile-text {
+  margin: 16px 0 0;
+  font-size: 17px;
 }
 
 .personal-info h3 {
-  margin: 16px 0 0;
-  font-size: 1rem;
-  font-weight: 600;
+  margin: 20px 0 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+
+.personal-info .tag-list {
+  margin-top: 8px;
 }
 
 .empty-note {
-  color: var(--color-text-secondary);
-}
-
-.tag-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 8px 0;
-}
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  background-color: var(--color-primary-light);
-  color: var(--color-primary);
-  border-radius: 999px;
-  font-size: 0.85rem;
-}
-
-.tag-remove {
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--color-primary);
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: transform var(--transition);
-}
-
-.tag-remove:hover {
-  transform: scale(1.2);
-}
-
-.tag-input input {
-  margin-top: 4px;
+  margin: 16px 0 0;
+  font-size: 17px;
+  color: var(--graphite);
 }

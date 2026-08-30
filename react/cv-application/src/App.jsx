@@ -6,6 +6,8 @@ import Education from './components/Education'
 import Experience from './components/Experience'
 import PdfButton from './components/PdfButton'
 import ConfirmModal from './components/ConfirmModal'
+import CvPreview from './components/CvPreview'
+import Footer from './components/Footer'
 
 const emptyGeneral = {
   fullName: '',
@@ -85,38 +87,60 @@ function App() {
 
   return (
     <div className="app">
-      <div className="app-header">
-        <h1>CV Application Generator</h1>
-        {generalConfirmed ? (
-          <PdfButton
+      <header className="masthead">
+        <div className="masthead-inner">
+          <div>
+            <h1>
+              CV Application<span className="dot">.</span>
+            </h1>
+          </div>
+          {generalConfirmed ? (
+            <PdfButton
+              general={generalInfo}
+              personal={personal}
+              education={education}
+              experiences={experiences}
+            />
+          ) : (
+            <button
+              type="button"
+              className="btn-pdf"
+              onClick={() => setShowModal(true)}
+            >
+              Download PDF
+            </button>
+          )}
+        </div>
+      </header>
+
+      <div className="wrap">
+        <div className="desk">
+          <main>
+            <GeneralInfo data={generalInfo} onSubmit={handleGeneralSubmit} />
+            <PersonalInfo data={personal} onSubmit={handlePersonalSubmit} />
+            <Education
+              items={education}
+              onAdd={handleAddEducation}
+              onSubmit={handleEducationSubmit}
+              onRemove={handleRemoveEducation}
+            />
+            <Experience
+              items={experiences}
+              onAdd={handleAddExperience}
+              onSubmit={handleExperienceSubmit}
+              onRemove={handleRemoveExperience}
+            />
+          </main>
+          <CvPreview
             general={generalInfo}
             personal={personal}
             education={education}
             experiences={experiences}
           />
-        ) : (
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowModal(true)}
-          >
-            Download PDF
-          </button>
-        )}
+        </div>
       </div>
-      <GeneralInfo data={generalInfo} onSubmit={handleGeneralSubmit} />
-      <PersonalInfo data={personal} onSubmit={handlePersonalSubmit} />
-      <Education
-        items={education}
-        onAdd={handleAddEducation}
-        onSubmit={handleEducationSubmit}
-        onRemove={handleRemoveEducation}
-      />
-      <Experience
-        items={experiences}
-        onAdd={handleAddExperience}
-        onSubmit={handleExperienceSubmit}
-        onRemove={handleRemoveExperience}
-      />
+
+      <Footer />
 
       {showModal && <ConfirmModal onClose={() => setShowModal(false)} />}
     </div>

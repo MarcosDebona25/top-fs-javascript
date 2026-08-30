@@ -5,7 +5,7 @@ function ConfirmModal({ onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <p className="modal-message">
-          Please submit your information first before downloading the PDF.
+          Save General Information before downloading the PDF.
         </p>
         <button className="btn btn-primary modal-btn" onClick={onClose}>
           Got it

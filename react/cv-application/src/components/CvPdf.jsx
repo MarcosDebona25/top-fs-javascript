@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     padding: 40,
     fontFamily: 'Helvetica',
     fontSize: 10.5,
-    color: '#1f2937',
+    color: '#1C1B18',
     lineHeight: 1.4,
   },
   name: {
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   contactLine: {
-    color: '#6b7280',
+    color: '#6E6A60',
   },
   socialRow: {
     flexDirection: 'row',
@@ -44,8 +44,8 @@ const styles = StyleSheet.create({
   sectionTitle: {
     marginTop: 16,
     paddingBottom: 4,
-    borderBottom: '1 solid #e5e7eb',
-    color: '#2563eb',
+    borderBottom: '1 solid #C8102E',
+    color: '#1C1B18',
     fontSize: 12,
     fontWeight: 'bold',
     textTransform: 'uppercase',
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   entryDate: {
-    color: '#6b7280',
+    color: '#6E6A60',
   },
   entrySubtitle: {
     marginTop: 2,

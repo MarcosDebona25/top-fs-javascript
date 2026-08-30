@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import '../styles/Education.css'
+import { useRef, useState } from 'react'
+import { educationValidators, runValidators } from '../validation'
 
 function EducationItem({ item, onSubmit, onRemove }) {
   const [isEditing, setIsEditing] = useState(true)
@@ -8,29 +8,70 @@ function EducationItem({ item, onSubmit, onRemove }) {
     title: item.title,
     date: item.date,
   })
+  const [errors, setErrors] = useState({})
+  const formRef = useRef(null)
 
   const handleChange = (e) => {
-    setDraft({ ...draft, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setDraft({ ...draft, [name]: value })
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: educationValidators[name](value) })
+    }
+  }
+
+  const handleBlur = (e) => {
+    const { name } = e.target
+    setErrors({ ...errors, [name]: educationValidators[name](draft[name]) })
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    const { errors: nextErrors, firstInvalid } = runValidators(
+      draft,
+      educationValidators
+    )
+    if (firstInvalid) {
+      setErrors(nextErrors)
+      formRef.current?.elements.namedItem(firstInvalid)?.focus()
+      return
+    }
     onSubmit(item.id, draft)
     setIsEditing(false)
   }
 
   const handleEdit = () => {
     setDraft({ school: item.school, title: item.title, date: item.date })
+    setErrors({})
     setIsEditing(true)
   }
 
-  const handleRemove = () => {
-    onRemove(item.id)
-  }
+  const renderField = (name, labelText, inputProps) => (
+    <div className="field" key={name}>
+      <label htmlFor={`${name}-${item.id}`}>
+        {labelText} <span className="req">*</span>
+      </label>
+      <input
+        id={`${name}-${item.id}`}
+        name={name}
+        value={draft[name]}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        className={errors[name] ? 'invalid' : ''}
+        aria-invalid={Boolean(errors[name])}
+        aria-describedby={errors[name] ? `${name}-${item.id}-error` : undefined}
+        {...inputProps}
+      />
+      {errors[name] && (
+        <span className="err" id={`${name}-${item.id}-error`}>
+          {errors[name]}
+        </span>
+      )}
+    </div>
+  )
 
   if (!isEditing) {
     return (
-      <div className="education-item">
+      <div className="item">
         <div className="item-header">
           <h3>{item.school}</h3>
           <span className="date">{item.date}</span>
@@ -47,7 +88,7 @@ function EducationItem({ item, onSubmit, onRemove }) {
           <button
             type="button"
             className="btn btn-danger"
-            onClick={handleRemove}
+            onClick={() => onRemove(item.id)}
           >
             Remove
           </button>
@@ -57,46 +98,26 @@ function EducationItem({ item, onSubmit, onRemove }) {
   }
 
   return (
-    <div className="education-item">
-      <form onSubmit={handleSubmit}>
-        <label htmlFor={`school-${item.id}`}>School name</label>
-        <input
-          type="text"
-          id={`school-${item.id}`}
-          name="school"
-          value={draft.school}
-          onChange={handleChange}
-        />
-
-        <label htmlFor={`title-${item.id}`}>Title of study</label>
-        <input
-          type="text"
-          id={`title-${item.id}`}
-          name="title"
-          value={draft.title}
-          onChange={handleChange}
-        />
-
-        <label htmlFor={`date-${item.id}`}>Date of study</label>
-        <input
-          type="text"
-          id={`date-${item.id}`}
-          name="date"
-          value={draft.date}
-          onChange={handleChange}
-          placeholder="e.g. 2018 - 2022"
-        />
+    <div className="item">
+      <form ref={formRef} onSubmit={handleSubmit} noValidate>
+        {renderField('school', 'School name', { type: 'text', maxLength: '80' })}
+        {renderField('title', 'Title of study', { type: 'text', maxLength: '80' })}
+        {renderField('date', 'Date of study', {
+          type: 'text',
+          maxLength: '20',
+          placeholder: 'e.g. 2018 - 2022',
+        })}
 
         <div className="form-actions">
           <button
             type="button"
             className="btn btn-danger"
-            onClick={handleRemove}
+            onClick={() => onRemove(item.id)}
           >
             Remove
           </button>
           <button type="submit" className="btn btn-primary">
-            Submit
+            Save
           </button>
         </div>
       </form>

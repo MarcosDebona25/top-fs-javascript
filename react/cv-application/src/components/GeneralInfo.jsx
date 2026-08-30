@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { validators, runValidators } from '../validation'
 import '../styles/GeneralInfo.css'
 
 const GitHubIcon = () => (
   <img
     src="/icons8-github-logo.svg"
-    width="18"
-    height="18"
+    width="16"
+    height="16"
     alt=""
     aria-hidden="true"
   />
@@ -14,8 +15,8 @@ const GitHubIcon = () => (
 const LinkedInIcon = () => (
   <img
     src="/icons8-linkedin.svg"
-    width="18"
-    height="18"
+    width="16"
+    height="16"
     alt=""
     aria-hidden="true"
   />
@@ -24,35 +25,78 @@ const LinkedInIcon = () => (
 function GeneralInfo({ data, onSubmit }) {
   const [isEditing, setIsEditing] = useState(true)
   const [draft, setDraft] = useState(data)
+  const [errors, setErrors] = useState({})
+  const formRef = useRef(null)
 
   const handleChange = (e) => {
-    setDraft({ ...draft, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setDraft({ ...draft, [name]: value })
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: validators[name](value) })
+    }
+  }
+
+  const handleBlur = (e) => {
+    const { name } = e.target
+    setErrors({ ...errors, [name]: validators[name](draft[name]) })
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    const { errors: nextErrors, firstInvalid } = runValidators(draft, validators)
+    if (firstInvalid) {
+      setErrors(nextErrors)
+      formRef.current?.elements.namedItem(firstInvalid)?.focus()
+      return
+    }
     onSubmit(draft)
     setIsEditing(false)
   }
 
   const handleEdit = () => {
     setDraft(data)
+    setErrors({})
     setIsEditing(true)
   }
+
+  const renderField = (name, labelText, inputProps, labelNode) => (
+    <div className="field" key={name}>
+      <label htmlFor={name}>{labelNode ?? labelText}</label>
+      <input
+        id={name}
+        name={name}
+        value={draft[name]}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        className={errors[name] ? 'invalid' : ''}
+        aria-invalid={Boolean(errors[name])}
+        aria-describedby={errors[name] ? `${name}-error` : undefined}
+        {...inputProps}
+      />
+      {errors[name] && (
+        <span className="err" id={`${name}-error`}>
+          {errors[name]}
+        </span>
+      )}
+    </div>
+  )
 
   if (!isEditing) {
     const hasLinks = data.github || data.linkedin
 
     return (
-      <section className="general-info">
-        <h2>General Information</h2>
+      <section className="general-info form-section">
+        <div className="sec-head">
+          <span className="sec-num">01</span>
+          <h2>General Information</h2>
+        </div>
         <div className="info-grid">
           <div className="info-field">
-            <strong>Full Name</strong>
+            <strong>Full name</strong>
             <span>{data.fullName}</span>
           </div>
           <div className="info-field">
-            <strong>Date of Birth</strong>
+            <strong>Date of birth</strong>
             <span>{data.dateOfBirth}</span>
           </div>
           <div className="info-field">
@@ -62,10 +106,16 @@ function GeneralInfo({ data, onSubmit }) {
           <div className="info-field">
             <strong>
               Identification
-              <span className="tooltip-trigger" tabIndex="0" aria-label="Identification depends on your country. For example, in Argentina it would be DNI: 45758863. In the US, it could be SSN or state ID. Use whatever is standard in your location.">
+              <span
+                className="tooltip-trigger"
+                tabIndex="0"
+                aria-label="Identification depends on your country. For example, in Argentina it would be DNI: 45758863. In the US, it could be SSN or state ID. Use whatever is standard in your location."
+              >
                 &#9432;
                 <span className="tooltip-content">
-                  This field depends on your country. In Argentina it&rsquo;s <em>DNI: 45758863</em>. In the US, it could be SSN or state ID. Use whatever is standard in your location.
+                  This field depends on your country. In Argentina it&rsquo;s{' '}
+                  <em>DNI: 45758863</em>. In the US, it could be SSN or state
+                  ID. Use whatever is standard in your location.
                 </span>
               </span>
             </strong>
@@ -126,90 +176,76 @@ function GeneralInfo({ data, onSubmit }) {
   }
 
   return (
-    <section className="general-info">
-      <h2>General Information</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="fullName">Full Name</label>
-        <input
-          type="text"
-          id="fullName"
-          name="fullName"
-          value={draft.fullName}
-          onChange={handleChange}
-        />
+    <section className="general-info form-section">
+      <div className="sec-head">
+        <span className="sec-num">01</span>
+        <h2>General Information</h2>
+      </div>
+      <form ref={formRef} onSubmit={handleSubmit} noValidate>
+        {renderField(
+          'fullName',
+          'Full name',
+          { type: 'text', maxLength: '80' },
+          <>
+            Full name <span className="req">*</span>
+          </>
+        )}
 
-        <label htmlFor="dateOfBirth">Date of Birth</label>
-        <input
-          type="date"
-          id="dateOfBirth"
-          name="dateOfBirth"
-          value={draft.dateOfBirth}
-          onChange={handleChange}
-        />
+        {renderField('dateOfBirth', 'Date of birth', { type: 'date' })}
 
-        <label htmlFor="identification">
-          Identification
-          <span className="tooltip-trigger" tabIndex="0" aria-label="This depends on your country. In Argentina it would be DNI: 45758863.">
-            &#9432;
-            <span className="tooltip-content">
-              This field depends on your country. In Argentina it&rsquo;s <em>DNI: 45758863</em>. In the US, it could be SSN or state ID. Use whatever is standard in your location.
+        {renderField(
+          'identification',
+          'Identification',
+          { type: 'text', maxLength: '20', placeholder: 'e.g. DNI: 45758863' },
+          <>
+            Identification
+            <span
+              className="tooltip-trigger"
+              tabIndex="0"
+              aria-label="Identification depends on your country. For example, in Argentina it would be DNI: 45758863. In the US, it could be SSN or state ID. Use whatever is standard in your location."
+            >
+              &#9432;
+              <span className="tooltip-content">
+                This field depends on your country. In Argentina it&rsquo;s{' '}
+                <em>DNI: 45758863</em>. In the US, it could be SSN or state ID.
+                Use whatever is standard in your location.
+              </span>
             </span>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="identification"
-          name="identification"
-          value={draft.identification}
-          onChange={handleChange}
-          placeholder="e.g. DNI: 45758863"
-        />
-      
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={draft.email}
-          onChange={handleChange}
-        />
+          </>
+        )}
 
-        <label htmlFor="phone">Phone</label>
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
-          value={draft.phone}
-          onChange={handleChange}
-        />
+        {renderField('email', 'Email', {
+          type: 'email',
+          placeholder: 'name@domain.com',
+        })}
 
-        <label htmlFor="github">
-          <GitHubIcon /> GitHub
-        </label>
-        <input
-          type="url"
-          id="github"
-          name="github"
-          value={draft.github}
-          onChange={handleChange}
-          placeholder="https://github.com/your-user"
-        />
+        {renderField('phone', 'Phone', {
+          type: 'tel',
+          maxLength: '20',
+          placeholder: '+54 9 11 5555 5555',
+        })}
 
-        <label htmlFor="linkedin">
-          <LinkedInIcon /> LinkedIn
-        </label>
-        <input
-          type="url"
-          id="linkedin"
-          name="linkedin"
-          value={draft.linkedin}
-          onChange={handleChange}
-          placeholder="https://linkedin.com/in/your-user"
-        />
+        {renderField(
+          'github',
+          'GitHub',
+          { type: 'url', placeholder: 'https://github.com/your-user' },
+          <>
+            <GitHubIcon /> GitHub
+          </>
+        )}
+
+        {renderField(
+          'linkedin',
+          'LinkedIn',
+          { type: 'url', placeholder: 'https://linkedin.com/in/your-user' },
+          <>
+            <LinkedInIcon /> LinkedIn
+          </>
+        )}
 
         <div className="form-actions">
           <button type="submit" className="btn btn-primary">
-            Submit
+            Save
           </button>
         </div>
       </form>

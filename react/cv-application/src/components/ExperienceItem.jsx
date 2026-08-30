@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import '../styles/Experience.css'
+import { useRef, useState } from 'react'
+import { experienceValidators, runValidators } from '../validation'
 
 function ExperienceItem({ item, onSubmit, onRemove }) {
   const [isEditing, setIsEditing] = useState(true)
@@ -10,13 +10,33 @@ function ExperienceItem({ item, onSubmit, onRemove }) {
     from: item.from,
     until: item.until,
   })
+  const [errors, setErrors] = useState({})
+  const formRef = useRef(null)
 
   const handleChange = (e) => {
-    setDraft({ ...draft, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setDraft({ ...draft, [name]: value })
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: experienceValidators[name](value) })
+    }
+  }
+
+  const handleBlur = (e) => {
+    const { name } = e.target
+    setErrors({ ...errors, [name]: experienceValidators[name](draft[name]) })
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    const { errors: nextErrors, firstInvalid } = runValidators(
+      draft,
+      experienceValidators
+    )
+    if (firstInvalid) {
+      setErrors(nextErrors)
+      formRef.current?.elements.namedItem(firstInvalid)?.focus()
+      return
+    }
     onSubmit(item.id, draft)
     setIsEditing(false)
   }
@@ -29,16 +49,38 @@ function ExperienceItem({ item, onSubmit, onRemove }) {
       from: item.from,
       until: item.until,
     })
+    setErrors({})
     setIsEditing(true)
   }
 
-  const handleRemove = () => {
-    onRemove(item.id)
-  }
+  const renderField = (name, labelText, inputProps, optional = false) => (
+    <div className="field" key={name}>
+      <label htmlFor={`${name}-${item.id}`}>
+        {labelText}
+        {!optional && <span className="req"> *</span>}
+      </label>
+      <input
+        id={`${name}-${item.id}`}
+        name={name}
+        value={draft[name]}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        className={errors[name] ? 'invalid' : ''}
+        aria-invalid={Boolean(errors[name])}
+        aria-describedby={errors[name] ? `${name}-${item.id}-error` : undefined}
+        {...inputProps}
+      />
+      {errors[name] && (
+        <span className="err" id={`${name}-${item.id}-error`}>
+          {errors[name]}
+        </span>
+      )}
+    </div>
+  )
 
   if (!isEditing) {
     return (
-      <div className="experience-item">
+      <div className="item">
         <div className="item-header">
           <h3>{item.company}</h3>
           <span className="date">
@@ -46,7 +88,7 @@ function ExperienceItem({ item, onSubmit, onRemove }) {
           </span>
         </div>
         <p className="item-title">{item.position}</p>
-        <p>{item.responsibilities}</p>
+        <p className="item-text">{item.responsibilities}</p>
         <div className="form-actions">
           <button
             type="button"
@@ -58,7 +100,7 @@ function ExperienceItem({ item, onSubmit, onRemove }) {
           <button
             type="button"
             className="btn btn-danger"
-            onClick={handleRemove}
+            onClick={() => onRemove(item.id)}
           >
             Remove
           </button>
@@ -68,67 +110,52 @@ function ExperienceItem({ item, onSubmit, onRemove }) {
   }
 
   return (
-    <div className="experience-item">
-      <form onSubmit={handleSubmit}>
-        <label htmlFor={`company-${item.id}`}>Company name</label>
-        <input
-          type="text"
-          id={`company-${item.id}`}
-          name="company"
-          value={draft.company}
-          onChange={handleChange}
-        />
+    <div className="item">
+      <form ref={formRef} onSubmit={handleSubmit} noValidate>
+        {renderField('company', 'Company name', { type: 'text', maxLength: '80' })}
+        {renderField('position', 'Position title', { type: 'text', maxLength: '80' })}
 
-        <label htmlFor={`position-${item.id}`}>Position title</label>
-        <input
-          type="text"
-          id={`position-${item.id}`}
-          name="position"
-          value={draft.position}
-          onChange={handleChange}
-        />
+        <div className="field">
+          <label htmlFor={`responsibilities-${item.id}`}>
+            Main responsibilities
+          </label>
+          <textarea
+            id={`responsibilities-${item.id}`}
+            name="responsibilities"
+            rows={3}
+            maxLength={1000}
+            value={draft.responsibilities}
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+          {errors.responsibilities && (
+            <span className="err" id={`responsibilities-${item.id}-error`}>
+              {errors.responsibilities}
+            </span>
+          )}
+        </div>
 
-        <label htmlFor={`responsibilities-${item.id}`}>
-          Main responsibilities
-        </label>
-        <textarea
-          id={`responsibilities-${item.id}`}
-          name="responsibilities"
-          rows={3}
-          value={draft.responsibilities}
-          onChange={handleChange}
-        />
-
-        <label htmlFor={`from-${item.id}`}>From</label>
-        <input
-          type="text"
-          id={`from-${item.id}`}
-          name="from"
-          value={draft.from}
-          onChange={handleChange}
-          placeholder="e.g. Jan 2022"
-        />
-
-        <label htmlFor={`until-${item.id}`}>Until</label>
-        <input
-          type="text"
-          id={`until-${item.id}`}
-          name="until"
-          value={draft.until}
-          onChange={handleChange}
-          placeholder="e.g. Dec 2024"
-        />
+        {renderField('from', 'From', {
+          type: 'text',
+          maxLength: '20',
+          placeholder: 'e.g. Jan 2022',
+        })}
+        {renderField('until', 'Until', {
+          type: 'text',
+          maxLength: '20',
+          placeholder: 'e.g. Dec 2024 or Present',
+        })}
 
         <div className="form-actions">
           <button
             type="button"
             className="btn btn-danger"
-            onClick={handleRemove}
+            onClick={() => onRemove(item.id)}
           >
             Remove
           </button>
           <button type="submit" className="btn btn-primary">
-            Submit
+            Save
           </button>
         </div>
       </form>
