@@ -24,7 +24,7 @@
 
 .modal-message {
   margin: 0 0 20px;
-  font-size: 17px;
+  font-size: var(--text-base);
   line-height: 1.55;
   color: var(--ink);
 }

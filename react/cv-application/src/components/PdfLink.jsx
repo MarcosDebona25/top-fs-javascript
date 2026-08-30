@@ -17,7 +17,7 @@ function PdfLink({ general, personal, education, experiences }) {
         />
       }
       fileName={fileName}
-      className="btn btn-primary"
+      className="btn-pdf"
     >
       Download PDF
     </PDFDownloadLink>

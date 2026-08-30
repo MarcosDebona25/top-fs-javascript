@@ -3,7 +3,7 @@ export const MAX_TAGS = 20
 export const MAX_TAG_LENGTH = 30
 
 const NAME_PATTERN = /^[\p{L}][\p{L}' -]*$/u
-const TEXT_PATTERN = /^[\p{L}\p{N} .,'&()/-]*$/u
+const TEXT_PATTERN = /^[\p{L}\p{N} .,'&()°/-]*$/u
 const TAG_PATTERN = /^[\p{L}\p{N} #+./-]+$/u
 const TEXT_MESSAGE = "Use letters, numbers and . , ' & ( ) / - only."
 

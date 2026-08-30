@@ -6,7 +6,7 @@ function PdfButton({ general, personal, education, experiences }) {
   return (
     <Suspense
       fallback={
-        <span className="btn btn-primary" style={{ opacity: 0.6, pointerEvents: 'none' }}>
+        <span className="btn-pdf" style={{ opacity: 0.6, pointerEvents: 'none' }}>
           Loading PDF…
         </span>
       }

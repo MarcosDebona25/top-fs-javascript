@@ -4,11 +4,27 @@ function CvPreview({ general, personal, education, experiences }) {
   const cleanUrl = (url) =>
     url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
 
-  const contactParts = [general.email, general.phone].filter(Boolean)
-  const linkParts = [general.github, general.linkedin]
+  const contactLine = [
+    general.email,
+    general.phone,
+    general.dateOfBirth ? `Born: ${general.dateOfBirth}` : '',
+    general.identification,
+  ]
     .filter(Boolean)
-    .map(cleanUrl)
-  const contactLine = [...contactParts, ...linkParts].join(' · ')
+    .join(' • ')
+
+  const links = [
+    general.github && {
+      href: general.github,
+      label: cleanUrl(general.github),
+      icon: '/icons8-github-logo.svg',
+    },
+    general.linkedin && {
+      href: general.linkedin,
+      label: cleanUrl(general.linkedin),
+      icon: '/icons8-linkedin.svg',
+    },
+  ].filter(Boolean)
 
   return (
     <aside className="sheet-col">
@@ -19,6 +35,16 @@ function CvPreview({ general, personal, education, experiences }) {
         <p className={contactLine ? 's-contact' : 's-contact s-empty'}>
           {contactLine || 'Your contact details will appear here.'}
         </p>
+        {links.length > 0 && (
+          <div className="s-links">
+            {links.map((link) => (
+              <span className="s-link" key={link.href}>
+                <img src={link.icon} alt="" />
+                {link.label}
+              </span>
+            ))}
+          </div>
+        )}
 
         {personal.profile && (
           <div className="s-sec">
@@ -29,7 +55,7 @@ function CvPreview({ general, personal, education, experiences }) {
 
         {experiences.length > 0 && (
           <div className="s-sec">
-            <h4>Experience</h4>
+            <h4>Practical Experience</h4>
             {experiences.map((experience) => (
               <div className="s-entry" key={experience.id}>
                 <div className="s-row">
@@ -58,18 +84,23 @@ function CvPreview({ general, personal, education, experiences }) {
                   <b>{item.school}</b>
                   <span className="s-date">{item.date}</span>
                 </div>
-                {item.title && <p className="s-sub">{item.title}</p>}
+                {item.title && <p className="s-text">{item.title}</p>}
               </div>
             ))}
           </div>
         )}
 
-        {(personal.stack.length > 0 || personal.softSkills.length > 0) && (
+        {personal.stack.length > 0 && (
           <div className="s-sec">
-            <h4>Skills</h4>
-            <p className="s-text">
-              {[...personal.stack, ...personal.softSkills].join(' · ')}
-            </p>
+            <h4>Technical Stack</h4>
+            <p className="s-text">{personal.stack.join(', ')}</p>
+          </div>
+        )}
+
+        {personal.softSkills.length > 0 && (
+          <div className="s-sec">
+            <h4>Soft Skills</h4>
+            <p className="s-text">{personal.softSkills.join(', ')}</p>
           </div>
         )}
       </div>

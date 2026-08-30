@@ -3,16 +3,21 @@
   top: 24px;
 }
 
+/* True-to-scale miniature of the A4 PDF (595.28pt wide).
+   Conversion: 1pt = 0.168cqw. Every size/margin below is a Pt value
+   from CvPdf.jsx converted at that rate. */
 .sheet {
   container-type: inline-size;
   aspect-ratio: 210 / 297;
   background-color: var(--sheet);
   overflow: hidden;
-  padding: 9% 8%;
+  padding: 6.72%; /* page padding 40pt */
   box-shadow:
     0 18px 44px rgba(28, 27, 24, 0.16),
     0 2px 6px rgba(28, 27, 24, 0.08);
   animation: print 550ms ease both;
+  font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.4;
 }
 
 @keyframes print {
@@ -32,13 +37,14 @@
   }
 }
 
+/* name: 24pt bold, lineHeight 1, paddingBottom 10pt */
 .s-name {
   margin: 0;
-  font-weight: 900;
-  font-size: 7cqw;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  line-height: 1.1;
+  padding-bottom: 1.68cqw;
+  font-size: 4.03cqw;
+  font-weight: 700;
+  line-height: 1;
+  overflow-wrap: anywhere;
 }
 
 .s-name.s-empty {
@@ -46,76 +52,97 @@
   opacity: 0.4;
 }
 
+/* contactLine: 10.5pt, gray */
 .s-contact {
-  margin: 1.5cqw 0 0;
-  font-family: var(--font-mono);
-  font-size: 3.4cqw;
-  line-height: 1.7;
+  margin: 0;
+  font-size: 1.76cqw;
   color: var(--graphite);
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .s-contact.s-empty {
   opacity: 0.55;
 }
 
+/* socialRow: marginTop 4pt, gap 16pt; socialText 10pt underlined */
+.s-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.34cqw 2.69cqw;
+  margin-top: 0.67cqw;
+}
+
+.s-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.67cqw;
+  font-size: 1.68cqw;
+  color: #374151;
+  text-decoration: underline;
+}
+
+.s-link img {
+  width: 1.85cqw;
+  height: 1.85cqw;
+}
+
+/* sectionTitle: marginTop 16pt, 12pt bold uppercase, letterSpacing 1.2pt */
 .s-sec {
-  margin-top: 4cqw;
+  margin-top: 2.69cqw;
 }
 
 .s-sec h4 {
   margin: 0;
-  padding-bottom: 0.75cqw;
+  padding-bottom: 0.67cqw;
   border-bottom: 1px solid var(--red);
-  font-size: 3.25cqw;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  font-size: 2.02cqw;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.s-sec h4 + .s-entry {
-  margin-top: 2cqw;
+/* entry: marginTop 8pt */
+.s-entry {
+  margin-top: 1.34cqw;
 }
 
-.s-entry + .s-entry {
-  margin-top: 1.5cqw;
-}
-
+/* entryHeader: gap 12pt */
 .s-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 2.5cqw;
-  margin-top: 2cqw;
+  gap: 2.02cqw;
 }
 
 .s-row b {
-  font-size: 3.6cqw;
+  font-size: 1.76cqw;
 }
 
 .s-date {
-  font-family: var(--font-mono);
-  font-size: 3.1cqw;
+  font-size: 1.76cqw;
   color: var(--graphite);
   white-space: nowrap;
 }
 
+/* entrySubtitle: marginTop 2pt, medium */
 .s-sub {
-  margin: 0.25cqw 0 0;
-  font-size: 3.5cqw;
+  margin: 0.34cqw 0 0;
+  font-size: 1.76cqw;
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
+/* entryText: marginTop 2pt, marginBottom 8pt */
 .s-text {
-  margin: 0.5cqw 0 0;
-  font-size: 3.25cqw;
-  line-height: 1.45;
-  opacity: 0.85;
+  margin: 0.34cqw 0 1.34cqw;
+  font-size: 1.76cqw;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .sheet-cap {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: var(--text-sm);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--graphite);

@@ -1,12 +1,13 @@
 .personal-info .profile-text {
   margin: 16px 0 0;
-  font-size: 17px;
+  font-size: var(--text-base);
+  overflow-wrap: anywhere;
 }
 
 .personal-info h3 {
   margin: 20px 0 0;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -19,6 +20,6 @@
 
 .empty-note {
   margin: 16px 0 0;
-  font-size: 17px;
+  font-size: var(--text-base);
   color: var(--graphite);
 }
