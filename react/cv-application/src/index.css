@@ -76,8 +76,8 @@ textarea {
   border-bottom: 1px solid var(--rule);
   border-radius: 0;
   padding: 10px 12px;
-  font: inherit;
-  font-size: var(--text-base);
+  /* font: inherit; */
+  /* font-size: var(--text-base); */
   font-weight: 500;
   color: var(--ink);
   transition: background-color var(--transition), border-color var(--transition);
