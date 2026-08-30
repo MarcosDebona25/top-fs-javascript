@@ -50,3 +50,46 @@ Source: https://sqlbolt.com/
 - SELECT (SUM(boxoffice.domestic_sales) + SUM(boxoffice.international_sales)) / 1000000 as total, boxoffice.movie_id FROM boxoffice GROUP BY boxoffice.movie_id;
 - SELECT *, boxoffice.rating * 10 FROM movies JOIN boxoffice ON movies.id = boxoffice.movie_id;
 - SELECT * FROM movies WHERE Year % 2 == 0;
+
+### Lesson 10
+- SELECT MAX(years_employed) FROM employees;
+- SELECT AVG(years_employed), role FROM employees GROUP BY role;
+- SELECT SUM(years_employed), building FROM employees GROUP BY building;
+
+### Lesson 11
+- SELECT COUNT(role) FROM employees WHERE role = 'Artist';
+- SELECT COUNT(*), role FROM employees GROUP BY role;
+- SELECT SUM(years_employed) FROM employees GROUP BY role HAVING role = 'Engineer'; // SELECT SUM(years_employed) FROM employees WHERE role = 'Engineer';
+
+### Lesson 12
+- SELECT COUNT(title) as movies_per_director, director FROM movies GROUP BY director;
+- SELECT SUM(boxoffice.domestic_sales + boxoffice.international_sales) as sales_per_director, movies.director FROM movies JOIN boxoffice ON movies.id = boxoffice.movie_id
+GROUP BY movies.director
+
+### Lesson 13
+- INSERT INTO movies (title, director, year, length_minutes) VALUES ('Toy Story 4', 'Unknown', 2000, 150);
+- INSERT INTO boxoffice (movie_id, rating, domestic_sales, international_sales) VALUES (15, 8.7, 340000000, 270000000);
+
+### Lesson 14
+- UPDATE movies SET director = 'John Lasseter' WHERE title = "A Bug's Life";
+- UPDATE movies SET year = 1999 WHERE title = 'Toy Story 2';
+- UPDATE movies SET title = 'Toy Story 3', director = 'Lee Unkrich' WHERE id = 11;
+
+### Lesson 15
+- DELETE * FROM movies WHERE year < 2005;
+- DELETE FROM movies WHERE director = 'Andrew Stanton';
+
+### Lesson 16
+- CREATE TABLE IF NOT EXISTS database (
+    name TEXT,
+    version FLOAT,
+    download_count INTEGER
+)
+
+### Lesson 17
+- ALTER TABLE movies ADD COLUMN aspect_ratio FLOAT;
+- ALTER TABLE movies ADD COLUMN Language TEXT DEFAULT 'English';
+
+### Lesson 18
+- DROP TABLE IF EXISTS movies;
+- DROP TABLE IF EXISTS boxoffice;
