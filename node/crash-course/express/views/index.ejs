@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include("partials/head") %>
+<body>
+    <%- include("partials/nav") %>
+
+    <main>
+        <section class="hero">
+            <h2>Bienvenido</h2>
+            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. At quisquam sequi consequatur hic, deserunt assumenda veniam aliquam itaque officiis nobis.</p>
+        </section>
+
+        <section>
+            <h2>Últimos artículos</h2>
+            <ul class="blogs">
+                <% blogs.forEach((blog) => { %>
+                    <li class="blog-card">
+                        <h3><%= blog.title %></h3>
+                        <p><%= blog.snippet %></p>
+                        <small><%= blog.author %> · <%= blog.date %></small>
+                    </li>
+                <% }) %>
+            </ul>
+        </section>
+    </main>
+
+    <%- include("partials/footer") %>
+</body>
+</html>
