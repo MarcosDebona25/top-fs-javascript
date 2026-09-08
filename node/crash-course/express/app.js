@@ -1,24 +1,21 @@
 const express = require("express");
+const morgan = require("morgan");
 const path = require("path");
 
-// express app
 const app = express();
 
-// register view engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // sirve archivos estaticos (css, imagenes...) desde /public
 app.use(express.static(path.join(__dirname, "public")));
 
-// middleware: pone datos globales a disposicion de TODAS las vistas
 // res.locals es lo que res.render mezcla con las variables que le pases
 app.use((req, res, next) => {
-  res.locals.currentPath = req.path; // lo usa nav.ejs para marcar el link activo
+  res.locals.currentPath = req.path;
   next();
 });
 
-// datos compartidos por todas las paginas
 const siteData = {
   navLinks: [
     { href: "/", label: "Inicio" },
@@ -31,7 +28,6 @@ const siteData = {
   ],
 };
 
-// dato especifico de la home: un arreglo que la vista recorre con <%- %> y <% %>
 const blogs = [
   {
     title: "Partials en EJS",
@@ -59,8 +55,17 @@ app.listen(port, () => {
   console.log("http://localhost:" + port);
 });
 
+// app.use((req, res, next) => {
+//   console.log("Request received at " + new Date().toLocaleString());
+//   console.log("New request: " + req.method + " " + req.path);
+//   console.log("Query params: ", req.query);
+//   console.log("Request body: ", req.body);
+//   next();
+// });
+
+app.use(morgan("dev")); // log requests to the console
+
 app.get("/", (req, res) => {
-  // los ...siteData "esparcen" navLinks y socials; blogs viaja aparte
   res.render("index", { title: "Home", ...siteData, blogs });
 });
 
