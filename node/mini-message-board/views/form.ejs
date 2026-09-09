@@ -1,0 +1,27 @@
+<%- include("partials/header") %>
+
+<h2>New Message</h2>
+
+<form method="POST" action="/new" class="message-form">
+  <label for="messageUser">Author</label>
+  <input
+    type="text"
+    id="messageUser"
+    name="messageUser"
+    placeholder="Your name"
+    required
+  />
+
+  <label for="messageText">Message</label>
+  <textarea
+    id="messageText"
+    name="messageText"
+    rows="4"
+    placeholder="Write your message..."
+    required
+  ></textarea>
+
+  <button type="submit" class="btn btn-primary">Send</button>
+</form>
+
+<%- include("partials/footer") %>

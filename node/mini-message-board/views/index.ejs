@@ -1,0 +1,22 @@
+<%- include("partials/header") %>
+
+<h2>Messages</h2>
+<a class="btn btn-primary" href="/new">New Message</a>
+
+<ul class="message-list">
+  <% messages.forEach((message) => { %>
+    <li class="message-card">
+      <p class="message-text"><%= message.text %></p>
+      <div class="message-meta">
+        <span class="avatar"><%= message.user.charAt(0).toUpperCase() %></span>
+        <span class="message-user"><%= message.user %></span>
+        <span class="message-date"><%= message.formattedDate %></span>
+        <a class="open-link" href="/message/<%= message.id %>"
+          >Open<span class="arrow">&rarr;</span></a
+        >
+      </div>
+    </li>
+  <% }) %>
+</ul>
+
+<%- include("partials/footer") %>

@@ -1,0 +1,14 @@
+<%- include("partials/header") %>
+
+<div class="message-card message-detail">
+  <p class="message-text"><%= message.text %></p>
+  <div class="message-meta">
+    <span class="avatar"><%= message.user.charAt(0).toUpperCase() %></span>
+    <span class="message-user"><%= message.user %></span>
+    <span class="message-date"><%= message.formattedDate %></span>
+  </div>
+</div>
+
+<a class="btn" href="/new">Reply with a new message</a>
+
+<%- include("partials/footer") %>
