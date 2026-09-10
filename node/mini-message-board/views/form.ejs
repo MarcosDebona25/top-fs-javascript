@@ -2,26 +2,67 @@
 
 <h2>New Message</h2>
 
-<form method="POST" action="/new" class="message-form">
-  <label for="messageUser">Author</label>
-  <input
-    type="text"
-    id="messageUser"
-    name="messageUser"
-    placeholder="Your name"
-    required
-  />
+<% if (errors.length > 0) { %>
+  <ul class="form-errors" role="alert">
+    <% errors.forEach((err) => { %>
+      <li><%= err %></li>
+    <% }) %>
+  </ul>
+<% } %>
 
-  <label for="messageText">Message</label>
-  <textarea
-    id="messageText"
-    name="messageText"
-    rows="4"
-    placeholder="Write your message..."
-    required
-  ></textarea>
+<form method="POST" action="/new" class="message-form" novalidate>
+  <label for="messageUser">Author <span class="label-hint">Letters, numbers and spaces · max 32</span></label>
+  <div class="input-wrap">
+    <input
+      type="text"
+      id="messageUser"
+      name="messageUser"
+      placeholder="Your name"
+      maxlength="32"
+      pattern="^[\p{L}\p{N} ]+$"
+      required
+      autocomplete="off"
+      value="<%= old.user || '' %>"
+    />
+    <span class="char-count" data-max="32"></span>
+  </div>
+
+  <label for="messageText">Message <span class="label-hint">Max 512 characters</span></label>
+  <div class="input-wrap">
+    <textarea
+      id="messageText"
+      name="messageText"
+      rows="4"
+      placeholder="Write your message..."
+      maxlength="512"
+      required
+    ><%= old.text || '' %></textarea>
+    <span class="char-count" data-max="512"></span>
+  </div>
 
   <button type="submit" class="btn btn-primary">Send</button>
 </form>
+
+<script>
+  document.querySelectorAll(".input-wrap").forEach((wrap) => {
+    const input = wrap.querySelector("input, textarea");
+    const counter = wrap.querySelector(".char-count");
+    if (!input || !counter) return;
+
+    const max = Number(counter.dataset.max);
+
+    function update() {
+      const len = input.value.length;
+      const remaining = max - len;
+      counter.textContent = remaining;
+      counter.classList.toggle("warn", remaining <= Math.ceil(max * 0.15));
+      counter.classList.toggle("over", remaining < 0);
+      counter.classList.toggle("visible", len > 0);
+    }
+
+    input.addEventListener("input", update);
+    update();
+  });
+</script>
 
 <%- include("partials/footer") %>

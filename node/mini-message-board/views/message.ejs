@@ -1,6 +1,12 @@
 <%- include("partials/header") %>
 
-<div class="message-card message-detail">
+<%
+  let _h = 0;
+  for (let i = 0; i < message.user.length; i++) _h = ((_h << 5) - _h + message.user.charCodeAt(i)) | 0;
+  const hue = ((_h % 360) + 360) % 360;
+%>
+
+<div class="message-card message-detail" style="--user-hue: <%= hue %>">
   <p class="message-text"><%= message.text %></p>
   <div class="message-meta">
     <span class="avatar"><%= message.user.charAt(0).toUpperCase() %></span>
@@ -9,6 +15,6 @@
   </div>
 </div>
 
-<a class="btn" href="/new">Reply with a new message</a>
+<a class="btn" href="/">← Back to board</a>
 
 <%- include("partials/footer") %>

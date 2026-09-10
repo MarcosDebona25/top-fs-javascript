@@ -1,22 +1,34 @@
 <%- include("partials/header") %>
 
-<h2>Messages</h2>
-<a class="btn btn-primary" href="/new">New Message</a>
+<section class="hero">
+  <h2 class="hero-title">What's on your mind?</h2>
+  <a class="hero-input" href="/new">
+    <span class="hero-placeholder">Write a message…</span>
+    <span class="hero-btn">Post</span>
+  </a>
+</section>
 
-<ul class="message-list">
-  <% messages.forEach((message) => { %>
-    <li class="message-card">
+<div class="section-header">
+  <span class="section-label">Recent messages</span>
+  <span class="message-count"><%= messages.length %></span>
+</div>
+
+<div class="message-grid">
+  <% messages.forEach((message) => {
+    let _h = 0;
+    for (let i = 0; i < message.user.length; i++) _h = ((_h << 5) - _h + message.user.charCodeAt(i)) | 0;
+    const hue = ((_h % 360) + 360) % 360;
+  %>
+    <article class="message-card" style="--user-hue: <%= hue %>">
       <p class="message-text"><%= message.text %></p>
       <div class="message-meta">
         <span class="avatar"><%= message.user.charAt(0).toUpperCase() %></span>
         <span class="message-user"><%= message.user %></span>
         <span class="message-date"><%= message.formattedDate %></span>
-        <a class="open-link" href="/message/<%= message.id %>"
-          >Open<span class="arrow">&rarr;</span></a
-        >
       </div>
-    </li>
+      <a class="card-link" href="/message/<%= message.id %>" aria-label="Open message by <%= message.user %>"></a>
+    </article>
   <% }) %>
-</ul>
+</div>
 
 <%- include("partials/footer") %>

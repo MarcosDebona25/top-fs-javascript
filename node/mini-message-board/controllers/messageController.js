@@ -19,21 +19,44 @@ function getMessages(req, res) {
   res.render("index", { title: "Mini Messageboard", messages });
 }
 
+const USERNAME_MAX = 32;
+const MESSAGE_MAX = 512;
+const USERNAME_RE = /^[\p{L}\p{N} ]+$/u;
+
 function getNewMessageForm(req, res) {
-  res.render("form", { title: "New Message" });
+  res.render("form", { title: "New Message", errors: [], old: {} });
 }
 
 function createNewMessage(req, res) {
-  const { messageText, messageUser } = req.body;
+  const rawUser = req.body.messageUser || "";
+  const rawText = req.body.messageText || "";
+  const user = rawUser.trim();
+  const text = rawText.trim();
+  const errors = [];
 
-  if (!messageText || !messageText.trim()) {
-    throw new ValidationError("Message text is required");
-  }
-  if (!messageUser || !messageUser.trim()) {
-    throw new ValidationError("Author name is required");
+  if (!user) {
+    errors.push("Author name is required.");
+  } else if (user.length > USERNAME_MAX) {
+    errors.push(`Author name must be ${USERNAME_MAX} characters or fewer.`);
+  } else if (!USERNAME_RE.test(user)) {
+    errors.push("Author name must contain only letters, numbers, and spaces.");
   }
 
-  addMessage({ text: messageText.trim(), user: messageUser.trim() });
+  if (!text) {
+    errors.push("Message text is required.");
+  } else if (text.length > MESSAGE_MAX) {
+    errors.push(`Message must be ${MESSAGE_MAX} characters or fewer.`);
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).render("form", {
+      title: "New Message",
+      errors,
+      old: { user: rawUser, text: rawText },
+    });
+  }
+
+  addMessage({ text, user });
   res.redirect("/");
 }
 
