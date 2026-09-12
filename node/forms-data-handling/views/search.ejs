@@ -1,0 +1,38 @@
+<!-- views/search.ejs -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+<body>
+  <h1><%= title %></h1>
+  <form action="/search" method="GET">
+    <label for="name">Name: </label>
+    <input type="text" name="name" id="name" value="<%= query.name || '' %>" placeholder="First or last name">
+    <label for="email">Email: </label>
+    <input type="text" name="email" id="email" value="<%= query.email || '' %>" placeholder="Email">
+    <button type="submit">Search</button>
+  </form>
+  <% if (hasQuery) { %>
+    <% if (users.length > 0) { %>
+      <h2>Results (<%= users.length %>)</h2>
+      <ul>
+        <% users.forEach(function(user) { %>
+          <li>
+            <div>
+              ID: <%= user.id %>, Name: <%= user.firstName %> <%= user.lastName %>, Email: <%= user.email || '-' %><% if (user.age !== undefined && user.age !== '') { %>, Age: <%= user.age %><% } %><% if (user.bio) { %>, Bio: <%= user.bio %><% } %>
+            </div>
+            <div class="actions">
+              <a class="btn" href="/<%= user.id %>/update">Update</a>
+            </div>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <p>No users found.</p>
+    <% } %>
+  <% } %>
+  <a href="/">Back to home</a>
+</body>
+</html>

@@ -1,0 +1,90 @@
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 640px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: #222;
+  background: #fafafa;
+  line-height: 1.5;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+form:not(.delete-form) {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  justify-items: start;
+}
+
+form:not(.delete-form) input,
+form:not(.delete-form) textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+form:not(.delete-form) button {
+  min-width: 140px;
+}
+
+input,
+textarea,
+button,
+a.btn {
+  font: inherit;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+button {
+  cursor: pointer;
+  background: #f0f0f0;
+}
+
+a.btn {
+  display: inline-block;
+  background: #f0f0f0;
+  color: #222;
+  text-decoration: none;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.actions .btn,
+.actions button {
+  min-width: 90px;
+  text-align: center;
+}
+
+.delete-form {
+  display: inline;
+  margin: 0;
+}
+
+a {
+  color: #2456a6;
+}

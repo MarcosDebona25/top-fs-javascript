@@ -1,0 +1,39 @@
+<!-- views/index.ejs -->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    <%= title %>
+  </title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+  <h1>
+    <%= title %>
+  </h1>
+  <ul>
+    <% if (locals.users) { %>
+      <% users.forEach(function(user) { %>
+        <li>
+          <div>
+            ID: <%= user.id %>, Name: <%= user.firstName %>
+                <%= user.lastName %>, Email: <%= user.email || '-' %><% if (user.age !== undefined && user.age !== '') { %>, Age: <%= user.age %><% } %><% if (user.bio) { %>, Bio: <%= user.bio %><% } %>
+          </div>
+          <div class="actions">
+            <a class="btn" href="/<%= user.id %>/update">Update</a>
+            <!-- This time we're sending a POST request to our route, so we need a form. -->
+            <form class="delete-form" action="/<%= user.id %>/delete" method="POST">
+              <button type="submit"
+                onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
+            </form>
+          </div>
+        </li>
+        <% }); %>
+          <% } %>
+  </ul>
+  <a href="/create">Create a user</a> | <a href="/search">Search users</a>
+</body>
+
+</html>
