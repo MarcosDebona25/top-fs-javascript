@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1><%= title %></h1>
+    <form action="/" method="GET">
+      <label for="search">Search users:</label>
+      <input
+        type="text"
+        name="search"
+        id="search"
+        placeholder="e.g. sup"
+        value="<%= typeof search !== 'undefined' ? search : '' %>"
+      />
+      <button type="submit">Search</button>
+    </form>
+    <% if (typeof search !== "undefined" && search) { %>
+      <p>Showing results for "<%= search %>". <a href="/">Clear search</a></p>
+    <% } %>
+    <% if (!users || users.length === 0) { %>
+      <p>No users yet. <a href="/new">Create the first one</a>.</p>
+    <% } else { %>
+      <ul>
+        <% users.forEach((user) => { %>
+          <li><%= user.username %></li>
+        <% }) %>
+      </ul>
+      <a class="button" href="/new">Create a user</a>
+      <a class="button" href="/delete">Delete all users</a>
+    <% } %>
+  </main>
+</body>
+</html>

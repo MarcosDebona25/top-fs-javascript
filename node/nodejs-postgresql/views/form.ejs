@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1><%= title %></h1>
+    <% if (typeof error !== "undefined" && error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+    <form action="/new" method="POST">
+      <label for="username">Username:</label>
+      <input
+        type="text"
+        name="username"
+        id="username"
+        required
+        value="<%= typeof username !== 'undefined' ? username : '' %>"
+      />
+      <button type="submit">Submit</button>
+    </form>
+    <p><a href="/">Back to home</a></p>
+  </main>
+</body>
+</html>
