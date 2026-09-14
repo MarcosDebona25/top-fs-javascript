@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+
+<body>
+    <% if (locals.currentUser) { %>
+        <h1>Welcome back, <%= currentUser.username %></h1>
+        <form action="/log-out" method="POST">
+            <button type="submit">Log Out</button>
+        </form>
+        <% } else { %>
+            <h1>Please log in</h1>
+            <% errorMessages.forEach((message) => { %>
+                <p><%= message %></p>
+                <% }) %>
+                <form action="/log-in" method="POST">
+                    <label for="username">Username</label>
+                    <input id="username" name="username" placeholder="username" type="text" required />
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" required />
+                    <button type="submit">Log In</button>
+                </form>
+                <p>No account yet? <a href="/sign-up">Sign up</a></p>
+                <% } %>
+</body>
+
+</html>
