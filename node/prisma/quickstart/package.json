@@ -1,0 +1,16 @@
+{
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "prisma": "^6.19.3"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^6.19.3",
+    "dotenv": "^18.0.0",
+    "pg": "^8.23.0"
+  },
+  "allowScripts": {
+    "prisma@6.19.3": true,
+    "@prisma/engines@6.19.3": true
+  }
+}
