@@ -1,0 +1,35 @@
+<%- include('../partials/head', { title: 'New category' }) %>
+<body>
+  <%- include('../partials/header') %>
+  <main id="main" class="container">
+    <%- include('../partials/breadcrumbs', { crumbs: [{ label: 'Home', href: '/' }, { label: 'New category' }] }) %>
+
+    <section class="panel panel--form">
+      <h1>New category</h1>
+      <p class="panel__intro">Categories group related parts. The name is unique, without regard to capital letters.</p>
+
+      <%- include('../partials/flash') %>
+      <%- include('../partials/form-errors', { errors }) %>
+
+      <form method="post" action="/categories" novalidate>
+        <%- include('../partials/csrf-input') %>
+        <%- include('../partials/field-text', {
+          name: 'name', id: 'name', label: 'Name', required: true,
+          value: values.name, errors, maxlength: 80,
+          extraAttrs: 'maxlength="80" autocomplete="off"'
+        }) %>
+        <%- include('../partials/field-textarea', {
+          name: 'description', id: 'description', label: 'Description',
+          value: values.description, errors, rows: 4,
+          extraAttrs: 'maxlength="1000"'
+        }) %>
+        <div class="form-actions">
+          <button type="submit" class="button button--primary">Create category</button>
+          <a class="button button--ghost" href="/">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>

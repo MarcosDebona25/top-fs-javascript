@@ -1,0 +1,24 @@
+<%- include('../partials/head', { title: title, description: message }) %>
+<body>
+  <%- include('../partials/header') %>
+  <main id="main" class="container">
+    <section class="error-page" role="alert">
+      <p class="error-page__code mono"><%= status %></p>
+      <h1><%= title %></h1>
+      <p class="error-page__message"><%= message %></p>
+      <% if (details && details.items && details.items.length) { %>
+        <ul class="error-page__list">
+          <% details.items.forEach((item) => { %>
+            <li><a href="/items/<%= item.id %>"><span class="mono"><%= item.sku %></span> — <%= item.name %></a></li>
+          <% }) %>
+        </ul>
+      <% } %>
+      <p class="error-page__actions">
+        <a class="button button--primary" href="/">Back to home</a>
+        <a class="button button--ghost" href="javascript:history.back()">Go back</a>
+      </p>
+    </section>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>

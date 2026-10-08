@@ -1,0 +1,33 @@
+<%#
+  Stock movement history. Deltas always render with an explicit
+  sign and a text label, never color alone.
+  Locals: movements [{type, delta, stock_before, stock_after, reason, created_at}]
+%>
+<table class="data-table data-table--movements">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Type</th>
+      <th scope="col" class="data-table__number">Change</th>
+      <th scope="col" class="data-table__number">Before</th>
+      <th scope="col" class="data-table__number">After</th>
+      <th scope="col">Reason</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% movements.forEach((movement) => { %>
+      <%
+        const labels = { receipt: 'Receipt', dispatch: 'Dispatch', adjustment: 'Adjustment' };
+        const sign = movement.delta > 0 ? '+' : '−';
+      %>
+      <tr>
+        <td data-label="Date"><%= formatDateTime(movement.created_at) %></td>
+        <td data-label="Type"><span class="badge badge--<%= movement.type %>"><%= labels[movement.type] %></span></td>
+        <td class="mono" data-label="Change"><span class="delta delta--<%= movement.delta > 0 ? 'in' : 'out' %>"><%= sign %><%= Math.abs(movement.delta) %></span></td>
+        <td class="mono" data-label="Before"><%= movement.stock_before %></td>
+        <td class="mono" data-label="After"><%= movement.stock_after %></td>
+        <td data-label="Reason"><%= movement.reason %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

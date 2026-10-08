@@ -1,0 +1,19 @@
+<%#
+  Select field with label, hint and error.
+  Locals: name, id, label, value, options [{value, label, disabled}], hint, errors, extraAttrs
+%>
+<%
+  const fieldHint = typeof hint !== 'undefined' ? hint : null;
+  const fieldAttrs = typeof extraAttrs !== 'undefined' ? extraAttrs : '';
+  const fieldValue = typeof value !== 'undefined' ? value : '';
+%>
+<div class="field<%= errors && errors[name] ? ' field--invalid' : '' %>">
+  <label for="<%= id %>"><%= label %></label>
+  <select class="input" id="<%= id %>" name="<%= name %>"<%- fieldAttrs %>>
+    <% options.forEach((option) => { %>
+      <option value="<%= option.value %>"<%= String(option.value) === String(fieldValue) ? ' selected' : '' %><%= option.disabled ? ' disabled' : '' %>><%= option.label %></option>
+    <% }) %>
+  </select>
+  <% if (fieldHint) { %><p class="field__hint"><%= fieldHint %></p><% } %>
+  <% if (errors && errors[name]) { %><p class="field__error" id="<%= id %>-error"><%= errors[name].msg %></p><% } %>
+</div>

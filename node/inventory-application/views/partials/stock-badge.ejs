@@ -1,0 +1,11 @@
+<%#
+  Availability badge: always includes text, not color alone.
+  Locals: item
+%>
+<% if (item.archived_at) { %>
+  <span class="badge badge--archived">Archived</span>
+<% } else if (item.stock_quantity > 0) { %>
+  <span class="badge badge--in-stock">In stock</span>
+<% } else { %>
+  <span class="badge badge--out-of-stock">Out of stock</span>
+<% } %>

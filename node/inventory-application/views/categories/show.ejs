@@ -1,0 +1,41 @@
+<%- include('../partials/head', { title: category.name }) %>
+<body>
+  <%- include('../partials/header') %>
+  <main id="main" class="container">
+    <%- include('../partials/breadcrumbs', { crumbs: [
+      { label: 'Home', href: '/' },
+      { label: 'Categories', href: '/' },
+      { label: category.name }
+    ] }) %>
+    <%- include('../partials/flash') %>
+
+    <section class="page-head page-head--actions">
+      <div>
+        <h1><%= category.name %></h1>
+        <% if (category.description) { %><p class="lede"><%= category.description %></p><% } %>
+      </div>
+      <div class="page-head__actions">
+        <a class="button button--ghost" href="/items/new?category_id=<%= category.id %>">New part here</a>
+        <a class="button button--ghost" href="/categories/<%= category.id %>/edit">Edit</a>
+        <a class="button button--danger" href="/categories/<%= category.id %>/delete">Delete</a>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="category-parts-title">
+      <h2 id="category-parts-title">Active parts</h2>
+      <% if (!items.length) { %>
+        <%- include('../partials/empty-state', {
+          title: 'No parts in this category yet',
+          text: 'Add the first part to start tracking its stock.',
+          actionHref: '/items/new?category_id=' + category.id,
+          actionLabel: 'New part here'
+        }) %>
+      <% } else { %>
+        <%- include('../partials/item-table', { items }) %>
+        <%- include('../partials/pagination', { pagination, hrefFor }) %>
+      <% } %>
+    </section>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<%#
+  Text input field with label, hint and error.
+  Locals: name, id, label, type, value, hint, required, errors, extraAttrs
+  Optional locals are guarded because EJS 7 includes do not
+  inherit variables that the caller did not pass explicitly.
+%>
+<%
+  const fieldType = typeof type !== 'undefined' ? type : 'text';
+  const fieldHint = typeof hint !== 'undefined' ? hint : null;
+  const isRequired = typeof required !== 'undefined' ? required : false;
+  const fieldAttrs = typeof extraAttrs !== 'undefined' ? extraAttrs : '';
+  const fieldValue = typeof value !== 'undefined' ? value : '';
+%>
+<div class="field<%= errors && errors[name] ? ' field--invalid' : '' %>">
+  <label for="<%= id %>"><%= label %><% if (isRequired) { %> <span class="field__required" title="Required">*</span><% } %></label>
+  <input class="input" type="<%= fieldType %>" id="<%= id %>" name="<%= name %>" value="<%= fieldValue != null ? fieldValue : '' %>"<%- fieldAttrs %>>
+  <% if (fieldHint) { %><p class="field__hint"><%= fieldHint %></p><% } %>
+  <% if (errors && errors[name]) { %><p class="field__error" id="<%= id %>-error"><%= errors[name].msg %></p><% } %>
+</div>

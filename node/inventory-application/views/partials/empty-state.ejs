@@ -1,0 +1,11 @@
+<%#
+  Empty state with an optional action, used across lists.
+  Locals: title, text, actionHref, actionLabel
+%>
+<div class="empty-state">
+  <h2><%= title %></h2>
+  <% if (text) { %><p><%= text %></p><% } %>
+  <% if (actionHref) { %>
+    <p><a class="button button--primary" href="<%= actionHref %>"><%= actionLabel %></a></p>
+  <% } %>
+</div>

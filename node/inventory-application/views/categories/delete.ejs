@@ -1,0 +1,70 @@
+<%- include('../partials/head', { title: 'Delete category' }) %>
+<body>
+  <%- include('../partials/header') %>
+  <main id="main" class="container">
+    <%- include('../partials/breadcrumbs', { crumbs: [
+      { label: 'Home', href: '/' },
+      { label: category.name, href: '/categories/' + category.id },
+      { label: 'Delete' }
+    ] }) %>
+
+    <section class="panel panel--form">
+      <h1>Delete category</h1>
+      <p class="panel__intro">Deleting is permanent and only possible while the category holds no parts.</p>
+
+      <%- include('../partials/flash') %>
+
+      <% if (conflict) { %>
+        <div class="flash flash--error" role="alert">
+          <span class="flash__label">Blocked:</span>
+          <p class="flash__message"><%= conflict %></p>
+        </div>
+      <% } %>
+
+      <% if (blockingItems.length) { %>
+        <section class="blocking-list" aria-labelledby="blocking-title">
+          <h2 id="blocking-title">Parts that block deletion</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">SKU</th>
+                <th scope="col">Part</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% blockingItems.forEach((item) => { %>
+                <tr>
+                  <td class="mono" data-label="SKU"><a href="/items/<%= item.id %>"><%= item.sku %></a></td>
+                  <td data-label="Part"><a href="/items/<%= item.id %>"><%= item.name %></a></td>
+                  <td data-label="Status"><%= item.archived ? 'Archived' : 'Active' %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          <p class="panel__hint">Move every listed part to another category — active and archived parts both block deletion — then repeat this action.</p>
+        </section>
+      <% } %>
+
+      <% if (!blockingItems.length) { %>
+        <form method="post" action="/categories/<%= category.id %>/delete" novalidate>
+          <%- include('../partials/csrf-input') %>
+          <p class="confirm-text">Delete the category <strong>“<%= category.name %>”</strong>? This cannot be undone.</p>
+          <%- include('../partials/field-text', {
+            name: 'admin_password', id: 'admin_password', label: 'Administrative password',
+            type: 'password', required: true, errors: {},
+            extraAttrs: 'autocomplete="off"'
+          }) %>
+          <div class="form-actions">
+            <button type="submit" class="button button--danger">Delete category</button>
+            <a class="button button--ghost" href="/categories/<%= category.id %>">Cancel</a>
+          </div>
+        </form>
+      <% } else { %>
+        <p class="form-actions"><a class="button button--ghost" href="/categories/<%= category.id %>">Back to category</a></p>
+      <% } %>
+    </section>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>

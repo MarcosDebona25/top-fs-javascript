@@ -1,0 +1,45 @@
+<%#
+  Pagination with a sliding window and ellipsis gaps.
+  Locals: pagination {page, totalPages, hasPrev, hasNext}, hrefFor(page)
+%>
+<%
+  const totalPages = pagination.totalPages;
+  const current = pagination.page;
+  const pages = [];
+  for (let p = 1; p <= totalPages; p += 1) {
+    if (p === 1 || p === totalPages || Math.abs(p - current) <= 2) {
+      pages.push(p);
+    } else if (pages[pages.length - 1] !== 'gap') {
+      pages.push('gap');
+    }
+  }
+%>
+<% if (totalPages > 1) { %>
+<nav class="pagination" aria-label="Pagination">
+  <ul>
+    <li>
+      <% if (pagination.hasPrev) { %>
+        <a class="pagination__nav" href="<%= hrefFor(current - 1) %>" rel="prev">&larr; Previous</a>
+      <% } else { %>
+        <span class="pagination__nav is-disabled" aria-disabled="true">&larr; Previous</span>
+      <% } %>
+    </li>
+    <% pages.forEach((p) => { %>
+      <% if (p === 'gap') { %>
+        <li><span class="pagination__gap" aria-hidden="true">&hellip;</span></li>
+      <% } else if (p === current) { %>
+        <li><span class="pagination__page is-current" aria-current="page"><%= p %></span></li>
+      <% } else { %>
+        <li><a class="pagination__page" href="<%= hrefFor(p) %>"><%= p %></a></li>
+      <% } %>
+    <% }) %>
+    <li>
+      <% if (pagination.hasNext) { %>
+        <a class="pagination__nav" href="<%= hrefFor(current + 1) %>" rel="next">Next &rarr;</a>
+      <% } else { %>
+        <span class="pagination__nav is-disabled" aria-disabled="true">Next &rarr;</span>
+      <% } %>
+    </li>
+  </ul>
+</nav>
+<% } %>

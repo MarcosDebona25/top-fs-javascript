@@ -1,0 +1,10 @@
+<% if (errors && Object.keys(errors).length) { %>
+<div class="form-errors" role="alert" aria-labelledby="form-errors-title">
+  <h2 id="form-errors-title">There is a problem</h2>
+  <ul>
+    <% Object.values(errors).forEach((error) => { %>
+      <li><a href="#<%= error.path %>"><%= error.msg %></a></li>
+    <% }) %>
+  </ul>
+</div>
+<% } %>

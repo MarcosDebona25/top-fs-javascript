@@ -1,0 +1,18 @@
+<%- include('../partials/head', { title: 'New part' }) %>
+<body>
+  <%- include('../partials/header') %>
+  <main id="main" class="container">
+    <%- include('../partials/breadcrumbs', { crumbs: [{ label: 'Home', href: '/' }, { label: 'Catalog', href: '/items' }, { label: 'New part' }] }) %>
+
+    <section class="panel">
+      <%- include('../partials/empty-state', {
+        title: 'Create a category first',
+        text: 'Every part belongs to exactly one category, and there are no categories yet. Create the first category, then return to add a part.',
+        actionHref: '/categories/new',
+        actionLabel: 'Create a category'
+      }) %>
+    </section>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>

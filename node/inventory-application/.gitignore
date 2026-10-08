@@ -1,0 +1,11 @@
+# Local PostgreSQL cluster and environment
+.local/
+.env
+
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+*.swp

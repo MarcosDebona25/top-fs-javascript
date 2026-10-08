@@ -1,0 +1,50 @@
+<%- include('../partials/head', { title: 'Restore part' }) %>
+<body>
+  <%- include('../partials/header') %>
+  <main id="main" class="container">
+    <%- include('../partials/breadcrumbs', { crumbs: [
+      { label: 'Home', href: '/' },
+      { label: item.name, href: '/items/' + item.id },
+      { label: 'Restore' }
+    ] }) %>
+
+    <section class="panel panel--form">
+      <h1>Restore part</h1>
+      <p class="panel__intro">Restarting makes the part visible in the catalog again and able to accept stock movements. Its history is never lost.</p>
+
+      <%- include('../partials/flash') %>
+
+      <% if (conflict) { %>
+        <div class="flash flash--error" role="alert">
+          <span class="flash__label">Blocked:</span>
+          <p class="flash__message"><%= conflict %></p>
+        </div>
+      <% } %>
+
+      <div class="confirm-summary">
+        <p><strong><%= item.name %></strong> <span class="mono">(<%= item.sku %>)</span></p>
+        <p>Stock before archiving: <span class="mono"><%= item.stock_quantity %></span> unit<%= item.stock_quantity === 1 ? '' : 's' %></p>
+      </div>
+
+      <% if (item.archived_at) { %>
+        <form method="post" action="/items/<%= item.id %>/restore" novalidate>
+          <%- include('../partials/csrf-input') %>
+          <p class="confirm-text">Restore <strong>“<%= item.name %>”</strong> to the active catalog?</p>
+          <%- include('../partials/field-text', {
+            name: 'admin_password', id: 'admin_password', label: 'Administrative password',
+            type: 'password', required: true, errors: {},
+            extraAttrs: 'autocomplete="off"'
+          }) %>
+          <div class="form-actions">
+            <button type="submit" class="button button--primary">Restore part</button>
+            <a class="button button--ghost" href="/items/<%= item.id %>">Cancel</a>
+          </div>
+        </form>
+      <% } else { %>
+        <p class="form-actions"><a class="button button--ghost" href="/items/<%= item.id %>">Back to part</a></p>
+      <% } %>
+    </section>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<%- include('../../partials/head', { title: 'Record movement' }) %>
+<body>
+  <%- include('../../partials/header') %>
+  <main id="main" class="container">
+    <%- include('../../partials/breadcrumbs', { crumbs: [
+      { label: 'Home', href: '/' },
+      { label: item.name, href: '/items/' + item.id },
+      { label: 'Record ' + type }
+    ] }) %>
+
+    <section class="panel panel--form">
+      <div class="panel__head">
+        <h1>Record movement</h1>
+        <div class="segmented" role="tablist" aria-label="Movement type">
+          <% const types = ['receipt', 'dispatch', 'adjustment']; %>
+          <% const labels = { receipt: 'Receipt', dispatch: 'Dispatch', adjustment: 'Adjustment' }; %>
+          <% types.forEach((t) => { %>
+            <% if (t === type) { %>
+              <span class="segmented__item is-active" aria-current="true"><%= labels[t] %></span>
+            <% } else { %>
+              <a class="segmented__item" href="/items/<%= item.id %>/movements/new?type=<%= t %>"><%= labels[t] %></a>
+            <% } %>
+          <% }) %>
+        </div>
+      </div>
+
+      <p class="panel__intro">
+        <% if (type === 'receipt') { %>
+          Receipts add units to <strong><%= item.sku %></strong>, which currently has <span class="mono"><%= item.stock_quantity %></span>.
+        <% } else if (type === 'dispatch') { %>
+          Dispatches remove units from <strong><%= item.sku %></strong>, which currently has <span class="mono"><%= item.stock_quantity %></span>. You cannot dispatch more than the available stock.
+        <% } else { %>
+          Adjustments correct the record by counting: enter the quantity you actually counted and the difference becomes a movement.
+        <% } %>
+      </p>
+
+      <%- include('../../partials/flash') %>
+      <%- include('../../partials/form-errors', { errors }) %>
+
+      <% if (conflict) { %>
+        <div class="flash flash--error" role="alert">
+          <span class="flash__label">Blocked:</span>
+          <p class="flash__message"><%= conflict %></p>
+        </div>
+      <% } %>
+
+      <form method="post" action="/items/<%= item.id %>/movements" novalidate>
+        <%- include('../../partials/csrf-input') %>
+        <input type="hidden" name="type" value="<%= type %>">
+        <input type="hidden" name="request_id" value="<%= requestId %>">
+        <%- include('../../partials/field-text', {
+          name: 'quantity', id: 'quantity', label: type === 'adjustment' ? 'Counted quantity' : (type === 'receipt' ? 'Units received' : 'Units dispatched'),
+          type: 'number', required: true, value: values.quantity, errors,
+          hint: type === 'adjustment'
+            ? 'The quantity you counted on shelves. Example: 12 recorded, 9 counted → a movement of −3.'
+            : 'Whole number of units.',
+          extraAttrs: 'min="' + (type === 'adjustment' ? '0' : '1') + '" step="1" inputmode="numeric" autocomplete="off"'
+        }) %>
+        <%- include('../../partials/field-text', {
+          name: 'reason', id: 'reason', label: 'Reason', required: true,
+          value: values.reason, errors,
+          hint: 'Required; up to 250 characters.',
+          extraAttrs: 'maxlength="250" autocomplete="off"'
+        }) %>
+        <%- include('../../partials/field-text', {
+          name: 'admin_password', id: 'admin_password', label: 'Administrative password',
+          type: 'password', required: true, errors,
+          hint: 'Required to record stock movements.',
+          extraAttrs: 'autocomplete="off"'
+        }) %>
+        <div class="form-actions">
+          <button type="submit" class="button button--primary">Record <%= type %></button>
+          <a class="button button--ghost" href="/items/<%= item.id %>#history">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+  <%- include('../../partials/footer') %>
+</body>
+</html>

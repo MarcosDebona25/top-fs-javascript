@@ -1,0 +1,80 @@
+<%- include('../partials/head', { title: item.name }) %>
+<body>
+  <%- include('../partials/header') %>
+  <main id="main" class="container">
+    <%- include('../partials/breadcrumbs', { crumbs: [
+      { label: 'Home', href: '/' },
+      { label: 'Catalog', href: '/items' },
+      { label: item.category_name, href: '/categories/' + item.category_id },
+      { label: item.name }
+    ] }) %>
+    <%- include('../partials/flash') %>
+
+    <div class="item-layout">
+      <div class="item-layout__main">
+        <%- include('../partials/plate', { item }) %>
+
+        <section class="panel" id="history" aria-labelledby="history-title" tabindex="-1">
+          <div class="panel__head">
+            <h2 id="history-title">Stock history</h2>
+            <% if (!item.archived_at) { %>
+              <div class="panel__actions">
+                <a class="button button--primary" href="/items/<%= item.id %>/movements/new?type=receipt">Record receipt</a>
+                <a class="button button--ghost" href="/items/<%= item.id %>/movements/new?type=dispatch">Record dispatch</a>
+                <a class="button button--ghost" href="/items/<%= item.id %>/movements/new?type=adjustment">Record adjustment</a>
+              </div>
+            <% } %>
+          </div>
+
+          <% if (!movements.length) { %>
+            <%- include('../partials/empty-state', {
+              title: 'No movements recorded yet',
+              text: item.archived_at ? 'This part is archived; restore it to record movements.' : 'Record the first receipt to start the history.',
+              actionHref: item.archived_at ? null : '/items/' + item.id + '/movements/new?type=receipt',
+              actionLabel: 'Record a receipt'
+            }) %>
+          <% } else { %>
+            <%- include('../partials/movement-table', { movements }) %>
+            <%- include('../partials/pagination', { pagination, hrefFor }) %>
+          <% } %>
+        </section>
+      </div>
+
+      <aside class="item-layout__side">
+        <section class="panel" id="stock" aria-labelledby="stock-title" tabindex="-1">
+          <h2 id="stock-title">Availability</h2>
+          <p class="stock-number mono"><%= item.stock_quantity %></p>
+          <p><%- include('../partials/stock-badge', { item }) %></p>
+          <dl class="data-list">
+            <div>
+              <dt>Unit price</dt>
+              <dd class="mono">$<%= formatPrice(item.unit_price) %></dd>
+            </div>
+            <div>
+              <dt>Stock value</dt>
+              <dd class="mono">$<%= formatPrice((Number(item.unit_price) * item.stock_quantity).toFixed(2)) %></dd>
+            </div>
+            <div>
+              <dt>SKU</dt>
+              <dd class="mono"><%= item.sku %></dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd><%= item.archived_at ? 'Archived' : 'Active' %></dd>
+            </div>
+          </dl>
+          <div class="panel__actions panel__actions--column">
+            <% if (item.archived_at) { %>
+              <a class="button button--primary" href="/items/<%= item.id %>/restore">Restore part</a>
+            <% } else { %>
+              <a class="button button--ghost" href="/items/<%= item.id %>/edit">Edit part</a>
+              <a class="button button--danger" href="/items/<%= item.id %>/archive">Archive part</a>
+            <% } %>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>

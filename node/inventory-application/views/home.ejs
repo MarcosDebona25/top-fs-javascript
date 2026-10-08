@@ -1,0 +1,44 @@
+<%- include('./partials/head', { title: 'Home' }) %>
+<body>
+  <%- include('./partials/header') %>
+  <main id="main" class="container">
+    <%- include('./partials/breadcrumbs', { crumbs: [{ label: 'Home' }] }) %>
+    <%- include('./partials/flash') %>
+
+    <section class="page-head">
+      <h1>Axle Supply</h1>
+      <p class="lede">Parts inventory — browse the catalog by category or manage stock with the administrative password.</p>
+    </section>
+
+    <% if (!categories.length) { %>
+      <%- include('./partials/empty-state', {
+        title: 'No categories yet',
+        text: 'Create the first category to start organizing the parts catalog.',
+        actionHref: '/categories/new',
+        actionLabel: 'Create a category'
+      }) %>
+    <% } else { %>
+      <section aria-label="Categories">
+        <div class="card-grid">
+          <% categories.forEach((category) => { %>
+            <article class="card">
+              <h2 class="card__title"><a href="/categories/<%= category.id %>"><%= category.name %></a></h2>
+              <% if (category.description) { %>
+                <p class="card__text"><%= category.description %></p>
+              <% } %>
+              <p class="card__meta">
+                <span class="mono"><%= category.active_item_count %></span>
+                active part<%= category.active_item_count === 1 ? '' : 's' %>
+              </p>
+              <p class="card__actions">
+                <a class="button button--ghost" href="/categories/<%= category.id %>">View parts</a>
+              </p>
+            </article>
+          <% }) %>
+        </div>
+      </section>
+    <% } %>
+  </main>
+  <%- include('./partials/footer') %>
+</body>
+</html>

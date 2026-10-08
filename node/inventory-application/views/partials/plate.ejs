@@ -1,0 +1,36 @@
+<%#
+  The signature element of the design: the factory identification
+  plate for a part. Locals: item (with category_name).
+%>
+<section class="plate" aria-labelledby="item-title">
+  <p class="plate__eyebrow">Part identification</p>
+  <h1 id="item-title" class="plate__name"><%= item.name %></h1>
+  <p class="plate__sku mono"><%= item.sku %></p>
+  <dl class="plate__data">
+    <div>
+      <dt>Brand</dt>
+      <dd><%= item.brand %></dd>
+    </div>
+    <div>
+      <dt>Category</dt>
+      <dd><a href="/categories/<%= item.category_id %>"><%= item.category_name %></a></dd>
+    </div>
+    <% if (item.part_number) { %>
+      <div>
+        <dt>Part number</dt>
+        <dd class="mono"><%= item.part_number %></dd>
+      </div>
+    <% } %>
+    <div>
+      <dt>Status</dt>
+      <dd><%= item.archived_at ? 'Archived' : 'Active' %></dd>
+    </div>
+    <div>
+      <dt>Added</dt>
+      <dd><%= formatDateTime(item.created_at) %></dd>
+    </div>
+  </dl>
+  <% if (item.description) { %>
+    <p class="plate__description"><%= item.description %></p>
+  <% } %>
+</section>
