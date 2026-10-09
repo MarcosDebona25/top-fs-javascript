@@ -9,13 +9,23 @@ const movementService = require('../services/movements');
 const archivingService = require('../services/archiving');
 const { setFlash } = require('../lib/flash');
 const { paginate, PER_PAGE } = require('../lib/pagination');
-const { NotFoundError } = require('../lib/errors');
+const { NotFoundError, ConflictError } = require('../lib/errors');
+const { parseId, parsePage } = require('../lib/params');
+const { MAX_MOVEMENT_QUANTITY, MAX_STOCK } = require('../lib/limits');
 
 const MOVEMENT_TYPES = ['receipt', 'dispatch', 'adjustment'];
+const MOVEMENT_LIMITS = { maxQuantity: MAX_MOVEMENT_QUANTITY, maxStock: MAX_STOCK };
+const CATEGORY_GONE = 'The selected category no longer exists. Select another one.';
+
+function requireItemId(req) {
+  const id = parseId(req.params.id);
+  if (id === null) throw new NotFoundError('The requested part was not found.');
+  return id;
+}
 
 function extractItemFields(body) {
   return {
-    category_id: Number(body.category_id),
+    category_id: parseId(body.category_id),
     sku: String(body.sku || '').trim().toUpperCase(),
     name: String(body.name || '').trim(),
     brand: String(body.brand || '').trim(),
@@ -30,10 +40,9 @@ function parseCatalogFilters(query) {
   const availability = ['in_stock', 'out_of_stock'].includes(query.availability)
     ? query.availability
     : 'all';
-  const categoryId =
-    query.category_id && /^\d+$/.test(query.category_id) ? Number(query.category_id) : null;
+  const categoryId = parseId(query.category_id);
   const q = typeof query.q === 'string' && query.q.trim() ? query.q.trim() : null;
-  const page = query.page && /^\d+$/.test(query.page) ? Math.max(1, Number(query.page)) : 1;
+  const page = parsePage(query.page);
   return { status, availability, categoryId, q, page };
 }
 
@@ -58,21 +67,25 @@ async function findItemOr404(id) {
 async function listItems(req, res, next) {
   try {
     const filters = parseCatalogFilters(req.query);
-    const [items, total, categories] = await Promise.all([
-      itemDb.searchItems({
-        ...filters,
-        limit: PER_PAGE,
-        offset: (filters.page - 1) * PER_PAGE,
-      }),
+    const [total, categories] = await Promise.all([
       itemDb.countItems(filters),
       categoryDb.listCategories(),
     ]);
+
+    // Count first so an out-of-range page is clamped before it becomes an
+    // offset: the list and the pagination always describe the same page.
+    const pagination = paginate({ page: filters.page, total });
+    const items = await itemDb.searchItems({
+      ...filters,
+      page: pagination.page,
+      limit: PER_PAGE,
+    });
 
     res.render('items/index', {
       items,
       filters,
       categories,
-      pagination: paginate({ page: filters.page, total }),
+      pagination,
       hrefFor: makeCatalogHref(filters),
     });
   } catch (err) {
@@ -90,10 +103,7 @@ async function showNewForm(req, res, next) {
       return res.render('items/no-categories');
     }
 
-    const preselectedCategoryId =
-      req.query.category_id && /^\d+$/.test(req.query.category_id)
-        ? Number(req.query.category_id)
-        : null;
+    const preselectedCategoryId = parseId(req.query.category_id);
 
     res.render('items/new', {
       categories,
@@ -131,12 +141,18 @@ async function createItem(req, res, next) {
     setFlash(req, 'success', `Part ${item.sku} was created with zero stock.`);
     res.redirect(303, `/items/${item.id}`);
   } catch (err) {
-    const categories = await categoryDb.listCategories();
-    if (err.code === '23505') {
+    // Backstops for a concurrent change that slipped past validation:
+    // a duplicate SKU (23505) or a category deleted meanwhile (23503).
+    const raceErrors = {
+      23505: { sku: { msg: 'A part with this SKU already exists. SKUs stay unique, even for archived parts.' } },
+      23503: { category_id: { msg: CATEGORY_GONE } },
+    }[err.code];
+    if (raceErrors) {
+      const categories = await categoryDb.listCategories();
       return res.status(422).render('items/new', {
         categories,
         values: { ...values, category_id: req.body.category_id },
-        errors: { sku: { msg: 'A part with this SKU already exists. SKUs stay unique, even for archived parts.' } },
+        errors: raceErrors,
       });
     }
     next(err);
@@ -145,21 +161,20 @@ async function createItem(req, res, next) {
 
 async function showItem(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested part was not found.');
+    const id = requireItemId(req);
 
     const item = await findItemOr404(id);
-    const page = req.query.page && /^\d+$/.test(req.query.page) ? Math.max(1, Number(req.query.page)) : 1;
-
-    const [movements, total] = await Promise.all([
-      movementDb.listMovements(id, { limit: PER_PAGE, offset: (page - 1) * PER_PAGE }),
-      movementDb.countMovements(id),
-    ]);
+    const total = await movementDb.countMovements(id);
+    const pagination = paginate({ page: parsePage(req.query.page), total });
+    const movements = await movementDb.listMovements(id, {
+      limit: PER_PAGE,
+      offset: (pagination.page - 1) * PER_PAGE,
+    });
 
     res.render('items/show', {
       item,
       movements,
-      pagination: paginate({ page, total }),
+      pagination,
       hrefFor: (p) => `/items/${id}?page=${p}#history`,
     });
   } catch (err) {
@@ -169,8 +184,7 @@ async function showItem(req, res, next) {
 
 async function showEditForm(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested part was not found.');
+    const id = requireItemId(req);
 
     const item = await findItemOr404(id);
     const categories = await categoryDb.listCategories();
@@ -196,44 +210,41 @@ async function showEditForm(req, res, next) {
 
 async function updateItem(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested part was not found.');
+    const id = requireItemId(req);
 
     const item = await findItemOr404(id);
     const errors = validationResult(req);
-    const values = extractItemFields(req.body);
-
-    if (!errors.isEmpty()) {
+    // The SKU is immutable: whatever the submission carries is ignored.
+    const values = { ...extractItemFields(req.body), sku: item.sku };
+    const renderInvalid = async (fieldErrors) => {
       const categories = await categoryDb.listCategories();
       return res.status(422).render('items/edit', {
         item,
         categories,
         values: { ...values, category_id: req.body.category_id },
-        errors: errors.mapped(),
+        errors: fieldErrors,
       });
-    }
+    };
 
-    const updated = await itemDb.updateItem(id, values);
-    setFlash(req, 'success', `Part ${updated.sku} was updated.`);
-    res.redirect(303, `/items/${id}`);
-  } catch (err) {
-    if (err.code === '23505') {
-      const categories = await categoryDb.listCategories();
-      return res.status(422).render('items/edit', {
-        item: await findItemOr404(Number(req.params.id)),
-        categories,
-        values: extractItemFields(req.body),
-        errors: { sku: { msg: 'A part with this SKU already exists.' } },
-      });
+    if (!errors.isEmpty()) return await renderInvalid(errors.mapped());
+
+    try {
+      const updated = await itemDb.updateItem(id, values);
+      setFlash(req, 'success', `Part ${updated.sku} was updated.`);
+      res.redirect(303, `/items/${id}`);
+    } catch (err) {
+      // The category was deleted between validation and the update.
+      if (err.code === '23503') return await renderInvalid({ category_id: { msg: CATEGORY_GONE } });
+      throw err;
     }
+  } catch (err) {
     next(err);
   }
 }
 
 async function showMovementForm(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested part was not found.');
+    const id = requireItemId(req);
 
     const item = await findItemOr404(id);
     const type = MOVEMENT_TYPES.includes(req.query.type) ? req.query.type : 'receipt';
@@ -242,6 +253,7 @@ async function showMovementForm(req, res, next) {
       item,
       type,
       requestId: crypto.randomUUID(),
+      limits: MOVEMENT_LIMITS,
       values: { quantity: '', reason: '' },
       errors: {},
       conflict: null,
@@ -252,7 +264,7 @@ async function showMovementForm(req, res, next) {
 }
 
 async function createMovement(req, res, next) {
-  const id = Number(req.params.id);
+  const id = requireItemId(req);
   const type = MOVEMENT_TYPES.includes(req.body.type) ? req.body.type : 'receipt';
   const values = {
     quantity: String(req.body.quantity || ''),
@@ -264,6 +276,7 @@ async function createMovement(req, res, next) {
       item: extras.item,
       type,
       requestId: String(req.body.request_id || ''),
+      limits: MOVEMENT_LIMITS,
       values,
       errors: extras.errors || {},
       conflict: extras.conflict || null,
@@ -314,8 +327,9 @@ async function createMovement(req, res, next) {
 
     res.redirect(303, `/items/${id}#history`);
   } catch (err) {
-    if (err instanceof require('../lib/errors').ConflictError) {
-      const item = err.details && err.details.item ? err.details.item : await itemDb.findItemById(id);
+    if (err instanceof ConflictError) {
+      // Reload the full row: the form needs the name and the current stock.
+      const item = await findItemOr404(id);
       return renderForm(409, {
         item,
         conflict: err.message,
@@ -327,8 +341,7 @@ async function createMovement(req, res, next) {
 
 async function showArchiveForm(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested part was not found.');
+    const id = requireItemId(req);
 
     const item = await findItemOr404(id);
     res.render('items/archive', { item, conflict: null });
@@ -339,8 +352,7 @@ async function showArchiveForm(req, res, next) {
 
 async function archiveItem(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested part was not found.');
+    const id = requireItemId(req);
 
     const archived = await archivingService.archiveItem(id);
     setFlash(
@@ -350,8 +362,8 @@ async function archiveItem(req, res, next) {
     );
     res.redirect(303, `/items/${id}`);
   } catch (err) {
-    if (err instanceof require('../lib/errors').ConflictError) {
-      const item = err.details && err.details.item ? err.details.item : await itemDb.findItemById(Number(req.params.id));
+    if (err instanceof ConflictError) {
+      const item = await findItemOr404(requireItemId(req));
       return res.status(409).render('items/archive', { item, conflict: err.message });
     }
     next(err);
@@ -360,8 +372,7 @@ async function archiveItem(req, res, next) {
 
 async function showRestoreForm(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested part was not found.');
+    const id = requireItemId(req);
 
     const item = await findItemOr404(id);
     res.render('items/restore', { item, conflict: null });
@@ -372,15 +383,14 @@ async function showRestoreForm(req, res, next) {
 
 async function restoreItem(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested part was not found.');
+    const id = requireItemId(req);
 
     const restored = await archivingService.restoreItem(id);
     setFlash(req, 'success', `Part ${restored.sku} was restored and accepts stock movements again.`);
     res.redirect(303, `/items/${id}`);
   } catch (err) {
-    if (err instanceof require('../lib/errors').ConflictError) {
-      const item = err.details && err.details.item ? err.details.item : await itemDb.findItemById(Number(req.params.id));
+    if (err instanceof ConflictError) {
+      const item = await findItemOr404(requireItemId(req));
       return res.status(409).render('items/restore', { item, conflict: err.message });
     }
     next(err);

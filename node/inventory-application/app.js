@@ -9,11 +9,29 @@ const cookieSession = require('cookie-session');
 
 const { csrfSynchronisedProtection, generateToken } = require('./lib/csrf');
 const { flashMiddleware } = require('./lib/flash');
-const { formatPrice, formatDateTime } = require('./lib/format');
-const { NotFoundError, HttpError } = require('./lib/errors');
+const { formatPrice, formatMoney, formatDateTime } = require('./lib/format');
+const { NotFoundError, HttpError, UnprocessableError } = require('./lib/errors');
 const homeRoutes = require('./routes');
 const categoryRoutes = require('./routes/categories');
 const itemRoutes = require('./routes/items');
+
+// The session secret signs the cookie that carries CSRF state. Production
+// must supply its own; local development and tests fall back to a fixed one.
+const DEV_SESSION_SECRET = 'local-dev-session-secret';
+const sessionSecret = process.env.SESSION_SECRET || DEV_SESSION_SECRET;
+if (!process.env.SESSION_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('SESSION_SECRET is required when NODE_ENV is "production". Set it in the environment.');
+  }
+  if (process.env.NODE_ENV !== 'test') {
+    console.warn('SESSION_SECRET is not set: using the built-in development secret.');
+  }
+}
+
+// PostgreSQL rejections of malformed input that slipped past validation:
+// value too long (22001), number out of range (22003), invalid text
+// representation (22P02). They are the client's fault, not a server failure.
+const BAD_INPUT_PG_CODES = new Set(['22001', '22003', '22P02']);
 
 const app = express();
 
@@ -35,7 +53,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   cookieSession({
     name: 'axle_supply_session',
-    keys: [process.env.SESSION_SECRET || 'local-dev-session-secret'],
+    keys: [sessionSecret],
     maxAge: 24 * 60 * 60 * 1000,
     sameSite: 'lax',
     httpOnly: true,
@@ -45,10 +63,24 @@ app.use(
 // CSRF protection on every POST (token read from the hidden `_csrf` field).
 app.use(csrfSynchronisedProtection);
 
-// Shared view locals: CSRF token, flash message and formatting helpers.
+// A form field sent more than once arrives as an array. No form here does
+// that, so it is rejected instead of being coerced into a single value.
+app.use((req, res, next) => {
+  const repeated = Object.values(req.body || {}).some((value) => typeof value !== 'string');
+  if (repeated) {
+    return next(new UnprocessableError('Each form field may be sent only once. Reload the form and try again.'));
+  }
+  next();
+});
+
+// Shared view locals: CSRF token, flash message, formatting helpers and
+// the current location (used to mark the active navigation item).
 app.use((req, res, next) => {
   res.locals.csrfToken = generateToken(req);
+  res.locals.currentPath = req.path;
+  res.locals.currentStatus = typeof req.query.status === 'string' ? req.query.status : '';
   res.locals.formatPrice = formatPrice;
+  res.locals.formatMoney = formatMoney;
   res.locals.formatDateTime = formatDateTime;
   next();
 });
@@ -66,7 +98,9 @@ app.use((req, res, next) => {
 // Central error handler: HTTP errors render a friendly page,
 // unexpected failures log the technical detail server-side only.
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || err.status || 500;
+  const isBadInput = BAD_INPUT_PG_CODES.has(err.code);
+  const isCsrfFailure = err.code === 'EBADCSRFTOKEN';
+  const statusCode = isBadInput ? 400 : err.statusCode || err.status || 500;
 
   if (statusCode >= 500) {
     console.error(`[${new Date().toISOString()}] ${statusCode} ${err.message}`);
@@ -85,10 +119,16 @@ app.use((err, req, res, next) => {
             ? 'The operation cannot be completed'
             : statusCode === 422
               ? 'The submitted data has problems'
-              : 'Something went wrong',
+              : statusCode === 400
+                ? 'The request is not valid'
+                : 'Something went wrong',
     message: isHttpError
       ? err.message
-      : 'An unexpected error occurred. The detail was logged on the server; try again in a moment.',
+      : isCsrfFailure
+        ? 'The security token of this form is missing or has expired. Go back, reload the form and submit it again.'
+        : isBadInput
+          ? 'The request contains a value that is too long, out of range or malformed.'
+          : 'An unexpected error occurred. The detail was logged on the server; try again in a moment.',
     details: err.details || null,
   });
 });

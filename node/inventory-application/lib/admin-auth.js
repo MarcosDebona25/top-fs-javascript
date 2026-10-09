@@ -30,8 +30,16 @@ function isRateLimited(ip) {
   return record.count >= MAX_ATTEMPTS;
 }
 
+// Drop expired records so addresses that never come back do not accumulate.
+function purgeExpired(now) {
+  for (const [ip, record] of attempts) {
+    if (now > record.resetAt) attempts.delete(ip);
+  }
+}
+
 function recordFailure(ip) {
   const now = Date.now();
+  purgeExpired(now);
   const record = attempts.get(ip);
   if (!record || now > record.resetAt) {
     attempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });

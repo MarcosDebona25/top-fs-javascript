@@ -8,7 +8,9 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "node --watch server.js",
+    "dev": "node scripts/dev.js",
+    "db:start": "/usr/lib/postgresql/16/bin/pg_ctl -D .local/postgres status > /dev/null || /usr/lib/postgresql/16/bin/pg_ctl -D .local/postgres -l .local/postgres/server.log -w start",
+    "db:stop": "/usr/lib/postgresql/16/bin/pg_ctl -D .local/postgres stop",
     "start": "node server.js",
     "test": "node --test --test-concurrency=1 \"test/*.test.js\"",
     "db:seed": "node db/seed.js"

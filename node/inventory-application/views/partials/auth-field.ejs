@@ -1,0 +1,18 @@
+<%#
+  Authorization block: the shared administrative password, kept apart
+  from the data fields of a protected form. The value is never echoed.
+  Locals: errors, hint
+%>
+<%
+  const authErrors = typeof errors !== 'undefined' && errors ? errors : {};
+  const authHint = typeof hint !== 'undefined' && hint ? hint : 'Checked on every protected change. It is never stored in the browser.';
+%>
+<fieldset class="auth">
+  <legend>Authorization</legend>
+  <%- include('./field-text', {
+    name: 'admin_password', id: 'admin_password', label: 'Administrative password',
+    type: 'password', required: true, errors: authErrors, width: 'md',
+    hint: authHint,
+    extraAttrs: 'autocomplete="off"'
+  }) %>
+</fieldset>

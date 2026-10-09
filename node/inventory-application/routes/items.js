@@ -22,7 +22,7 @@ router.get('/:id/edit', asyncHandler(itemsController.showEditForm));
 router.post(
   '/:id/edit',
   requireAdminPassword,
-  itemRules(),
+  itemRules({ includeSku: false }),
   asyncHandler(itemsController.updateItem)
 );
 

@@ -9,13 +9,13 @@
       <% if (details && details.items && details.items.length) { %>
         <ul class="error-page__list">
           <% details.items.forEach((item) => { %>
-            <li><a href="/items/<%= item.id %>"><span class="mono"><%= item.sku %></span> — <%= item.name %></a></li>
+            <li><a href="/items/<%= item.id %>"><span class="mono"><%= item.sku %></span> <%= item.name %></a></li>
           <% }) %>
         </ul>
       <% } %>
       <p class="error-page__actions">
         <a class="button button--primary" href="/">Back to home</a>
-        <a class="button button--ghost" href="javascript:history.back()">Go back</a>
+        <a class="button button--ghost" href="/items">Browse the catalog</a>
       </p>
     </section>
   </main>

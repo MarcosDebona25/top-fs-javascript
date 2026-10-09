@@ -1,6 +1,6 @@
-# Axle Supply — Parts inventory
+# Axle Supply - Parts inventory
 
-Aplicación local de inventario de repuestos para una tienda ficticia, construida como proyecto de **The Odin Project** (fase de Node.js). Marca: **Axle Supply**, subtítulo *Parts inventory*. Interfaz en inglés, precios en USD.
+Aplicación local de inventario de repuestos para una tienda ficticia, construida como proyecto de **The Odin Project** (sección Node.js).
 
 ---
 
@@ -42,15 +42,13 @@ Esta fase de The Odin Project pide trabajar los fundamentos: se usan **consultas
 | Pruebas | `node:test` + `supertest` contra `axle_supply_test` |
 | Estilos | CSS propio, fuentes alojadas localmente |
 
-Sin dependencias de CDN, sin fotos, sin JavaScript obligatorio en el navegador: todos los formularios funcionan con JS deshabilitado.
-
 ---
 
 ## 3. Cuentas de prueba y credenciales
 
 | Uso | Usuario / valor | Contraseña |
 |---|---|---|
-| Contraseña administrativa (POST protegidos) | — | `axle-admin` |
+| Contraseña administrativa (POST protegidos) | - | `axle-admin` |
 | Base de datos (app y tests) | `inventory_app` | `inventory_app` |
 | Superusuario del cluster (solo administración) | `postgres` | `postgres` |
 
@@ -84,7 +82,7 @@ $PGBIN/initdb -D .local/postgres -U postgres --encoding=UTF8 --locale=C.UTF-8
 # unix_socket_directories = '<raíz-del-proyecto>/.local' en postgresql.conf,
 # y en pg_hba.conf: local = trust, host 127.0.0.1/32 = scram-sha-256
 
-# Iniciar / detener
+# Iniciar / detener (equivale a `npm run db:start` / `npm run db:stop`)
 $PGBIN/pg_ctl -D .local/postgres -l .local/postgres/server.log start
 $PGBIN/pg_ctl -D .local/postgres stop
 
@@ -124,12 +122,16 @@ npm run db:seed
 
 | Comando | Función |
 |---|---|
-| `npm run dev` | Servidor en modo desarrollo con recarga (`--watch`) |
+| `npm run dev` | Inicia el cluster PostgreSQL si hace falta y levanta el servidor en modo desarrollo con recarga (`--watch`); al cortar con Ctrl+C también detiene el cluster |
 | `npm start` | Servidor en producción |
 | `npm test` | Suite de pruebas sobre `axle_supply_test` |
 | `npm run db:seed` | Seed determinista (idempotente) |
+| `npm run db:start` | Inicia el cluster PostgreSQL local (no hace nada si ya está corriendo) |
+| `npm run db:stop` | Detiene el cluster PostgreSQL local |
 
-El servidor escucha en `http://127.0.0.1:3000` por defecto. Si el puerto está ocupado, cambia la variable `PORT` (p. ej. `PORT=3100 npm start`); el proceso avisa y termina con un mensaje claro si el puerto ya está en uso.
+`npm run dev` solo detiene el cluster si fue él quien lo inició: si ya estaba corriendo (p. ej. con `npm run db:start`), queda encendido al salir. `npm start` y `npm test` no inician la base; requieren el cluster en marcha. `npm run dev` busca `pg_ctl` en `/usr/lib/postgresql/16/bin`; para usar otra ubicación, define `PGBIN` (p. ej. `PGBIN=/ruta/a/bin npm run dev`). Los scripts `db:start` y `db:stop` usan esa ruta fija.
+
+El servidor escucha en `http://127.0.0.1:3000` por defecto y solo acepta conexiones locales; para exponerlo a otras máquinas hay que definir `HOST` (p. ej. `HOST=0.0.0.0 npm start`). Si el puerto está ocupado, cambia la variable `PORT` (p. ej. `PORT=3100 npm start`); el proceso avisa y termina con un mensaje claro si el puerto ya está en uso.
 
 La suite **rechaza** configuraciones que apunten a la base de desarrollo: exige `TEST_DATABASE_URL` con la base `axle_supply_test` y aísla sus fixtures antes de cada prueba.
 
@@ -182,6 +184,8 @@ erDiagram
 
 **Índices adicionales:** `items(category_id)` para listar piezas por categoría y `stock_movements(item_id, created_at DESC)` para el historial por pieza y fecha.
 
+**Qué garantiza cada capa.** El esquema garantiza las claves foráneas, la unicidad (SKU, nombre de categoría, `request_id`), los largos máximos de los `VARCHAR`, el formato y las mayúsculas del SKU, el precio y el stock no negativos, el signo del delta según el tipo, `stock_after = stock_before + delta` y que un archivado tenga stock cero. Las demás reglas del diagrama las aplica solo la capa de validación de la aplicación (`validators/` y `services/`): los largos mínimos (SKU 3, nombres 2, marca no vacía), el motivo no vacío, el máximo de 1000 caracteres de las descripciones, los topes de cantidad y stock, y la prohibición de movimientos sobre piezas archivadas. Un `INSERT` directo en la base puede saltearlas.
+
 ### Secuencia de procesamiento de un movimiento
 
 ```mermaid
@@ -211,6 +215,9 @@ Cada movimiento usa **un mismo cliente de `pg`** para todas las consultas de la 
 - **Secuencia transaccional** de cada movimiento: validar campos, contraseña y token CSRF → abrir transacción y bloquear la fila (`SELECT … FOR UPDATE`) → verificar que está activo y reconocer `request_id` ya procesados → calcular con el stock vigente → rechazar cantidades inválidas o stock insuficiente → insertar movimiento y actualizar `stock_quantity` → confirmar ambos cambios juntos (o revertirlos).
 - **Archivo:** solo con stock cero; los archivados no admiten movimientos hasta restaurarse; su metadata y categoría siguen editables con contraseña; el SKU y todo el historial se conservan.
 - **Categorías:** una categoría con repuestos activos o archivados no puede eliminarse; la confirmación muestra las piezas que la bloquean.
+- **Topes** (definidos en `lib/limits.js`): una entrada o una salida mueve como máximo **10 000** unidades; un ajuste acepta una cantidad contada de hasta **1 000 000**; ningún movimiento puede dejar el stock por encima de **1 000 000** (se rechaza con 409).
+- **Idempotencia:** reenviar el mismo `request_id` para la misma pieza no registra nada nuevo; usarlo para otra pieza se rechaza con 409.
+- **SKU inmutable:** el formulario de edición lo muestra como solo lectura y el servidor ignora cualquier SKU enviado al editar.
 - `updated_at` se actualiza explícitamente en cada cambio.
 
 ---
@@ -244,11 +251,13 @@ Todas las vistas se renderizan desde el servidor; los formularios usan GET y POS
 | Operación exitosa | **303** + aviso de texto predefinido |
 | Datos inválidos o duplicados | **422** con errores por campo y valores conservados |
 | Contraseña ausente/incorrecta o CSRF inválido | **403** |
-| Recurso inexistente | **404** |
+| Recurso inexistente, o id que no es un entero positivo de hasta 9 dígitos | **404** |
+| Valor mal formado o fuera de rango que la base rechaza | **400** con mensaje general |
+| Campo de formulario enviado más de una vez | **422** |
 | Stock insuficiente, archivo bloqueado, categoría ocupada | **409** con explicación de cómo resolverlo |
 | Fallo inesperado | **500** con mensaje general y registro técnico en el servidor |
 
-La contraseña queda vacía tras cualquier error; ninguna solicitud GET modifica datos.
+La contraseña queda vacía tras cualquier error; ninguna solicitud GET modifica datos. En los listados, un número de página ilegible se trata como la primera página y uno mayor al total muestra la última.
 
 ---
 
@@ -256,6 +265,8 @@ La contraseña queda vacía tras cualquier error; ninguna solicitud GET modifica
 
 - **CSRF** en todos los POST mediante `cookie-session` + `csrf-sync`; la cookie contiene únicamente estado anónimo para CSRF, firmada, `HttpOnly` y `SameSite=Lax` (`Secure` con HTTPS). El token viaja en un campo oculto del formulario.
 - **Contraseña administrativa** verificada por digest con `crypto.timingSafeEqual`; límite de **10 intentos fallidos por IP cada 15 minutos**.
+- **`SESSION_SECRET`** firma la cookie de sesión: es obligatorio con `NODE_ENV=production` (el servidor no arranca sin él); en desarrollo, si falta, se usa un valor fijo y se avisa por consola.
+- La búsqueda del catálogo trata `%` y `_` como texto literal.
 - `helmet`, límite de tamaño de cuerpo (100 KB), escape de contenido vía EJS y consultas 100 % parametrizadas.
 
 ---
@@ -298,5 +309,6 @@ inventory-application/
 ├── lib/                 # errores HTTP, contraseña+rate limit, CSRF, flash, paginación
 ├── views/               # plantillas EJS y parciales compartidos
 ├── public/              # estilos, fuentes e iconos
+├── scripts/             # dev.js (npm run dev: base + servidor) y descarga de fuentes
 └── test/                # node:test + supertest sobre axle_supply_test
 ```

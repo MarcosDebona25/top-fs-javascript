@@ -5,8 +5,10 @@ require('dotenv').config();
 const app = require('./app');
 
 const port = Number(process.env.PORT) || 3000;
+// Local-only by default. Set HOST=0.0.0.0 to accept connections from other machines.
+const host = process.env.HOST || '127.0.0.1';
 
-const server = app.listen(port);
+const server = app.listen(port, host);
 
 server.on('error', (err) => {
   if (err && err.code === 'EADDRINUSE') {
@@ -20,6 +22,6 @@ server.on('error', (err) => {
 });
 
 server.on('listening', () => {
-  console.log(`Axle Supply listening on http://127.0.0.1:${port}`);
+  console.log(`Axle Supply listening on http://${host}:${port}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });

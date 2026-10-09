@@ -7,50 +7,69 @@
     <section class="panel panel--form">
       <h1>New part</h1>
       <p class="panel__intro">A new part starts with zero stock. Record a receipt afterwards to add units.</p>
+      <%- include('../partials/required-legend') %>
 
       <%- include('../partials/flash') %>
       <%- include('../partials/form-errors', { errors }) %>
 
       <form method="post" action="/items" novalidate>
         <%- include('../partials/csrf-input') %>
-        <%- include('../partials/field-select', {
-          name: 'category_id', id: 'category_id', label: 'Category', required: true,
-          value: values.category_id, errors,
-          options: categories.map((category) => ({ value: category.id, label: category.name }))
-        }) %>
-        <%- include('../partials/field-text', {
-          name: 'sku', id: 'sku', label: 'SKU', required: true,
-          value: values.sku, errors,
-          hint: '3–40 characters: letters, digits and hyphens, starting with a letter or digit. Stored in capitals and unique, even among archived parts.',
-          extraAttrs: 'maxlength="40" autocomplete="off" spellcheck="false"'
-        }) %>
-        <%- include('../partials/field-text', {
-          name: 'name', id: 'name', label: 'Part name', required: true,
-          value: values.name, errors,
-          extraAttrs: 'maxlength="120" autocomplete="off"'
-        }) %>
-        <%- include('../partials/field-text', {
-          name: 'brand', id: 'brand', label: 'Brand', required: true,
-          value: values.brand, errors,
-          extraAttrs: 'maxlength="80" autocomplete="off"'
-        }) %>
-        <%- include('../partials/field-text', {
-          name: 'part_number', id: 'part_number', label: 'Part number',
-          value: values.part_number, errors,
-          hint: 'Optional manufacturer code.',
-          extraAttrs: 'maxlength="60" autocomplete="off" spellcheck="false"'
-        }) %>
-        <%- include('../partials/field-text', {
-          name: 'unit_price', id: 'unit_price', label: 'Unit price (USD)', required: true,
-          type: 'text', value: values.unit_price, errors,
-          hint: 'Up to 8 whole digits and 2 decimals, for example 14.99.',
-          extraAttrs: 'inputmode="decimal" autocomplete="off"'
-        }) %>
-        <%- include('../partials/field-textarea', {
-          name: 'description', id: 'description', label: 'Description',
-          value: values.description, errors, rows: 4,
-          extraAttrs: 'maxlength="1000"'
-        }) %>
+
+        <fieldset class="fieldset">
+          <legend>Identification</legend>
+          <%- include('../partials/field-select', {
+            name: 'category_id', id: 'category_id', label: 'Category', required: true,
+            value: values.category_id, errors, width: 'md',
+            options: categories.map((category) => ({ value: category.id, label: category.name }))
+          }) %>
+          <div class="field-row">
+            <%- include('../partials/field-text', {
+              name: 'sku', id: 'sku', label: 'SKU', required: true,
+              value: values.sku, errors, mono: true,
+              hint: '3–40 letters, digits and hyphens. Stored in capitals; unique even among archived parts.',
+              extraAttrs: 'maxlength="40" autocomplete="off" spellcheck="false"'
+            }) %>
+            <%- include('../partials/field-text', {
+              name: 'part_number', id: 'part_number', label: 'Part number',
+              value: values.part_number, errors, mono: true,
+              hint: 'Optional manufacturer code.',
+              extraAttrs: 'maxlength="60" autocomplete="off" spellcheck="false"'
+            }) %>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Commercial</legend>
+          <%- include('../partials/field-text', {
+            name: 'name', id: 'name', label: 'Part name', required: true,
+            value: values.name, errors,
+            extraAttrs: 'maxlength="120" autocomplete="off"'
+          }) %>
+          <div class="field-row">
+            <%- include('../partials/field-text', {
+              name: 'brand', id: 'brand', label: 'Brand', required: true,
+              value: values.brand, errors,
+              extraAttrs: 'maxlength="80" autocomplete="off"'
+            }) %>
+            <%- include('../partials/field-text', {
+              name: 'unit_price', id: 'unit_price', label: 'Unit price (USD)', required: true,
+              type: 'text', value: values.unit_price, errors, mono: true, prefix: '$', width: 'sm',
+              hint: 'Up to 2 decimals, for example 14.99.',
+              extraAttrs: 'inputmode="decimal" autocomplete="off"'
+            }) %>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Notes</legend>
+          <%- include('../partials/field-textarea', {
+            name: 'description', id: 'description', label: 'Description',
+            value: values.description, errors, rows: 4,
+            hint: 'Optional. Up to 1000 characters.',
+            extraAttrs: 'maxlength="1000"'
+          }) %>
+        </fieldset>
+
         <div class="form-actions">
           <button type="submit" class="button button--primary">Create part</button>
           <a class="button button--ghost" href="/items">Cancel</a>

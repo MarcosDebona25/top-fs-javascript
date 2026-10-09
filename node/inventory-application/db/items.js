@@ -11,7 +11,9 @@ function buildFilters(filters) {
   where.push(filters.status === 'archived' ? 'i.archived_at IS NOT NULL' : 'i.archived_at IS NULL');
 
   if (filters.q) {
-    params.push(`%${filters.q.toLowerCase()}%`);
+    // Escape LIKE wildcards so the search text is matched literally.
+    const literal = filters.q.toLowerCase().replace(/[\\%_]/g, '\\$&');
+    params.push(`%${literal}%`);
     const pattern = `$${params.length}`;
     where.push(
       `(lower(i.name) LIKE ${pattern} OR lower(i.sku) LIKE ${pattern} OR lower(i.brand) LIKE ${pattern})`
@@ -73,11 +75,8 @@ async function findItemById(id) {
   return rows[0] || null;
 }
 
-async function findItemBySku(sku, excludeId = null) {
-  const { rows } = await db.query(
-    `SELECT id FROM items WHERE sku = $1${excludeId ? ' AND id <> $2' : ''}`,
-    excludeId ? [sku, excludeId] : [sku]
-  );
+async function findItemBySku(sku) {
+  const { rows } = await db.query('SELECT id FROM items WHERE sku = $1', [sku]);
   return rows[0] || null;
 }
 

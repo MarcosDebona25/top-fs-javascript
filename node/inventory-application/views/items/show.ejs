@@ -14,8 +14,8 @@
       <div class="item-layout__main">
         <%- include('../partials/plate', { item }) %>
 
-        <section class="panel" id="history" aria-labelledby="history-title" tabindex="-1">
-          <div class="panel__head">
+        <section class="sheet" id="history" aria-labelledby="history-title" tabindex="-1">
+          <div class="sheet__head">
             <h2 id="history-title">Stock history</h2>
             <% if (!item.archived_at) { %>
               <div class="panel__actions">
@@ -42,25 +42,17 @@
 
       <aside class="item-layout__side">
         <section class="panel" id="stock" aria-labelledby="stock-title" tabindex="-1">
-          <h2 id="stock-title">Availability</h2>
-          <p class="stock-number mono"><%= item.stock_quantity %></p>
+          <h2 id="stock-title" class="stock-label">Availability</h2>
+          <p class="stock-number mono<%= !item.archived_at && item.stock_quantity === 0 ? ' stock-number--out' : '' %>"><%= item.stock_quantity %></p>
           <p><%- include('../partials/stock-badge', { item }) %></p>
           <dl class="data-list">
             <div>
               <dt>Unit price</dt>
-              <dd class="mono">$<%= formatPrice(item.unit_price) %></dd>
+              <dd class="mono">$<%= formatMoney(item.unit_price) %></dd>
             </div>
             <div>
               <dt>Stock value</dt>
-              <dd class="mono">$<%= formatPrice((Number(item.unit_price) * item.stock_quantity).toFixed(2)) %></dd>
-            </div>
-            <div>
-              <dt>SKU</dt>
-              <dd class="mono"><%= item.sku %></dd>
-            </div>
-            <div>
-              <dt>Status</dt>
-              <dd><%= item.archived_at ? 'Archived' : 'Active' %></dd>
+              <dd class="mono">$<%= formatMoney(Number(item.unit_price) * item.stock_quantity) %></dd>
             </div>
           </dl>
           <div class="panel__actions panel__actions--column">

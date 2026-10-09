@@ -9,8 +9,8 @@
       <th scope="col">SKU</th>
       <th scope="col">Part</th>
       <th scope="col">Brand</th>
-      <th scope="col" class="data-table__number">Stock</th>
-      <th scope="col" class="data-table__number">Unit price</th>
+      <th scope="col" class="data-table__num">Stock</th>
+      <th scope="col" class="data-table__num">Unit price</th>
     </tr>
   </thead>
   <tbody>
@@ -19,8 +19,8 @@
         <td class="mono" data-label="SKU"><a href="/items/<%= item.id %>"><%= item.sku %></a></td>
         <td data-label="Part"><a href="/items/<%= item.id %>"><%= item.name %></a></td>
         <td data-label="Brand"><%= item.brand %></td>
-        <td class="mono" data-label="Stock"><%= item.stock_quantity %></td>
-        <td class="mono" data-label="Unit price">$<%= formatPrice(item.unit_price) %></td>
+        <td class="mono data-table__num<%= Number(item.stock_quantity) === 0 ? ' is-out' : '' %>" data-label="Stock"><%= item.stock_quantity %></td>
+        <td class="mono data-table__num" data-label="Unit price">$<%= formatMoney(item.unit_price) %></td>
       </tr>
     <% }) %>
   </tbody>

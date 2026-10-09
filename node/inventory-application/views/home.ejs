@@ -2,12 +2,11 @@
 <body>
   <%- include('./partials/header') %>
   <main id="main" class="container">
-    <%- include('./partials/breadcrumbs', { crumbs: [{ label: 'Home' }] }) %>
     <%- include('./partials/flash') %>
 
     <section class="page-head">
-      <h1>Axle Supply</h1>
-      <p class="lede">Parts inventory — browse the catalog by category or manage stock with the administrative password.</p>
+      <h1>Parts by category</h1>
+      <p class="lede">Browse the catalog by category, or manage stock with the administrative password.</p>
     </section>
 
     <% if (!categories.length) { %>
@@ -19,23 +18,16 @@
       }) %>
     <% } else { %>
       <section aria-label="Categories">
-        <div class="card-grid">
-          <% categories.forEach((category) => { %>
-            <article class="card">
-              <h2 class="card__title"><a href="/categories/<%= category.id %>"><%= category.name %></a></h2>
-              <% if (category.description) { %>
-                <p class="card__text"><%= category.description %></p>
-              <% } %>
-              <p class="card__meta">
-                <span class="mono"><%= category.active_item_count %></span>
-                active part<%= category.active_item_count === 1 ? '' : 's' %>
-              </p>
-              <p class="card__actions">
-                <a class="button button--ghost" href="/categories/<%= category.id %>">View parts</a>
-              </p>
-            </article>
+        <ol class="index">
+          <% categories.forEach((category, position) => { %>
+            <li class="index__row">
+              <span class="index__no mono" aria-hidden="true"><%= String(position + 1).padStart(2, '0') %></span>
+              <h2 class="index__name"><a href="/categories/<%= category.id %>"><%= category.name %></a></h2>
+              <p class="index__text"><%= category.description || '' %></p>
+              <p class="index__count"><span class="mono"><%= category.active_item_count %></span> active part<%= category.active_item_count === 1 ? '' : 's' %></p>
+            </li>
           <% }) %>
-        </div>
+        </ol>
       </section>
     <% } %>
   </main>

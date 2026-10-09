@@ -5,6 +5,13 @@ const categoryDb = require('../db/categories');
 const { setFlash } = require('../lib/flash');
 const { paginate, PER_PAGE } = require('../lib/pagination');
 const { NotFoundError } = require('../lib/errors');
+const { parseId, parsePage } = require('../lib/params');
+
+function requireCategoryId(req) {
+  const id = parseId(req.params.id);
+  if (id === null) throw new NotFoundError('The requested category was not found.');
+  return id;
+}
 
 function extractFields(body) {
   return {
@@ -64,18 +71,16 @@ async function createCategory(req, res, next) {
 
 async function showCategory(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested category was not found.');
+    const id = requireCategoryId(req);
 
     const category = await findCategoryOr404(id);
-    const page = req.query.page && /^\d+$/.test(req.query.page) ? Number(req.query.page) : 1;
+    const total = await categoryDb.countActiveItems(id);
+    const pagination = paginate({ page: parsePage(req.query.page), total });
+    const items = await categoryDb.listActiveItems(id, {
+      limit: PER_PAGE,
+      offset: (pagination.page - 1) * PER_PAGE,
+    });
 
-    const [items, total] = await Promise.all([
-      categoryDb.listActiveItems(id, { limit: PER_PAGE, offset: (page - 1) * PER_PAGE }),
-      categoryDb.countActiveItems(id),
-    ]);
-
-    const pagination = paginate({ page, total });
     res.render('categories/show', {
       category,
       items,
@@ -89,8 +94,7 @@ async function showCategory(req, res, next) {
 
 async function showEditForm(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested category was not found.');
+    const id = requireCategoryId(req);
 
     const category = await findCategoryOr404(id);
     res.render('categories/edit', {
@@ -104,11 +108,11 @@ async function showEditForm(req, res, next) {
 }
 
 async function updateCategory(req, res, next) {
+  let category = null;
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested category was not found.');
+    const id = requireCategoryId(req);
 
-    const category = await findCategoryOr404(id);
+    category = await findCategoryOr404(id);
     const errors = validationResult(req);
     const values = extractFields(req.body);
 
@@ -124,8 +128,10 @@ async function updateCategory(req, res, next) {
     setFlash(req, 'success', `Category "${updated.name}" was updated.`);
     res.redirect(303, `/categories/${id}`);
   } catch (err) {
-    if (err.code === '23505') {
+    // Backstop for a concurrent duplicate that slipped past the check.
+    if (err.code === '23505' && category) {
       return res.status(422).render('categories/edit', {
+        category,
         values: extractFields(req.body),
         errors: { name: { msg: 'A category with this name already exists.' } },
       });
@@ -136,8 +142,7 @@ async function updateCategory(req, res, next) {
 
 async function showDeleteForm(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested category was not found.');
+    const id = requireCategoryId(req);
 
     const category = await findCategoryOr404(id);
     const blockingItems = await categoryDb.listBlockingItems(id);
@@ -149,8 +154,7 @@ async function showDeleteForm(req, res, next) {
 
 async function deleteCategory(req, res, next) {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id)) throw new NotFoundError('The requested category was not found.');
+    const id = requireCategoryId(req);
 
     const category = await findCategoryOr404(id);
     const blockingItems = await categoryDb.listBlockingItems(id);
@@ -172,9 +176,10 @@ async function deleteCategory(req, res, next) {
   } catch (err) {
     // A part was assigned to the category between the check and the delete.
     if (err.code === '23503') {
-      const blockingItems = await categoryDb.listBlockingItems(Number(req.params.id));
+      const id = requireCategoryId(req);
+      const blockingItems = await categoryDb.listBlockingItems(id);
       return res.status(409).render('categories/delete', {
-        category: { id: Number(req.params.id), name: req.body.name || 'This category' },
+        category: { id, name: 'This category' },
         blockingItems,
         conflict:
           'The category still contains parts. Move every part to another category before deleting it.',

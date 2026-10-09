@@ -461,10 +461,12 @@ async function main() {
 }
 
 if (require.main === module) {
-  main().catch((err) => {
-    console.error('Seed failed:', err);
-    process.exit(1);
-  });
+  main()
+    .then(() => db.pool.end())
+    .catch((err) => {
+      console.error('Seed failed:', err);
+      process.exit(1);
+    });
 }
 
 module.exports = { main, CATEGORIES, ITEMS };

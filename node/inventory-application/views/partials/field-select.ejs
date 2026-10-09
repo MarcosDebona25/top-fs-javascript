@@ -1,19 +1,24 @@
 <%#
   Select field with label, hint and error.
-  Locals: name, id, label, value, options [{value, label, disabled}], hint, errors, extraAttrs
+  Locals: name, id, label, value, options [{value, label, disabled}], hint,
+          required, errors, extraAttrs, width ('xs' | 'sm' | 'md')
 %>
 <%
   const fieldHint = typeof hint !== 'undefined' ? hint : null;
+  const isRequired = typeof required !== 'undefined' ? required : false;
   const fieldAttrs = typeof extraAttrs !== 'undefined' ? extraAttrs : '';
   const fieldValue = typeof value !== 'undefined' ? value : '';
+  const fieldWidth = typeof width !== 'undefined' && width ? ' field--' + width : '';
+  const fieldError = errors && errors[name] ? errors[name] : null;
+  const describedBy = [fieldHint ? id + '-hint' : null, fieldError ? id + '-error' : null].filter(Boolean).join(' ');
 %>
-<div class="field<%= errors && errors[name] ? ' field--invalid' : '' %>">
-  <label for="<%= id %>"><%= label %></label>
-  <select class="input" id="<%= id %>" name="<%= name %>"<%- fieldAttrs %>>
+<div class="field<%= fieldWidth %><%= fieldError ? ' field--invalid' : '' %>">
+  <label for="<%= id %>"><%= label %><% if (isRequired) { %> <span class="field__required" title="Required" aria-hidden="true">*</span><% } %></label>
+  <select class="input" id="<%= id %>" name="<%= name %>" <%- fieldAttrs %><% if (isRequired) { %> aria-required="true"<% } %><% if (fieldError) { %> aria-invalid="true"<% } %><% if (describedBy) { %> aria-describedby="<%= describedBy %>"<% } %>>
     <% options.forEach((option) => { %>
       <option value="<%= option.value %>"<%= String(option.value) === String(fieldValue) ? ' selected' : '' %><%= option.disabled ? ' disabled' : '' %>><%= option.label %></option>
     <% }) %>
   </select>
-  <% if (fieldHint) { %><p class="field__hint"><%= fieldHint %></p><% } %>
-  <% if (errors && errors[name]) { %><p class="field__error" id="<%= id %>-error"><%= errors[name].msg %></p><% } %>
+  <% if (fieldHint) { %><p class="field__hint" id="<%= id %>-hint"><%= fieldHint %></p><% } %>
+  <% if (fieldError) { %><p class="field__error" id="<%= id %>-error"><%= fieldError.msg %></p><% } %>
 </div>

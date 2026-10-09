@@ -7,10 +7,12 @@
   const fieldHint = typeof hint !== 'undefined' ? hint : null;
   const fieldAttrs = typeof extraAttrs !== 'undefined' ? extraAttrs : '';
   const fieldValue = typeof value !== 'undefined' ? value : '';
+  const fieldError = errors && errors[name] ? errors[name] : null;
+  const describedBy = [fieldHint ? id + '-hint' : null, fieldError ? id + '-error' : null].filter(Boolean).join(' ');
 %>
-<div class="field<%= errors && errors[name] ? ' field--invalid' : '' %>">
+<div class="field<%= fieldError ? ' field--invalid' : '' %>">
   <label for="<%= id %>"><%= label %></label>
-  <textarea class="input" id="<%= id %>" name="<%= name %>" rows="<%= fieldRows %>"<%- fieldAttrs %>><%= fieldValue != null ? fieldValue : '' %></textarea>
-  <% if (fieldHint) { %><p class="field__hint"><%= fieldHint %></p><% } %>
-  <% if (errors && errors[name]) { %><p class="field__error" id="<%= id %>-error"><%= errors[name].msg %></p><% } %>
+  <textarea class="input" id="<%= id %>" name="<%= name %>" rows="<%= fieldRows %>" <%- fieldAttrs %><% if (fieldError) { %> aria-invalid="true"<% } %><% if (describedBy) { %> aria-describedby="<%= describedBy %>"<% } %>><%= fieldValue != null ? fieldValue : '' %></textarea>
+  <% if (fieldHint) { %><p class="field__hint" id="<%= id %>-hint"><%= fieldHint %></p><% } %>
+  <% if (fieldError) { %><p class="field__error" id="<%= id %>-error"><%= fieldError.msg %></p><% } %>
 </div>

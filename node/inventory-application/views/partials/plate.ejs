@@ -1,11 +1,15 @@
 <%#
-  The signature element of the design: the factory identification
+  The signature element of the design: the riveted identification
   plate for a part. Locals: item (with category_name).
 %>
 <section class="plate" aria-labelledby="item-title">
-  <p class="plate__eyebrow">Part identification</p>
-  <h1 id="item-title" class="plate__name"><%= item.name %></h1>
-  <p class="plate__sku mono"><%= item.sku %></p>
+  <div class="plate__top">
+    <div>
+      <p class="plate__eyebrow">Part identification</p>
+      <h1 id="item-title" class="plate__name"><%= item.name %></h1>
+    </div>
+    <p class="plate__sku mono"><span class="visually-hidden">SKU </span><%= item.sku %></p>
+  </div>
   <dl class="plate__data">
     <div>
       <dt>Brand</dt>

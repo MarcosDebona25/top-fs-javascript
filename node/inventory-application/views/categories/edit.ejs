@@ -10,7 +10,8 @@
 
     <section class="panel panel--form">
       <h1>Edit category</h1>
-      <p class="panel__intro">Editing a category is protected: enter the administrative password.</p>
+      <p class="panel__intro">Renaming a category keeps every part assigned to it.</p>
+      <%- include('../partials/required-legend') %>
 
       <%- include('../partials/flash') %>
       <%- include('../partials/form-errors', { errors }) %>
@@ -19,20 +20,16 @@
         <%- include('../partials/csrf-input') %>
         <%- include('../partials/field-text', {
           name: 'name', id: 'name', label: 'Name', required: true,
-          value: values.name, errors,
+          value: values.name, errors, width: 'md',
           extraAttrs: 'maxlength="80" autocomplete="off"'
         }) %>
         <%- include('../partials/field-textarea', {
           name: 'description', id: 'description', label: 'Description',
           value: values.description, errors, rows: 4,
+          hint: 'Optional. Up to 1000 characters.',
           extraAttrs: 'maxlength="1000"'
         }) %>
-        <%- include('../partials/field-text', {
-          name: 'admin_password', id: 'admin_password', label: 'Administrative password',
-          type: 'password', required: true, errors,
-          hint: 'Required for every protected change.',
-          extraAttrs: 'autocomplete="off"'
-        }) %>
+        <%- include('../partials/auth-field', { errors }) %>
         <div class="form-actions">
           <button type="submit" class="button button--primary">Save changes</button>
           <a class="button button--ghost" href="/categories/<%= category.id %>">Cancel</a>

@@ -8,9 +8,9 @@
     <tr>
       <th scope="col">Date</th>
       <th scope="col">Type</th>
-      <th scope="col" class="data-table__number">Change</th>
-      <th scope="col" class="data-table__number">Before</th>
-      <th scope="col" class="data-table__number">After</th>
+      <th scope="col" class="data-table__num">Change</th>
+      <th scope="col" class="data-table__num">Before</th>
+      <th scope="col" class="data-table__num">After</th>
       <th scope="col">Reason</th>
     </tr>
   </thead>
@@ -21,11 +21,11 @@
         const sign = movement.delta > 0 ? '+' : '−';
       %>
       <tr>
-        <td data-label="Date"><%= formatDateTime(movement.created_at) %></td>
+        <td class="nowrap" data-label="Date"><%= formatDateTime(movement.created_at) %></td>
         <td data-label="Type"><span class="badge badge--<%= movement.type %>"><%= labels[movement.type] %></span></td>
-        <td class="mono" data-label="Change"><span class="delta delta--<%= movement.delta > 0 ? 'in' : 'out' %>"><%= sign %><%= Math.abs(movement.delta) %></span></td>
-        <td class="mono" data-label="Before"><%= movement.stock_before %></td>
-        <td class="mono" data-label="After"><%= movement.stock_after %></td>
+        <td class="mono data-table__num" data-label="Change"><span class="delta delta--<%= movement.delta > 0 ? 'in' : 'out' %>"><%= sign %><%= Math.abs(movement.delta) %></span></td>
+        <td class="mono data-table__num" data-label="Before"><%= movement.stock_before %></td>
+        <td class="mono data-table__num" data-label="After"><%= movement.stock_after %></td>
         <td data-label="Reason"><%= movement.reason %></td>
       </tr>
     <% }) %>

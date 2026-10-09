@@ -42,7 +42,7 @@
               <% }) %>
             </tbody>
           </table>
-          <p class="panel__hint">Move every listed part to another category — active and archived parts both block deletion — then repeat this action.</p>
+          <p class="panel__hint">Move every listed part to another category, then repeat this action. Active and archived parts both block deletion.</p>
         </section>
       <% } %>
 
@@ -50,11 +50,7 @@
         <form method="post" action="/categories/<%= category.id %>/delete" novalidate>
           <%- include('../partials/csrf-input') %>
           <p class="confirm-text">Delete the category <strong>“<%= category.name %>”</strong>? This cannot be undone.</p>
-          <%- include('../partials/field-text', {
-            name: 'admin_password', id: 'admin_password', label: 'Administrative password',
-            type: 'password', required: true, errors: {},
-            extraAttrs: 'autocomplete="off"'
-          }) %>
+          <%- include('../partials/auth-field', { errors: {} }) %>
           <div class="form-actions">
             <button type="submit" class="button button--danger">Delete category</button>
             <a class="button button--ghost" href="/categories/<%= category.id %>">Cancel</a>

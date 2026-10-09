@@ -52,7 +52,7 @@
       </form>
     </section>
 
-    <section class="panel" aria-labelledby="results-title">
+    <section class="sheet" aria-labelledby="results-title">
       <h2 id="results-title" class="visually-hidden"><%= filters.status === 'archived' ? 'Archived parts' : 'Parts' %></h2>
       <% if (!items.length) { %>
         <%- include('../partials/empty-state', {

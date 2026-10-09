@@ -1,0 +1,23 @@
+<%#
+  Context aside shown next to forms that act on one part: its current
+  stock in large figures plus its identity.
+  Locals: item {sku, name, stock_quantity, archived_at}, stockLabel
+%>
+<%
+  const contextLabel = typeof stockLabel !== 'undefined' && stockLabel ? stockLabel : 'Current stock';
+%>
+<section class="panel" aria-label="Part summary">
+  <p class="stock-label"><%= contextLabel %></p>
+  <p class="stock-number mono<%= !item.archived_at && item.stock_quantity === 0 ? ' stock-number--out' : '' %>"><%= item.stock_quantity %></p>
+  <p><%- include('./stock-badge', { item }) %></p>
+  <dl class="data-list">
+    <div>
+      <dt>SKU</dt>
+      <dd class="mono"><%= item.sku %></dd>
+    </div>
+    <div>
+      <dt>Part</dt>
+      <dd><%= item.name %></dd>
+    </div>
+  </dl>
+</section>
