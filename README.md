@@ -32,3 +32,4 @@ Repositorio con los proyectos realizados del módulo Full Stack Javascript de [T
 | # | Proyecto | Live Demo |
 |---|----------|-----------|
 | 14 | Mini Message Board | [Ver proyecto](https://top-fs-javascript-mini-message-board.onrender.com/) |
+| 15 | Inventory Application | Pendiente de deploy |
