@@ -1,0 +1,13 @@
+<%# locals: name, label, type ('text'), value (''), error (null), autocomplete, hint %>
+<% const _type = typeof type !== 'undefined' ? type : 'text'; %>
+<% const _error = typeof error !== 'undefined' ? error : null; %>
+<div class="field">
+  <label for="<%= name %>"><%= label %></label>
+  <input id="<%= name %>" name="<%= name %>" type="<%= _type %>"
+         value="<%= typeof value !== 'undefined' ? value : '' %>"
+         <% if (typeof autocomplete !== 'undefined') { %>autocomplete="<%= autocomplete %>"<% } %>
+         data-rule="<%= name %>"
+         aria-describedby="<%= name %>-error"
+         <% if (_error) { %>aria-invalid="true"<% } %>>
+  <p class="field-error" id="<%= name %>-error" data-error-for="<%= name %>" aria-live="polite"><%= _error || '' %></p>
+</div>

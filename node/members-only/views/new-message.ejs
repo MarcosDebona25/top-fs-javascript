@@ -1,0 +1,18 @@
+<%- include('partials/header', { title: 'New message' }) %>
+<section class="panel">
+  <h1>New message</h1>
+  <p class="muted">Posts are anonymous to everyone who is not a member.</p>
+  <form method="post" action="/messages" novalidate data-validate="message">
+    <%- include('partials/field', { name: 'title', label: 'Title', value: values.title || '', error: errors.title }) %>
+    <p class="counter" data-counter-for="title" data-max="100"></p>
+    <div class="field">
+      <label for="text">Message</label>
+      <textarea id="text" name="text" rows="6" data-rule="text" aria-describedby="text-error"
+                <% if (errors.text) { %>aria-invalid="true"<% } %>><%= values.text || '' %></textarea>
+      <p class="field-error" id="text-error" data-error-for="text" aria-live="polite"><%= errors.text || '' %></p>
+    </div>
+    <p class="counter" data-counter-for="text" data-max="1000"></p>
+    <button type="submit" class="btn btn-primary btn-block" data-submit>Post message</button>
+  </form>
+</section>
+<%- include('partials/footer') %>

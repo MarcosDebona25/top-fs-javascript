@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= typeof title !== 'undefined' ? title + ' · ' : '' %>Members Only</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/">MEMBERS ONLY</a>
+  <nav class="nav">
+    <% if (currentUser) { %>
+      <% if (currentUser.is_admin) { %>
+        <span class="badge badge-admin">Admin</span>
+      <% } else if (currentUser.is_member) { %>
+        <span class="badge">Member</span>
+      <% } %>
+      <span class="nav-name">
+        <span class="avatar" aria-hidden="true"><%= currentUser.first_name.charAt(0) %><%= currentUser.last_name.charAt(0) %></span>
+        <%= currentUser.first_name %> <%= currentUser.last_name %>
+      </span>
+      <a href="/messages/new">New message</a>
+      <% if (!currentUser.is_member && !currentUser.is_admin) { %><a href="/join-club">Join the club</a><% } %>
+      <% if (!currentUser.is_admin) { %><a href="/become-admin">Become admin</a><% } %>
+      <form method="post" action="/log-out" class="inline"><button type="submit" class="link-button">Log out</button></form>
+    <% } else { %>
+      <a href="/log-in">Log in</a>
+      <a class="btn btn-primary btn-small" href="/sign-up">Sign up</a>
+    <% } %>
+  </nav>
+</header>
+<main class="container">
+  <% success.forEach((m) => { %><p class="flash flash-success" role="status"><%= m %></p><% }) %>
+  <% failure.forEach((m) => { %><p class="flash flash-error" role="alert"><%= m %></p><% }) %>

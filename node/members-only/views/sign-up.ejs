@@ -1,0 +1,23 @@
+<%- include('partials/header', { title: 'Sign up' }) %>
+<section class="panel">
+  <h1>Create your account</h1>
+  <p class="muted">You will join the club afterwards, with the secret passcode.</p>
+
+  <form method="post" action="/sign-up" novalidate data-validate="sign-up">
+    <div class="two-col">
+      <%- include('partials/field', { name: 'firstName', label: 'First name', value: values.firstName || '', error: errors.firstName, autocomplete: 'given-name' }) %>
+      <%- include('partials/field', { name: 'lastName', label: 'Last name', value: values.lastName || '', error: errors.lastName, autocomplete: 'family-name' }) %>
+    </div>
+    <%- include('partials/field', { name: 'email', label: 'Email', type: 'email', value: values.email || '', error: errors.email, autocomplete: 'email' }) %>
+    <%- include('partials/field', { name: 'password', label: 'Password', type: 'password', error: errors.password, autocomplete: 'new-password' }) %>
+    <ul class="checklist" id="password-checklist" aria-label="Password requirements">
+      <li data-req="length">At least 8 characters</li>
+      <li data-req="upper">At least 1 uppercase letter</li>
+      <li data-req="digit">At least 1 number</li>
+    </ul>
+    <%- include('partials/field', { name: 'confirmPassword', label: 'Confirm password', type: 'password', error: errors.confirmPassword, autocomplete: 'new-password' }) %>
+    <button type="submit" class="btn btn-primary btn-block" data-submit>Sign up</button>
+  </form>
+  <p class="muted">Already have an account? <a href="/log-in">Log in</a></p>
+</section>
+<%- include('partials/footer') %>

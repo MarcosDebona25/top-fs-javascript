@@ -1,0 +1,42 @@
+<%- include('partials/header', { title: 'The wall' }) %>
+<section class="page-head">
+  <h1>The wall</h1>
+  <p class="muted">
+    <% if (showAuthors) { %>
+      You are in the club: authors and dates are visible.
+    <% } else { %>
+      Anyone can read. Only members know who wrote it.
+    <% } %>
+  </p>
+</section>
+
+<% if (!messages.length) { %>
+  <p class="empty">No messages yet.</p>
+<% } %>
+
+<section class="grid">
+  <% messages.forEach((m) => { %>
+    <article class="card">
+      <h2><%= m.title %></h2>
+      <p class="card-text"><%= m.text %></p>
+      <footer class="card-foot">
+        <% if (showAuthors) { %>
+          <span><strong><%= m.first_name %> <%= m.last_name %></strong> · <time datetime="<%= m.created_at.toISOString() %>"><%= m.created_at.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) %></time></span>
+        <% } else { %>
+          <span class="hidden-meta" role="img" aria-label="Author and date hidden">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <%# Fixed filler text, blurred by CSS. Never the real author/date: blur is only cosmetic. %>
+            <span class="blurred blurred-name" aria-hidden="true">Anonymous Author</span>
+            <span class="blurred" aria-hidden="true">Jan 1, 2000, 12:00 PM</span>
+          </span>
+        <% } %>
+        <% if (currentUser && currentUser.is_admin) { %>
+          <form method="post" action="/messages/<%= m.id %>/delete" class="inline">
+            <button type="submit" class="btn btn-danger btn-small">Delete</button>
+          </form>
+        <% } %>
+      </footer>
+    </article>
+  <% }) %>
+</section>
+<%- include('partials/footer') %>
