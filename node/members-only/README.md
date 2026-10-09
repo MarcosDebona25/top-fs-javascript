@@ -42,3 +42,17 @@ npm test            # unit + integration (supertest, members_only_test)
 npx playwright install chromium   # once
 npm run test:e2e    # real browser against the test DB
 ```
+
+## Demo data
+
+```bash
+npm run db:seed   # idempotent; 3 users + 7 messages
+```
+
+Accounts (password `Seed1234`): `admin@seed.test` (admin), `member@seed.test`
+(member), `user@seed.test` (plain user).
+
+## Notifications
+
+Flash messages render as toasts: they close on their own (5 s success, 8 s
+error, paused while hovered) and with the X at the top-left of each one.

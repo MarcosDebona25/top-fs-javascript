@@ -94,6 +94,23 @@ test.describe('inline validation (sign-up)', () => {
   });
 });
 
+test.describe('toasts', () => {
+  test('close with the X button', async ({ page }) => {
+    await login(page, 'nobody@example.com', 'Wrong123');
+    const toast = page.locator('.toast-error');
+    await expect(toast).toBeVisible();
+    await toast.getByRole('button', { name: 'Dismiss notification' }).click();
+    await expect(toast).toHaveCount(0);
+  });
+
+  test('disappear on their own after a few seconds', async ({ page }) => {
+    await register(page, uniqueEmail());
+    const toast = page.locator('.toast-success');
+    await expect(toast).toBeVisible();
+    await expect(toast).toHaveCount(0, { timeout: 10000 });
+  });
+});
+
 test.describe('new-message counters', () => {
   test('shows live character counts and blocks empty submit', async ({ page }) => {
     const email = uniqueEmail();

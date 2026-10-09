@@ -33,5 +33,21 @@
   </nav>
 </header>
 <main class="container">
-  <% success.forEach((m) => { %><p class="flash flash-success" role="status"><%= m %></p><% }) %>
-  <% failure.forEach((m) => { %><p class="flash flash-error" role="alert"><%= m %></p><% }) %>
+  <% if (success.length || failure.length) { %>
+  <div class="toasts">
+    <% success.forEach((m) => { %>
+      <div class="toast toast-success" data-kind="success" role="status">
+        <button type="button" class="toast-close" aria-label="Dismiss notification">&times;</button>
+        <p class="toast-text"><%= m %></p>
+        <span class="toast-bar" aria-hidden="true"></span>
+      </div>
+    <% }) %>
+    <% failure.forEach((m) => { %>
+      <div class="toast toast-error" data-kind="error" role="alert">
+        <button type="button" class="toast-close" aria-label="Dismiss notification">&times;</button>
+        <p class="toast-text"><%= m %></p>
+        <span class="toast-bar" aria-hidden="true"></span>
+      </div>
+    <% }) %>
+  </div>
+  <% } %>
