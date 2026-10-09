@@ -5,7 +5,7 @@ require('dotenv').config();
 const app = require('./app');
 
 const port = Number(process.env.PORT) || 3000;
-// Local-only by default. Set HOST=0.0.0.0 to accept connections from other machines.
+
 const host = process.env.HOST || '127.0.0.1';
 
 const server = app.listen(port, host);

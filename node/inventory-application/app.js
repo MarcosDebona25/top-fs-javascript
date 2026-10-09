@@ -15,8 +15,7 @@ const homeRoutes = require('./routes');
 const categoryRoutes = require('./routes/categories');
 const itemRoutes = require('./routes/items');
 
-// The session secret signs the cookie that carries CSRF state. Production
-// must supply its own; local development and tests fall back to a fixed one.
+// The session secret signs the cookie that carries CSRF state. Production must supply its own; local development and tests fall back to a fixed one.
 const DEV_SESSION_SECRET = 'local-dev-session-secret';
 const sessionSecret = process.env.SESSION_SECRET || DEV_SESSION_SECRET;
 if (!process.env.SESSION_SECRET) {
@@ -28,9 +27,7 @@ if (!process.env.SESSION_SECRET) {
   }
 }
 
-// PostgreSQL rejections of malformed input that slipped past validation:
-// value too long (22001), number out of range (22003), invalid text
-// representation (22P02). They are the client's fault, not a server failure.
+// PostgreSQL rejections of malformed input that slipped past validation: value too long (22001), number out of range (22003), invalid text, representation (22P02).
 const BAD_INPUT_PG_CODES = new Set(['22001', '22003', '22P02']);
 
 const app = express();
@@ -48,8 +45,7 @@ app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 // Static assets (styles, fonts, icons).
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Anonymous, signed session used only for CSRF state and flash messages.
-// No authentication state is kept between actions.
+// Anonymous, signed session used only for CSRF state and flash messages. No authentication state is kept between actions.
 app.use(
   cookieSession({
     name: 'axle_supply_session',
@@ -63,8 +59,7 @@ app.use(
 // CSRF protection on every POST (token read from the hidden `_csrf` field).
 app.use(csrfSynchronisedProtection);
 
-// A form field sent more than once arrives as an array. No form here does
-// that, so it is rejected instead of being coerced into a single value.
+// A form field sent more than once arrives as an array. No form here does that, so it is rejected instead of being coerced into a single value.
 app.use((req, res, next) => {
   const repeated = Object.values(req.body || {}).some((value) => typeof value !== 'string');
   if (repeated) {
@@ -73,8 +68,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Shared view locals: CSRF token, flash message, formatting helpers and
-// the current location (used to mark the active navigation item).
+// Shared view locals: CSRF token, flash message, formatting helpers and the current location (used to mark the active navigation item).
 app.use((req, res, next) => {
   res.locals.csrfToken = generateToken(req);
   res.locals.currentPath = req.path;
