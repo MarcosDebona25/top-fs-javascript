@@ -4,7 +4,10 @@
   "private": true,
   "main": "src/app.js",
   "scripts": {
-    "dev": "bash scripts/dev.sh"
+    "dev": "bash scripts/dev.sh",
+    "start": "node src/app.js",
+    "seed": "prisma db seed",
+    "assets:retry": "node scripts/retry-asset-deletions.js"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.0",
