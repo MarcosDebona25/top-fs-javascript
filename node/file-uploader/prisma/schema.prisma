@@ -6,9 +6,80 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id           Int         @id @default(autoincrement())
+  email        String      @unique
+  username     String      @unique
+  passwordHash String
+  createdAt    DateTime    @default(now())
+  folders      Folder[]
+  files        File[]
+  shareLinks   ShareLink[]
+}
+
 model Session {
   id        String   @id
   sid       String   @unique
   data      String
   expiresAt DateTime
+}
+
+model Folder {
+  id         Int         @id @default(autoincrement())
+  name       String
+  ownerId    Int
+  parentId   Int?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  owner      User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  parent     Folder?     @relation("FolderTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children   Folder[]    @relation("FolderTree")
+  files      File[]
+  shareLinks ShareLink[]
+
+  @@unique([parentId, name])
+  @@index([ownerId])
+  @@index([parentId])
+}
+
+model File {
+  id           Int      @id @default(autoincrement())
+  name         String
+  extension    String
+  mimeType     String
+  size         Int
+  url          String
+  publicId     String
+  resourceType String
+  folderId     Int
+  ownerId      Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  folder       Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([folderId])
+  @@index([ownerId])
+}
+
+model ShareLink {
+  id           Int      @id @default(autoincrement())
+  token        String   @unique
+  folderId     Int
+  ownerId      Int
+  durationDays Int
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  folder       Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([folderId])
+}
+
+model AssetDeletionFailure {
+  id           Int      @id @default(autoincrement())
+  publicId     String
+  resourceType String
+  errorMessage String
+  createdAt    DateTime @default(now())
 }
