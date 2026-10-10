@@ -33,7 +33,7 @@ async function signUp(req, res, next) {
     });
   } catch (error) {
     const field = uniqueViolationField(error);
-    if (field === 'email') return renderErrors({ email: 'This email is already registered.' });
+    if (field === 'email') return renderErrors({ email: 'This email cannot be used. Try a different one.' });
     if (field === 'username') return renderErrors({ username: 'This username is already taken.' });
     throw error;
   }
