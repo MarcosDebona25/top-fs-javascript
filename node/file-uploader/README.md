@@ -10,6 +10,7 @@ Proyecto de The Odin Project: una aplicación web donde cada usuario administra 
 - Subir archivos (hasta 10 MB), ver su detalle, renombrarlos, descargarlos y borrarlos.
 - Links compartidos de carpeta con duración de 1, 7, 15 o 30 días, vistas públicas de solo lectura y página 410 para links vencidos.
 - Validaciones inline en cliente y servidor.
+- Crear carpeta, subir archivo, renombrar y borrar carpeta desde modales (`<dialog>`), con páginas de respaldo si el navegador no ejecuta JavaScript.
 
 ## Stack y versiones fijadas
 

@@ -11,6 +11,14 @@ function flash(req, res, next) {
   };
   res.locals.flash = req.session.flash || null;
   delete req.session.flash;
+
+  // Browsers follow a redirect as soon as its headers arrive, which can be before
+  // express-session finishes storing the flash. Store it first, then redirect.
+  const redirect = res.redirect.bind(res);
+  res.redirect = (...args) => {
+    if (!req.session || !req.session.flash) return redirect(...args);
+    return req.session.save((error) => (error ? next(error) : redirect(...args)));
+  };
   next();
 }
 

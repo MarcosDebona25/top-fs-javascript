@@ -12,6 +12,9 @@ const router = Router();
 router.use(ensureAuthenticated);
 
 router.get('/:id', controller.show);
+router.get('/:id/new', controller.showForm('create'));
+router.get('/:id/upload', controller.showForm('upload'));
+router.get('/:id/rename', controller.showForm('rename'));
 router.post('/:id/folders', folderNameRules, controller.createSubfolder);
 router.post('/:id/rename', folderNameRules, controller.rename);
 router.get('/:id/delete', controller.showDelete);

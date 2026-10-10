@@ -35,7 +35,7 @@ async function show(req, res) {
 async function upload(req, res) {
   const folder = await folders.findOwnedFolder(parseId(req.params.id), req.user.id);
   const fail = (message, status = 422) =>
-    folders.renderFolder(req, res, folder, { status, errors: { file: message } });
+    folders.renderFolder(req, res, folder, { status, errors: { file: message }, openForm: 'upload' });
 
   if (req.uploadError) return fail(req.uploadError);
   if (!req.file) return fail('Select a file to upload.');

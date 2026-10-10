@@ -1,12 +1,16 @@
 <%- include('../partials/head') %>
-<%- include('../partials/breadcrumbs', { items: breadcrumbs.map((crumb) => ({ name: crumb.name, href: '/folders/' + crumb.id })).concat({ name: 'Share links', href: null }) }) %>
+<div class="intro">
+  <%- include('../partials/breadcrumbs', { items: breadcrumbs.map((crumb) => ({ name: crumb.name, href: '/folders/' + crumb.id })).concat({ name: 'Share links', href: null }) }) %>
 
-<h1>Share links for <%= folder.name %></h1>
-<p class="lead">Anyone with a link can view this folder, its subfolders and files, and download files until the link expires. Expiry does not revoke URLs that were already copied.</p>
+  <h1>Share links for <%= folder.name %></h1>
+  <p class="lead">Anyone with a link can view this folder, its subfolders and files, and download files until the link expires. Expiry does not revoke URLs that were already copied.</p>
+</div>
 
-<form method="post" action="/folders/<%= folder.id %>/shares" class="form-row form-row-single" novalidate data-validate>
+<section class="panel" aria-labelledby="new-link-title">
+  <div class="panel-head"><h2 id="new-link-title" class="panel-title">New share link</h2></div>
+<form method="post" action="/folders/<%= folder.id %>/shares" novalidate data-validate>
   <div class="field<%= errors.durationDays ? ' has-error' : '' %>">
-    <label for="durationDays">New share link</label>
+    <label for="durationDays">Duration</label>
     <div class="control">
       <select id="durationDays" name="durationDays" required aria-describedby="durationDays-error durationDays-hint"<%- errors.durationDays ? ' aria-invalid="true"' : '' %>>
         <% durations.forEach((days) => { %>
@@ -19,7 +23,10 @@
     <p id="durationDays-hint" class="hint">The link stops working after the chosen duration.</p>
   </div>
 </form>
+</section>
 
+<section class="panel" aria-labelledby="links-title">
+  <div class="panel-head"><h2 id="links-title" class="panel-title">Links</h2></div>
 <% if (links.length === 0) { %>
   <div class="empty">
     <p class="empty-title">No share links for this folder</p>
@@ -49,4 +56,5 @@
     </table>
   </div>
 <% } %>
+</section>
 <%- include('../partials/foot') %>

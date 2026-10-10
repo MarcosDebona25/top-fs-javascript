@@ -1,0 +1,29 @@
+<%
+  const base = '/folders/' + folder.id;
+  const spec = {
+    create: { title: 'New folder', action: base + '/folders', submit: 'Create folder', context: 'Created inside' },
+    upload: { title: 'Upload file', action: base + '/files', submit: 'Upload', context: 'Uploaded to' },
+    rename: { title: 'Rename folder', action: base + '/rename', submit: 'Rename', context: null },
+  }[form];
+  const nameHint = "Up to 100 characters. Can't contain / or \\.";
+  const nameAttrs = { maxlength: 100, 'data-no-slashes': 'true' };
+%>
+<form method="post" action="<%= spec.action %>" class="<%= inDialog ? 'modal-body' : 'form-stack' %>"<%- form === 'upload' ? ' enctype="multipart/form-data"' : '' %> novalidate data-validate>
+  <% if (inDialog) { %>
+    <h2 id="<%= form %>-title" class="modal-title"><%= spec.title %></h2>
+  <% } else { %>
+    <h1><%= spec.title %></h1>
+  <% } %>
+  <% if (spec.context) { %><p class="meta"><%= spec.context %> <strong><%= folder.name %></strong>.</p><% } %>
+  <% if (form === 'create') { %>
+    <%- include('field', { id: 'name', label: 'Folder name', value: values.name, error: errors.name, hint: nameHint, attrs: nameAttrs }) %>
+  <% } else if (form === 'upload') { %>
+    <%- include('field', { id: 'file', label: 'File', type: 'file', error: errors.file, hint: 'Max 10 MB. PNG, JPG, WEBP, GIF, PDF, TXT, DOCX, XLSX.', attrs: { 'data-max-size': 10485760, 'data-allowed-ext': 'png,jpg,jpeg,webp,gif,pdf,txt,docx,xlsx' } }) %>
+  <% } else { %>
+    <%- include('field', { id: 'rename-name', name: 'name', label: 'Folder name', value: values.renameName !== undefined ? values.renameName : folder.name, error: errors.renameName, hint: nameHint, attrs: nameAttrs }) %>
+  <% } %>
+  <div class="<%= inDialog ? 'modal-actions' : 'actions state-action' %>">
+    <a class="button" href="<%= base %>"<%- inDialog ? ' data-dialog-close' : '' %>>Cancel</a>
+    <button type="submit" class="button button-primary"><%= spec.submit %></button>
+  </div>
+</form>

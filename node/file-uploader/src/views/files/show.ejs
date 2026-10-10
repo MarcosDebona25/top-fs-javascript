@@ -1,33 +1,44 @@
 <%- include('../partials/head', { pageClass: 'page-medium' }) %>
 <% const parent = breadcrumbs[breadcrumbs.length - 1]; %>
-<%- include('../partials/breadcrumbs', { items: breadcrumbs.map((crumb) => ({ name: crumb.name, href: '/folders/' + crumb.id })).concat({ name: file.name, href: null }) }) %>
+<div class="intro">
+  <%- include('../partials/breadcrumbs', { items: breadcrumbs.map((crumb) => ({ name: crumb.name, href: '/folders/' + crumb.id })).concat({ name: file.name, href: null }) }) %>
 
-<div class="title-row">
-  <h1><%= file.name %></h1>
-  <div class="actions">
-    <a class="button button-primary" href="/files/<%= file.id %>/download">Download</a>
-    <a class="button" href="/folders/<%= file.folderId %>">Back to folder</a>
+  <div class="title-row">
+    <h1><%= file.name %></h1>
+    <div class="actions">
+      <a class="button button-primary" href="/files/<%= file.id %>/download">Download</a>
+      <a class="button" href="/folders/<%= file.folderId %>">Back to folder</a>
+    </div>
   </div>
 </div>
 
-<dl class="details">
-  <dt>Type</dt><dd><%= typeDescription(file.extension) %></dd>
-  <dt>Size</dt><dd><%= formatSize(file.size) %></dd>
-  <dt>Uploaded</dt><dd><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDateTime(file.createdAt) %></time></dd>
-  <dt>Folder</dt><dd><a href="/folders/<%= parent.id %>"><%= parent.name %></a></dd>
-</dl>
+<section class="panel" aria-labelledby="details-title">
+  <div class="panel-head"><h2 id="details-title" class="panel-title">Details</h2></div>
+  <dl class="details">
+    <dt>Type</dt><dd><%= typeDescription(file.extension) %></dd>
+    <dt>Size</dt><dd><%= formatSize(file.size) %></dd>
+    <dt>Uploaded</dt><dd><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDateTime(file.createdAt) %></time></dd>
+    <dt>Folder</dt><dd><a href="/folders/<%= parent.id %>"><%= parent.name %></a></dd>
+  </dl>
+</section>
 
-<form method="post" action="/files/<%= file.id %>/rename" class="form-split" novalidate data-validate>
-  <%- include('../partials/field', { id: 'name', label: 'Rename file', value: values.name !== undefined ? values.name : baseName, error: errors.name, suffix: '.' + file.extension, hint: 'The extension (.' + file.extension + ") can't be changed.", attrs: { maxlength: 200, 'data-no-slashes': 'true', 'data-no-extension': 'true' } }) %>
-  <button type="submit" class="button">Rename</button>
-</form>
-
-<div class="danger-row">
-  <p class="meta">Deleting removes the file permanently. It can't be recovered.</p>
-  <form method="post" action="/files/<%= file.id %>/delete">
-    <button type="submit" class="button button-danger">Delete file</button>
+<section class="panel" aria-labelledby="rename-title">
+  <div class="panel-head"><h2 id="rename-title" class="panel-title">Rename</h2></div>
+  <form method="post" action="/files/<%= file.id %>/rename" class="form-split" novalidate data-validate>
+    <%- include('../partials/field', { id: 'name', label: 'New name', value: values.name !== undefined ? values.name : baseName, error: errors.name, suffix: '.' + file.extension, hint: 'The extension (.' + file.extension + ") can't be changed.", attrs: { maxlength: 200, 'data-no-slashes': 'true', 'data-no-extension': 'true' } }) %>
+    <button type="submit" class="button">Rename</button>
   </form>
-</div>
+</section>
+
+<section class="panel" aria-labelledby="delete-title">
+  <div class="panel-head"><h2 id="delete-title" class="panel-title">Delete file</h2></div>
+  <div class="danger-row">
+    <p class="meta">Deleting removes the file permanently. It can't be recovered.</p>
+    <form method="post" action="/files/<%= file.id %>/delete">
+      <button type="submit" class="button button-danger">Delete file</button>
+    </form>
+  </div>
+</section>
 
 <p class="note">Files are stored at public, hard-to-guess URLs. Private URLs are not supported yet.</p>
 <%- include('../partials/foot') %>

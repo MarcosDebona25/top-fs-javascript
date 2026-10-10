@@ -72,6 +72,16 @@ async function createSubfolder(req, res) {
   return res.redirect(`/folders/${parent.id}`);
 }
 
+// Pages behind the dialog triggers, reached only when the dialog script didn't run.
+function showForm(form) {
+  return async (req, res) => {
+    const folder = await findOwnedFolder(parseId(req.params.id), req.user.id);
+    if (form === 'rename') assertNotRoot(folder);
+    const titles = { create: 'New folder', upload: 'Upload file', rename: `Rename ${folder.name}` };
+    res.render('folders/form', { title: titles[form], folder, form, errors: {}, values: {} });
+  };
+}
+
 async function rename(req, res) {
   const folder = await findOwnedFolder(parseId(req.params.id), req.user.id);
   assertNotRoot(folder);
@@ -121,4 +131,4 @@ async function remove(req, res) {
   res.redirect(`/folders/${folder.parentId}`);
 }
 
-module.exports = { show, createSubfolder, rename, showDelete, remove, findOwnedFolder, renderFolder };
+module.exports = { show, showForm, createSubfolder, rename, showDelete, remove, findOwnedFolder, renderFolder };

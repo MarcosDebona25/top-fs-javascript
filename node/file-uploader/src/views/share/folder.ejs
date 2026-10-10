@@ -1,11 +1,13 @@
 <%- include('../partials/head') %>
-<%- include('../partials/breadcrumbs', { items: breadcrumbs.map((crumb, index) => ({ name: crumb.name, href: index === breadcrumbs.length - 1 ? null : crumb.href })) }) %>
+<div class="intro">
+  <%- include('../partials/breadcrumbs', { items: breadcrumbs.map((crumb, index) => ({ name: crumb.name, href: index === breadcrumbs.length - 1 ? null : crumb.href })) }) %>
 
-<div class="title-block">
   <h1><%= folder.name %></h1>
   <p class="meta">Shared by <%= ownerName %>. This link expires on <time datetime="<%= expiresAt.toISOString() %>"><%= formatDateTime(expiresAt) %></time>.</p>
 </div>
 
+<section class="panel" aria-labelledby="contents-title">
+  <div class="panel-head"><h2 id="contents-title" class="panel-title">Contents</h2></div>
 <% if (folders.length === 0 && files.length === 0) { %>
   <div class="empty">
     <p class="empty-title">This folder is empty</p>
@@ -13,4 +15,5 @@
 <% } else { %>
   <%- include('../partials/listing', { folderBase: '/share/' + token + '/folders/', fileBase: '/share/' + token + '/files/' }) %>
 <% } %>
+</section>
 <%- include('../partials/foot') %>

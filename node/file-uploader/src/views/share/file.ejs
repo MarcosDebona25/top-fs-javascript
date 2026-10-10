@@ -1,4 +1,5 @@
 <%- include('../partials/head', { pageClass: 'page-medium' }) %>
+<div class="intro">
 <%- include('../partials/breadcrumbs', { items: breadcrumbs.concat({ name: file.name, href: null }) }) %>
 
 <div class="title-row">
@@ -8,10 +9,14 @@
     <a class="button" href="<%= breadcrumbs[breadcrumbs.length - 1].href %>">Back to folder</a>
   </div>
 </div>
+</div>
 
+<section class="panel" aria-labelledby="details-title">
+  <div class="panel-head"><h2 id="details-title" class="panel-title">Details</h2></div>
 <dl class="details">
   <dt>Type</dt><dd><%= typeDescription(file.extension) %></dd>
   <dt>Size</dt><dd><%= formatSize(file.size) %></dd>
   <dt>Uploaded</dt><dd><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDateTime(file.createdAt) %></time></dd>
 </dl>
+</section>
 <%- include('../partials/foot') %>

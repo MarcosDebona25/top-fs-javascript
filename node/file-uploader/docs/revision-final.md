@@ -86,3 +86,21 @@ Pruebas en Chromium sin interfaz (Playwright, fuera de las dependencias del proy
 | 390 px: sin desplazamiento horizontal de página en carpeta, archivo, links y vista pública | OK |
 
 No verificado: `password-limit.js` (pegado y límite de 72 bytes), la accesibilidad con lector de pantalla y otros navegadores además de Chromium.
+
+## Pruebas tras pasar los formularios a modales y separar secciones en paneles
+
+"New folder", "Upload file" y "Rename" abren un `<dialog>` modal; cada sección va en un panel blanco con título. Checklist con curl: 90 de 91 correctas (la restante es la misma de la caché del CDN de Cloudinary). Pruebas en Chromium sin interfaz: 44 de 46; las dos restantes son del script (un conteo esperado desactualizado y las respuestas 404, 410 y 422 intencionales que la consola registra como error).
+
+| Prueba | Resultado |
+| --- | --- |
+| Los tres modales abren sin navegar, con foco en el campo; "Rename" trae el nombre actual | OK |
+| Cierre con Cancel, Escape y clic fuera; arrastrar una selección desde el campo hacia fuera no lo cierra | OK |
+| Validación en cliente dentro del modal: `/` y `\` en nombres, subida sin archivo | OK |
+| Error del servidor (422): la página vuelve con el modal abierto, el error y el valor enviado | OK |
+| Crear carpeta, subir archivo, renombrar y borrar carpeta desde los modales | OK |
+| Sin JavaScript, cada botón lleva a su página (`/folders/:id/new`, `/upload`, `/rename`) | OK |
+| Sin JavaScript, un envío fallido muestra el diálogo abierto con el error y "Cancel" vuelve a la carpeta | OK |
+| Páginas de respaldo: 403 para renombrar la raíz, 404 para carpetas de otro usuario | OK |
+| 390 px: sin desplazamiento horizontal de página | OK |
+
+Durante estas pruebas apareció un defecto previo: tras subir un archivo desde el navegador, el aviso de éxito no se mostraba porque el navegador seguía la redirección antes de que la sesión terminara de guardarse. Ahora la sesión se guarda antes de redirigir cuando hay un aviso pendiente.
