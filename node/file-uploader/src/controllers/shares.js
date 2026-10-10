@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 const prisma = require('../lib/prisma');
 const { HttpError, parseId, mapErrors } = require('../lib/http');
 const { ALLOWED_DURATIONS } = require('../validators/share');
+const { getBreadcrumbs } = require('../services/folder-tree');
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -13,15 +14,19 @@ async function findOwnedFolder(id, ownerId) {
 }
 
 async function renderShares(req, res, folder, { status = 200, errors = {}, values = {} } = {}) {
-  const links = await prisma.shareLink.findMany({
-    where: { folderId: folder.id, ownerId: req.user.id },
-    orderBy: { createdAt: 'desc' },
-  });
+  const [breadcrumbs, links] = await Promise.all([
+    getBreadcrumbs(folder.id, req.user.id),
+    prisma.shareLink.findMany({
+      where: { folderId: folder.id, ownerId: req.user.id },
+      orderBy: { createdAt: 'desc' },
+    }),
+  ]);
   const now = new Date();
   const baseUrl = `${req.protocol}://${req.get('host')}`;
   res.status(status).render('shares/index', {
     title: `Share links for ${folder.name}`,
     folder,
+    breadcrumbs,
     durations: ALLOWED_DURATIONS,
     errors,
     values,

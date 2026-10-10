@@ -1,23 +1,17 @@
-<%- include('../partials/head') %>
-<nav class="breadcrumbs" aria-label="Breadcrumb">
-  <ol>
-    <% breadcrumbs.forEach((crumb) => { %>
-      <li><a href="<%= crumb.href %>"><%= crumb.name %></a></li>
-    <% }) %>
-    <li><span aria-current="page"><%= file.name %></span></li>
-  </ol>
-</nav>
+<%- include('../partials/head', { pageClass: 'page-medium' }) %>
+<%- include('../partials/breadcrumbs', { items: breadcrumbs.concat({ name: file.name, href: null }) }) %>
 
 <div class="title-row">
-  <h1><%- include('../partials/icon', { name: file.extension }) %> <%= file.name %></h1>
+  <h1><%= file.name %></h1>
   <div class="actions">
     <a class="button button-primary" href="/share/<%= token %>/files/<%= file.id %>/download">Download</a>
+    <a class="button" href="<%= breadcrumbs[breadcrumbs.length - 1].href %>">Back to folder</a>
   </div>
 </div>
 
 <dl class="details">
-  <dt>Type</dt><dd><%= file.mimeType %></dd>
+  <dt>Type</dt><dd><%= typeDescription(file.extension) %></dd>
   <dt>Size</dt><dd><%= formatSize(file.size) %></dd>
-  <dt>Uploaded</dt><dd><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDate(file.createdAt) %></time></dd>
+  <dt>Uploaded</dt><dd><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDateTime(file.createdAt) %></time></dd>
 </dl>
 <%- include('../partials/foot') %>

@@ -21,8 +21,9 @@
       <% for (const [key, val] of Object.entries(fieldAttrs)) { %><%= key %>="<%= val %>" <% } %>
       aria-describedby="<%= describedBy.join(' ') %>">
     <% if (locals.suffix) { %><span class="suffix"><%= suffix %></span><% } %>
+    <% if (locals.button) { %><button type="submit" class="button<%= locals.buttonClass ? ' ' + buttonClass : '' %>"><%= button %></button><% } %>
   </div>
-  <% if (locals.hint) { %><p id="<%= id %>-hint" class="hint"><%= hint %></p><% } %>
-  <% if (isPassword) { %><p id="<%= id %>-warning" class="field-warning" role="status" hidden></p><% } %>
   <p id="<%= id %>-error" class="field-error" aria-live="polite"<%= locals.error ? '' : ' hidden' %>><%= locals.error || '' %></p>
+  <% if (isPassword) { %><p id="<%= id %>-warning" class="field-warning" role="status" hidden></p><% } %>
+  <% if (locals.hint) { %><p id="<%= id %>-hint" class="hint"><%= hint %></p><% } %>
 </div>

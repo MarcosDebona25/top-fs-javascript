@@ -66,4 +66,23 @@ Se ejecutó con curl contra la app levantada (puerto 3111), con los datos del se
 
 Verificado en fases anteriores: límite de 10 MB + 1 byte, MIME que no coincide, compensación ante falla de base, borrado de carpeta con assets, registro y reintento de `AssetDeletionFailure`, descarga de los 9 tipos con nombre renombrado.
 
-No verificado en navegador real: los scripts de cliente (`validate.js`, `password-limit.js`, `copy.js`), la accesibilidad con lector de pantalla y el copiado al portapapeles.
+## Pruebas tras aplicar la identidad visual
+
+Se resembró la base (los assets de Cloudinary se habían borrado a mano) y se repitió el checklist anterior con curl, más comprobaciones del marcado nuevo: 68 de 69 correctas. La restante pide la URL de Cloudinary de un archivo recién borrado y recibe 200 desde la caché del CDN; la API de administración confirma que el asset ya no existe (limitación documentada en el README).
+
+Pruebas en Chromium sin interfaz (Playwright, fuera de las dependencias del proyecto), a 1280 px y 390 px:
+
+| Prueba | Resultado |
+| --- | --- |
+| Tipografías locales cargadas, colores y medidas de los botones | OK |
+| Nombres sin subrayado, carpetas en negrita, un icono por fila | OK |
+| `validate.js`: alta con 4 errores, `/` en nombre de carpeta, subida sin archivo, extensión al renombrar | OK |
+| El error ocupa el lugar de la ayuda y la ayuda vuelve al corregir | OK |
+| Modal de borrado: abre sin navegar, cierra con Cancel, Escape y clic fuera; el clic dentro no lo cierra | OK |
+| Sin JavaScript, "Delete folder" lleva a la página de confirmación | OK |
+| `copy.js`: el link llega al portapapeles y el botón muestra "Copied" | OK |
+| Detalle de archivo: "Rename" alineado al borde derecho con "Delete file" | OK |
+| Botones de fila en Share links: 28 px de alto, texto de 13 px | OK |
+| 390 px: sin desplazamiento horizontal de página en carpeta, archivo, links y vista pública | OK |
+
+No verificado: `password-limit.js` (pegado y límite de 72 bytes), la accesibilidad con lector de pantalla y otros navegadores además de Chromium.

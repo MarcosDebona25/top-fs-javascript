@@ -1,55 +1,52 @@
 <%- include('../partials/head') %>
-<nav class="breadcrumbs" aria-label="Breadcrumb">
-  <ol>
-    <li><a href="/folders/<%= folder.id %>"><%= folder.name %></a></li>
-    <li><span aria-current="page">Share links</span></li>
-  </ol>
-</nav>
+<%- include('../partials/breadcrumbs', { items: breadcrumbs.map((crumb) => ({ name: crumb.name, href: '/folders/' + crumb.id })).concat({ name: 'Share links', href: null }) }) %>
 
-<h1>Share links for "<%= folder.name %>"</h1>
-<p class="notice">Anyone with a link can view this folder and its contents, and download files. Links are read-only.</p>
+<h1>Share links for <%= folder.name %></h1>
+<p class="lead">Anyone with a link can view this folder, its subfolders and files, and download files until the link expires. Expiry does not revoke URLs that were already copied.</p>
 
-<section class="panel">
-  <h2>Create a link</h2>
-  <form method="post" action="/folders/<%= folder.id %>/shares" class="inline-form" novalidate data-validate>
-    <div class="field<%= errors.durationDays ? ' has-error' : '' %>">
-      <label for="durationDays">Expires after</label>
-      <select id="durationDays" name="durationDays" required aria-describedby="durationDays-error"<%- errors.durationDays ? ' aria-invalid="true"' : '' %>>
+<form method="post" action="/folders/<%= folder.id %>/shares" class="form-row form-row-single" novalidate data-validate>
+  <div class="field<%= errors.durationDays ? ' has-error' : '' %>">
+    <label for="durationDays">New share link</label>
+    <div class="control">
+      <select id="durationDays" name="durationDays" required aria-describedby="durationDays-error durationDays-hint"<%- errors.durationDays ? ' aria-invalid="true"' : '' %>>
         <% durations.forEach((days) => { %>
           <option value="<%= days %>"<%= String(values.durationDays || 7) === String(days) ? ' selected' : '' %>><%= days %> <%= days === 1 ? 'day' : 'days' %></option>
         <% }) %>
       </select>
-      <p id="durationDays-error" class="field-error" aria-live="polite"<%= errors.durationDays ? '' : ' hidden' %>><%= errors.durationDays || '' %></p>
+      <button type="submit" class="button button-primary">Create link</button>
     </div>
-    <button type="submit" class="button button-primary">Create link</button>
-  </form>
-</section>
-
-<p class="notice">When a link expires, people who already copied a file URL can still access that file.</p>
+    <p id="durationDays-error" class="field-error" aria-live="polite"<%= errors.durationDays ? '' : ' hidden' %>><%= errors.durationDays || '' %></p>
+    <p id="durationDays-hint" class="hint">The link stops working after the chosen duration.</p>
+  </div>
+</form>
 
 <% if (links.length === 0) { %>
   <div class="empty">
-    <p><strong>No share links for this folder.</strong></p>
-    <p>Create a link to let others browse and download its contents.</p>
+    <p class="empty-title">No share links for this folder</p>
+    <p class="empty-text">Create a link to let others browse and download its contents.</p>
   </div>
 <% } else { %>
-  <ul class="links">
-    <% links.forEach((link) => { %>
-      <li class="link-item">
-        <p class="link-url"><a href="<%= link.url %>"><%= link.url %></a></p>
-        <p class="link-meta">
-          <span class="badge <%= link.active ? 'badge-active' : 'badge-expired' %>"><%= link.active ? 'Active' : 'Expired' %></span>
-          Created <time datetime="<%= link.createdAt.toISOString() %>"><%= formatDateTime(link.createdAt) %></time>.
-          Expires <time datetime="<%= link.expiresAt.toISOString() %>"><%= formatDateTime(link.expiresAt) %></time>.
-        </p>
-        <div class="actions">
-          <button type="button" class="button" data-copy="<%= link.url %>">Copy link</button>
-          <form method="post" action="/shares/<%= link.id %>/delete">
-            <button type="submit" class="button button-danger">Delete</button>
-          </form>
-        </div>
-      </li>
-    <% }) %>
-  </ul>
+  <div class="table-wrap">
+    <table class="listing links">
+      <thead>
+        <tr><th scope="col">Link</th><th scope="col" class="col-expires">Expires</th><th scope="col" class="col-status">Status</th><th scope="col" class="col-actions">Actions</th></tr>
+      </thead>
+      <tbody>
+        <% links.forEach((link) => { %>
+          <tr>
+            <td class="col-url"><a href="<%= link.url %>"><%= link.url %></a></td>
+            <td class="col-expires"><time datetime="<%= link.expiresAt.toISOString() %>"><%= formatDateTime(link.expiresAt) %></time></td>
+            <td class="col-status <%= link.active ? 'link-active' : 'link-expired' %>"><%= link.active ? 'Active' : 'Expired' %></td>
+            <td class="col-actions">
+              <button type="button" class="button button-small" data-copy="<%= link.url %>">Copy</button>
+              <form method="post" action="/shares/<%= link.id %>/delete">
+                <button type="submit" class="button button-danger button-small">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
 <% } %>
 <%- include('../partials/foot') %>

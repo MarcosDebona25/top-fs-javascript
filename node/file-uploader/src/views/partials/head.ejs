@@ -4,23 +4,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= title %> - File Uploader</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preload" href="/fonts/instrument-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+<%
+  let homeHref = '/';
+  if (locals.publicView && locals.token) homeHref = '/share/' + token;
+  else if (locals.rootFolderId) homeHref = '/folders/' + rootFolderId;
+%>
 <header class="site-header">
+  <a class="brand" href="<%= homeHref %>"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 5.5A1.5 1.5 0 0 1 3.5 4H9l2 2.5h9.5A1.5 1.5 0 0 1 22 8v10.5a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 18.5z" fill="#ffffff"/><path d="M12 17v-6.5M9 13l3-3 3 3" fill="none" stroke="#2230d6" stroke-width="2" stroke-linecap="square"/></svg>File Uploader</a>
   <% if (locals.publicView) { %>
-    <span class="brand">File Uploader</span>
-  <% } else { %>
-    <a class="brand" href="<%= locals.rootFolderId ? '/folders/' + rootFolderId : '/' %>">File Uploader</a>
-  <% } %>
-  <% if (locals.currentUser && !locals.publicView) { %>
+    <span class="nav-note">Shared view</span>
+  <% } else if (locals.currentUser) { %>
     <div class="user-menu">
       <span class="username"><%= currentUser.username %></span>
       <form method="post" action="/log-out">
-        <button type="submit" class="button button-quiet">Log out</button>
+        <button type="submit" class="button button-nav">Log out</button>
       </form>
     </div>
   <% } %>
 </header>
-<main class="page">
+<main class="page<%= locals.pageClass ? ' ' + pageClass : '' %>">
 <%- include('flash') %>

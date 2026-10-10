@@ -17,17 +17,27 @@ function assertNotRoot(folder) {
   }
 }
 
+// Subfolders and files inside the folder, at any depth. Shown before deleting it.
+async function countContents(folder, ownerId) {
+  const ids = await getSubtreeIds(folder.id, ownerId);
+  const fileCount = await prisma.file.count({ where: { folderId: { in: ids }, ownerId } });
+  return { folderCount: ids.length - 1, fileCount };
+}
+
 async function renderFolder(req, res, folder, { status = 200, errors = {}, values = {}, openForm = null } = {}) {
   const ownerId = req.user.id;
-  const [breadcrumbs, folders, files] = await Promise.all([
+  const isRoot = folder.parentId === null;
+  const [breadcrumbs, folders, files, deleteCounts] = await Promise.all([
     getBreadcrumbs(folder.id, ownerId),
     prisma.folder.findMany({ where: { parentId: folder.id, ownerId }, orderBy: { name: 'asc' } }),
     prisma.file.findMany({ where: { folderId: folder.id, ownerId }, orderBy: { name: 'asc' } }),
+    isRoot ? null : countContents(folder, ownerId),
   ]);
   res.status(status).render('folders/show', {
     title: folder.name,
     folder,
-    isRoot: folder.parentId === null,
+    isRoot,
+    deleteCounts,
     breadcrumbs,
     folders,
     files,
@@ -90,14 +100,8 @@ async function rename(req, res) {
 async function showDelete(req, res) {
   const folder = await findOwnedFolder(parseId(req.params.id), req.user.id);
   assertNotRoot(folder);
-  const ids = await getSubtreeIds(folder.id, req.user.id);
-  const fileCount = await prisma.file.count({ where: { folderId: { in: ids }, ownerId: req.user.id } });
-  res.render('folders/delete', {
-    title: `Delete ${folder.name}`,
-    folder,
-    folderCount: ids.length - 1,
-    fileCount,
-  });
+  const counts = await countContents(folder, req.user.id);
+  res.render('folders/delete', { title: `Delete ${folder.name}`, folder, ...counts });
 }
 
 async function remove(req, res) {

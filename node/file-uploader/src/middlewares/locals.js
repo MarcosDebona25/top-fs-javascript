@@ -1,5 +1,5 @@
 const prisma = require('../lib/prisma');
-const { formatSize } = require('../lib/files');
+const { formatSize, typeLabel, typeDescription } = require('../lib/files');
 const { fileIcon } = require('../lib/file-icons');
 
 const dateFormatter = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -30,6 +30,8 @@ async function viewLocals(req, res, next) {
   res.locals.formatDateTime = (date) => dateTimeFormatter.format(date);
   res.locals.fileIcon = fileIcon;
   res.locals.formatSize = formatSize;
+  res.locals.typeLabel = typeLabel;
+  res.locals.typeDescription = typeDescription;
   if (req.user) {
     const root = await prisma.folder.findFirst({
       where: { ownerId: req.user.id, parentId: null },

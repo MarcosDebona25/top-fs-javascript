@@ -1,50 +1,16 @@
 <%- include('../partials/head') %>
-<nav class="breadcrumbs" aria-label="Breadcrumb">
-  <ol>
-    <% breadcrumbs.forEach((crumb, index) => { %>
-      <li>
-        <% if (index === breadcrumbs.length - 1) { %>
-          <span aria-current="page"><%= crumb.name %></span>
-        <% } else { %>
-          <a href="<%= crumb.href %>"><%= crumb.name %></a>
-        <% } %>
-      </li>
-    <% }) %>
-  </ol>
-</nav>
+<%- include('../partials/breadcrumbs', { items: breadcrumbs.map((crumb, index) => ({ name: crumb.name, href: index === breadcrumbs.length - 1 ? null : crumb.href })) }) %>
 
-<div class="title-row">
-  <h1><%- include('../partials/icon', { name: 'folder' }) %> <%= folder.name %></h1>
+<div class="title-block">
+  <h1><%= folder.name %></h1>
+  <p class="meta">Shared by <%= ownerName %>. This link expires on <time datetime="<%= expiresAt.toISOString() %>"><%= formatDateTime(expiresAt) %></time>.</p>
 </div>
-<p class="notice">Shared folder, read-only. This link expires on <time datetime="<%= expiresAt.toISOString() %>"><%= formatDateTime(expiresAt) %></time>.</p>
 
 <% if (folders.length === 0 && files.length === 0) { %>
   <div class="empty">
-    <p><strong>This folder is empty.</strong></p>
+    <p class="empty-title">This folder is empty</p>
   </div>
 <% } else { %>
-  <div class="table-wrap">
-    <table class="listing">
-      <thead>
-        <tr><th scope="col">Name</th><th scope="col" class="num">Size</th><th scope="col" class="col-date">Created</th></tr>
-      </thead>
-      <tbody>
-        <% folders.forEach((child) => { %>
-          <tr>
-            <td><%- include('../partials/icon', { name: 'folder' }) %> <a href="/share/<%= token %>/folders/<%= child.id %>"><%= child.name %></a></td>
-            <td class="num">-</td>
-            <td class="col-date"><time datetime="<%= child.createdAt.toISOString() %>"><%= formatDate(child.createdAt) %></time></td>
-          </tr>
-        <% }) %>
-        <% files.forEach((file) => { %>
-          <tr>
-            <td><%- include('../partials/icon', { name: file.extension }) %> <a href="/share/<%= token %>/files/<%= file.id %>"><%= file.name %></a></td>
-            <td class="num"><%= formatSize(file.size) %></td>
-            <td class="col-date"><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDate(file.createdAt) %></time></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
+  <%- include('../partials/listing', { folderBase: '/share/' + token + '/folders/', fileBase: '/share/' + token + '/files/' }) %>
 <% } %>
 <%- include('../partials/foot') %>

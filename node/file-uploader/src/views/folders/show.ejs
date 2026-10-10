@@ -1,85 +1,57 @@
 <%- include('../partials/head') %>
-<nav class="breadcrumbs" aria-label="Breadcrumb">
-  <ol>
-    <% breadcrumbs.forEach((crumb, index) => { %>
-      <li>
-        <% if (index === breadcrumbs.length - 1) { %>
-          <span aria-current="page"><%= crumb.name %></span>
-        <% } else { %>
-          <a href="/folders/<%= crumb.id %>"><%= crumb.name %></a>
-        <% } %>
-      </li>
-    <% }) %>
-  </ol>
-</nav>
+<%- include('../partials/breadcrumbs', { items: breadcrumbs.map((crumb, index) => ({ name: crumb.name, href: index === breadcrumbs.length - 1 ? null : '/folders/' + crumb.id })) }) %>
 
 <div class="title-row">
-  <h1><%- include('../partials/icon', { name: 'folder' }) %> <%= folder.name %></h1>
+  <h1><%= folder.name %></h1>
   <div class="actions">
     <a class="button" href="/folders/<%= folder.id %>/shares">Share links</a>
     <% if (!isRoot) { %>
-      <a class="button button-danger" href="/folders/<%= folder.id %>/delete">Delete folder</a>
+      <a class="button button-danger" href="/folders/<%= folder.id %>/delete" data-dialog-open="delete-dialog">Delete folder</a>
     <% } %>
   </div>
 </div>
 
-<p class="notice">Files and folders can't be moved after creation.</p>
-
-<section class="panel">
-  <h2>New folder</h2>
-  <form method="post" action="/folders/<%= folder.id %>/folders" class="inline-form" novalidate data-validate>
-    <%- include('../partials/field', { id: 'name', label: 'Folder name', value: values.name, error: openForm === 'create' ? errors.name : null, attrs: { maxlength: 100, 'data-no-slashes': 'true' } }) %>
-    <button type="submit" class="button button-primary">Create folder</button>
+<div class="form-row">
+  <form method="post" action="/folders/<%= folder.id %>/folders" novalidate data-validate>
+    <%- include('../partials/field', { id: 'name', label: 'New folder', value: values.name, error: openForm === 'create' ? errors.name : null, button: 'Create', buttonClass: 'button-primary', attrs: { maxlength: 100, 'data-no-slashes': 'true' } }) %>
   </form>
-</section>
-
-<section class="panel">
-  <h2>Upload file</h2>
-  <form method="post" action="/folders/<%= folder.id %>/files" enctype="multipart/form-data" class="inline-form" novalidate data-validate>
-    <%- include('../partials/field', { id: 'file', name: 'file', label: 'File', type: 'file', error: errors.file, hint: 'Max 10 MB. PNG, JPG, WEBP, GIF, PDF, TXT, DOCX, XLSX', attrs: { 'data-max-size': 10485760, 'data-allowed-ext': 'png,jpg,jpeg,webp,gif,pdf,txt,docx,xlsx' } }) %>
-    <button type="submit" class="button button-primary">Upload file</button>
+  <form method="post" action="/folders/<%= folder.id %>/files" enctype="multipart/form-data" novalidate data-validate>
+    <%- include('../partials/field', { id: 'file', name: 'file', label: 'Upload file', type: 'file', error: errors.file, hint: 'Max 10 MB. PNG, JPG, WEBP, GIF, PDF, TXT, DOCX, XLSX.', button: 'Upload', buttonClass: 'button-primary', attrs: { 'data-max-size': 10485760, 'data-allowed-ext': 'png,jpg,jpeg,webp,gif,pdf,txt,docx,xlsx' } }) %>
   </form>
-  <p class="notice">Files are stored at public, hard-to-guess URLs. Private URLs are not supported yet.</p>
-</section>
+</div>
 
 <% if (!isRoot) { %>
-  <details class="panel"<%= openForm === 'rename' ? ' open' : '' %>>
+  <details class="rename"<%= openForm === 'rename' ? ' open' : '' %>>
     <summary>Rename folder</summary>
-    <form method="post" action="/folders/<%= folder.id %>/rename" class="inline-form" novalidate data-validate>
-      <%- include('../partials/field', { id: 'rename-name', name: 'name', label: 'New name', value: values.renameName !== undefined ? values.renameName : folder.name, error: errors.renameName, attrs: { maxlength: 100, 'data-no-slashes': 'true' } }) %>
-      <button type="submit" class="button">Rename</button>
+    <form method="post" action="/folders/<%= folder.id %>/rename" class="rename-body" novalidate data-validate>
+      <%- include('../partials/field', { id: 'rename-name', name: 'name', label: 'New name', value: values.renameName !== undefined ? values.renameName : folder.name, error: errors.renameName, button: 'Rename', attrs: { maxlength: 100, 'data-no-slashes': 'true' } }) %>
     </form>
   </details>
 <% } %>
 
 <% if (folders.length === 0 && files.length === 0) { %>
   <div class="empty">
-    <p><strong>This folder is empty.</strong></p>
-    <p>Create a subfolder or upload a file to get started.</p>
+    <p class="empty-title">This folder is empty</p>
+    <p class="empty-text">Create a subfolder or upload a file to get started.</p>
   </div>
 <% } else { %>
-  <div class="table-wrap">
-    <table class="listing">
-      <thead>
-        <tr><th scope="col">Name</th><th scope="col" class="num">Size</th><th scope="col" class="col-date">Created</th></tr>
-      </thead>
-      <tbody>
-        <% folders.forEach((child) => { %>
-          <tr>
-            <td><%- include('../partials/icon', { name: 'folder' }) %> <a href="/folders/<%= child.id %>"><%= child.name %></a></td>
-            <td class="num">-</td>
-            <td class="col-date"><time datetime="<%= child.createdAt.toISOString() %>"><%= formatDate(child.createdAt) %></time></td>
-          </tr>
-        <% }) %>
-        <% files.forEach((file) => { %>
-          <tr>
-            <td><%- include('../partials/icon', { name: file.extension }) %> <a href="/files/<%= file.id %>"><%= file.name %></a></td>
-            <td class="num"><%= formatSize(file.size) %></td>
-            <td class="col-date"><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDate(file.createdAt) %></time></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
+  <%- include('../partials/listing', { folderBase: '/folders/', fileBase: '/files/' }) %>
+<% } %>
+
+<p class="note">Files and folders can't be moved after creation. Files are stored at public, hard-to-guess URLs; private URLs are not supported yet.</p>
+
+<% if (!isRoot) { %>
+  <dialog id="delete-dialog" class="modal" aria-labelledby="delete-title">
+    <div class="modal-body">
+      <h2 id="delete-title" class="modal-title">Delete "<%= folder.name %>"?</h2>
+      <p class="modal-text"><%- include('../partials/delete-summary', deleteCounts) %></p>
+      <div class="modal-actions">
+        <button type="button" class="button" data-dialog-close>Cancel</button>
+        <form method="post" action="/folders/<%= folder.id %>/delete">
+          <button type="submit" class="button button-danger">Delete folder</button>
+        </form>
+      </div>
+    </div>
+  </dialog>
 <% } %>
 <%- include('../partials/foot') %>

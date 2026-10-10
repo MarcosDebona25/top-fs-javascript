@@ -1,17 +1,17 @@
-<%- include('../partials/head') %>
+<%- include('../partials/head', { pageClass: 'page-state' }) %>
 <%
   const copy = {
     403: ['Not allowed', 'This action is not allowed.'],
-    404: ['Page not found', "This page doesn't exist, or you don't have access to it."],
-    410: ['Link expired', 'This share link has expired. Ask the owner to create a new one.'],
+    404: ['Page not found', "The page you are looking for doesn't exist, or you don't have access to it."],
+    410: ['This share link has expired', 'The owner chose a limited duration for this link and it has ended. Ask them to create a new share link if you still need access.'],
     500: ['Something went wrong', 'An unexpected error occurred. Try again in a moment.']
   };
   const [heading, fallback] = copy[status] || ['Error', 'Something went wrong.'];
 %>
-<section class="card state">
-  <p class="state-code"><%= status %></p>
-  <h1><%= heading %></h1>
-  <p><%= message && status !== 404 && status !== 410 ? message : fallback %></p>
-  <p><a class="button" href="/">Go to your drive</a></p>
-</section>
+<p class="state-code">Error <%= status %></p>
+<h1><%= heading %></h1>
+<p class="state-text"><%= message && status !== 404 && status !== 410 ? message : fallback %></p>
+<% if (status !== 410) { %>
+  <div><a class="button button-primary state-action" href="/">Go to My Drive</a></div>
+<% } %>
 <%- include('../partials/foot') %>

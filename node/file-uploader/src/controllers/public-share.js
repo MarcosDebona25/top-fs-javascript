@@ -7,7 +7,13 @@ const storage = require('../services/storage');
 async function resolveShare(token) {
   const link = await prisma.shareLink.findFirst({
     where: { token, expiresAt: { gt: new Date() } },
-    select: { token: true, folderId: true, ownerId: true, expiresAt: true },
+    select: {
+      token: true,
+      folderId: true,
+      ownerId: true,
+      expiresAt: true,
+      owner: { select: { username: true } },
+    },
   });
   if (link) return link;
 
@@ -44,6 +50,7 @@ async function renderFolder(req, res, link, folderId) {
     publicView: true,
     token: link.token,
     expiresAt: link.expiresAt,
+    ownerName: link.owner.username,
     folder,
     breadcrumbs,
     folders,

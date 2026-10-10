@@ -3,15 +3,25 @@ const OOXML_SHEET = 'application/vnd.openxmlformats-officedocument.spreadsheetml
 
 // Extension (lowercase) is the primary criterion; the MIME must be one of the accepted values.
 const FILE_TYPES = {
-  png: { mimes: ['image/png'], resourceType: 'image' },
-  jpg: { mimes: ['image/jpeg'], resourceType: 'image' },
-  jpeg: { mimes: ['image/jpeg'], resourceType: 'image' },
-  webp: { mimes: ['image/webp'], resourceType: 'image' },
-  gif: { mimes: ['image/gif'], resourceType: 'image' },
-  pdf: { mimes: ['application/pdf'], resourceType: 'image' },
-  txt: { mimes: ['text/plain'], resourceType: 'raw' },
-  docx: { mimes: [OOXML_WORD, 'application/octet-stream'], resourceType: 'raw' },
-  xlsx: { mimes: [OOXML_SHEET, 'application/octet-stream'], resourceType: 'raw' },
+  png: { mimes: ['image/png'], resourceType: 'image', label: 'Image', description: 'PNG image' },
+  jpg: { mimes: ['image/jpeg'], resourceType: 'image', label: 'Image', description: 'JPEG image' },
+  jpeg: { mimes: ['image/jpeg'], resourceType: 'image', label: 'Image', description: 'JPEG image' },
+  webp: { mimes: ['image/webp'], resourceType: 'image', label: 'Image', description: 'WebP image' },
+  gif: { mimes: ['image/gif'], resourceType: 'image', label: 'Image', description: 'GIF image' },
+  pdf: { mimes: ['application/pdf'], resourceType: 'image', label: 'PDF', description: 'PDF document' },
+  txt: { mimes: ['text/plain'], resourceType: 'raw', label: 'Text', description: 'Plain text' },
+  docx: {
+    mimes: [OOXML_WORD, 'application/octet-stream'],
+    resourceType: 'raw',
+    label: 'Document',
+    description: 'Word document',
+  },
+  xlsx: {
+    mimes: [OOXML_SHEET, 'application/octet-stream'],
+    resourceType: 'raw',
+    label: 'Spreadsheet',
+    description: 'Excel spreadsheet',
+  },
 };
 
 const MAX_FILE_SIZE = 10485760;

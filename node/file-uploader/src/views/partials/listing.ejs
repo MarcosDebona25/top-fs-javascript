@@ -1,0 +1,25 @@
+<div class="table-wrap">
+  <table class="listing">
+    <thead>
+      <tr><th scope="col">Name</th><th scope="col" class="col-type">Type</th><th scope="col" class="num">Size</th><th scope="col" class="col-date">Created</th></tr>
+    </thead>
+    <tbody>
+      <% folders.forEach((child) => { %>
+        <tr>
+          <td class="col-name"><a class="name name-folder" href="<%= folderBase %><%= child.id %>"><%- include('icon', { name: 'folder' }) %><%= child.name %></a></td>
+          <td class="col-type">Folder</td>
+          <td class="num">-</td>
+          <td class="col-date"><time datetime="<%= child.createdAt.toISOString() %>"><%= formatDate(child.createdAt) %></time></td>
+        </tr>
+      <% }) %>
+      <% files.forEach((file) => { %>
+        <tr>
+          <td class="col-name"><a class="name" href="<%= fileBase %><%= file.id %>"><%- include('icon', { name: file.extension }) %><%= file.name %></a></td>
+          <td class="col-type"><%= typeLabel(file.extension) %></td>
+          <td class="num"><%= formatSize(file.size) %></td>
+          <td class="col-date"><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDate(file.createdAt) %></time></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
