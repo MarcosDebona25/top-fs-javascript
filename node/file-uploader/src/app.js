@@ -8,6 +8,7 @@ const { HttpError } = require('./lib/http');
 const { flash, viewLocals } = require('./middlewares/locals');
 const authRoutes = require('./routes/auth');
 const folderRoutes = require('./routes/folders');
+const fileRoutes = require('./routes/files');
 const shareRoutes = require('./routes/shares');
 const publicShareRoutes = require('./routes/public-share');
 
@@ -38,6 +39,7 @@ app.get('/', async (req, res) => {
 
 app.use(authRoutes);
 app.use('/folders', folderRoutes);
+app.use('/files', fileRoutes);
 app.use('/shares', shareRoutes);
 app.use('/share', publicShareRoutes);
 

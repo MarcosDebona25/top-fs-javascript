@@ -117,4 +117,4 @@ async function remove(req, res) {
   res.redirect(`/folders/${folder.parentId}`);
 }
 
-module.exports = { show, createSubfolder, rename, showDelete, remove };
+module.exports = { show, createSubfolder, rename, showDelete, remove, findOwnedFolder, renderFolder };

@@ -75,6 +75,10 @@
 
     if (input.dataset.noSlashes && /[\/\\]/.test(value)) return "Can't contain / or \\.";
 
+    if (input.dataset.noExtension && /\.(?=[a-z0-9]{1,5}$)[a-z0-9]*[a-z][a-z0-9]*$/i.test(value)) {
+      return "File extension can't be changed.";
+    }
+
     if (input.dataset.match) {
       var other = document.getElementById(input.dataset.match);
       if (other && other.value !== input.value) return "Passwords don't match.";

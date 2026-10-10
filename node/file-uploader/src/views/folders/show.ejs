@@ -33,6 +33,15 @@
   </form>
 </section>
 
+<section class="panel">
+  <h2>Upload file</h2>
+  <form method="post" action="/folders/<%= folder.id %>/files" enctype="multipart/form-data" class="inline-form" novalidate data-validate>
+    <%- include('../partials/field', { id: 'file', name: 'file', label: 'File', type: 'file', error: errors.file, hint: 'Max 10 MB. PNG, JPG, WEBP, GIF, PDF, TXT, DOCX, XLSX', attrs: { 'data-max-size': 10485760, 'data-allowed-ext': 'png,jpg,jpeg,webp,gif,pdf,txt,docx,xlsx' } }) %>
+    <button type="submit" class="button button-primary">Upload file</button>
+  </form>
+  <p class="notice">Files are stored at public, hard-to-guess URLs. Private URLs are not supported yet.</p>
+</section>
+
 <% if (!isRoot) { %>
   <details class="panel"<%= openForm === 'rename' ? ' open' : '' %>>
     <summary>Rename folder</summary>
@@ -46,7 +55,7 @@
 <% if (folders.length === 0 && files.length === 0) { %>
   <div class="empty">
     <p><strong>This folder is empty.</strong></p>
-    <p>Create a subfolder to start organizing your files.</p>
+    <p>Create a subfolder or upload a file to get started.</p>
   </div>
 <% } else { %>
   <div class="table-wrap">

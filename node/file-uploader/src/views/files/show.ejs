@@ -1,0 +1,37 @@
+<%- include('../partials/head') %>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    <% breadcrumbs.forEach((crumb) => { %>
+      <li><a href="/folders/<%= crumb.id %>"><%= crumb.name %></a></li>
+    <% }) %>
+    <li><span aria-current="page"><%= file.name %></span></li>
+  </ol>
+</nav>
+
+<div class="title-row">
+  <h1><%- include('../partials/icon', { name: fileCategory(file.extension) }) %> <%= file.name %></h1>
+  <div class="actions">
+    <a class="button button-primary" href="/files/<%= file.id %>/download">Download</a>
+    <form method="post" action="/files/<%= file.id %>/delete">
+      <button type="submit" class="button button-danger">Delete</button>
+    </form>
+  </div>
+</div>
+
+<dl class="details">
+  <dt>Name</dt><dd><%= file.name %></dd>
+  <dt>Type</dt><dd><%= file.mimeType %></dd>
+  <dt>Size</dt><dd><%= formatSize(file.size) %></dd>
+  <dt>Uploaded</dt><dd><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDate(file.createdAt) %></time></dd>
+</dl>
+
+<p class="notice">Files are stored at public, hard-to-guess URLs. Private URLs are not supported yet.</p>
+
+<details class="panel"<%= openForm === 'rename' ? ' open' : '' %>>
+  <summary>Rename file</summary>
+  <form method="post" action="/files/<%= file.id %>/rename" class="inline-form" novalidate data-validate>
+    <%- include('../partials/field', { id: 'name', label: 'New name', value: values.name !== undefined ? values.name : baseName, error: errors.name, suffix: '.' + file.extension, attrs: { maxlength: 200, 'data-no-slashes': 'true', 'data-no-extension': 'true' } }) %>
+    <button type="submit" class="button">Rename</button>
+  </form>
+</details>
+<%- include('../partials/foot') %>
