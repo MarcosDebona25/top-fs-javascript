@@ -21,7 +21,7 @@ const emailRule = body('email')
 const bytesRule = (field) =>
   body(field)
     .custom((value) => passwordBytes(value || '') <= MAX_PASSWORD_BYTES)
-    .withMessage(`Password is too long (max ${MAX_PASSWORD_BYTES} bytes).`);
+    .withMessage(`Password is too long. Use a shorter password.`);
 
 const signUpRules = [
   body('username')
@@ -37,7 +37,7 @@ const signUpRules = [
     .withMessage(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`)
     .bail()
     .custom((value) => passwordBytes(value) <= MAX_PASSWORD_BYTES)
-    .withMessage(`Password is too long (max ${MAX_PASSWORD_BYTES} bytes).`),
+    .withMessage(`Password is too long. Use a shorter password.`),
   body('passwordConfirmation')
     .custom((value, { req }) => value === req.body.password)
     .withMessage("Passwords don't match."),

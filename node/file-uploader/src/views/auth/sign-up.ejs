@@ -4,7 +4,7 @@
   <form method="post" action="/sign-up" novalidate data-validate>
     <%- include('../partials/field', { id: 'username', label: 'Username', value: values.username, error: errors.username, autocomplete: 'username', hint: '3 to 20 characters: lowercase letters, numbers and underscores.', attrs: { minlength: 3, maxlength: 20, pattern: '[A-Za-z0-9_]{3,20}', 'data-lowercase': 'true', 'data-pattern-message': 'Use 3 to 20 letters, numbers or underscores.' } }) %>
     <%- include('../partials/field', { id: 'email', label: 'Email', type: 'email', value: values.email, error: errors.email, autocomplete: 'email', attrs: { maxlength: 254 } }) %>
-    <%- include('../partials/field', { id: 'password', label: 'Password', type: 'password', error: errors.password, autocomplete: 'new-password', hint: 'At least 8 characters, up to 72 bytes.', attrs: { minlength: 8 } }) %>
+    <%- include('../partials/field', { id: 'password', label: 'Password', type: 'password', error: errors.password, autocomplete: 'new-password', hint: 'At least 8 characters.', attrs: { minlength: 8 } }) %>
     <%- include('../partials/field', { id: 'passwordConfirmation', label: 'Confirm password', type: 'password', error: errors.passwordConfirmation, autocomplete: 'new-password', attrs: { 'data-match': 'password' } }) %>
     <button type="submit" class="button button-primary">Sign up</button>
   </form>

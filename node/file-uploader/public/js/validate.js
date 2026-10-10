@@ -62,7 +62,7 @@
     if (max && !isPassword && chars(value) > max) return 'Must be ' + max + ' characters or fewer.';
 
     if (input.dataset.maxBytes && encoder.encode(value).length > Number(input.dataset.maxBytes)) {
-      return 'Password is too long (max ' + input.dataset.maxBytes + ' bytes).';
+      return 'Password is too long. Use a shorter password.';
     }
 
     var pattern = input.getAttribute('pattern');

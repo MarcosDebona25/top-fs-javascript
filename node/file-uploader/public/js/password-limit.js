@@ -39,7 +39,7 @@
       if (byteLength(valueAfterInsert(input, text)) > MAX_BYTES) {
         // The pasted text is never truncated: it is rejected as a whole.
         event.preventDefault();
-        showWarning(input, 'Pasted password is too long (max 72 bytes).');
+        showWarning(input, 'Pasted password is too long. Type a shorter password.');
       } else {
         hideWarning(input);
       }
