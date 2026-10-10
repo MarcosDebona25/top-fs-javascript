@@ -53,17 +53,6 @@ Copiar `.env.example` a `.env` y completar:
 
 `PORT` es opcional (por defecto 3000). El archivo `.env` está en `.gitignore`.
 
-## Configuración de Cloudinary (cuenta gratuita)
-
-1. Crear una cuenta en cloudinary.com (plan gratuito).
-2. Entrar al Dashboard y abrir "Go to API Keys" (o Settings, API Keys).
-3. Copiar `Cloud name`, `API Key` y `API Secret` a las variables `CLOUDINARY_*` del `.env`.
-4. Ir a Settings, Security.
-5. Activar "Allow delivery of PDF and ZIP files". Se activa para poder descargar PDF; la app no acepta ZIP. Sin esta opción, las descargas de PDF devuelven 401.
-6. Guardar los cambios.
-
-Los límites del plan gratuito coinciden con los de la app: 10 MB por archivo, y las imágenes no deben superar 25 megapíxeles (la app no valida los megapíxeles; si Cloudinary los rechaza, el usuario ve un error de subida).
-
 ## Instalación, migraciones, seed y ejecución
 
 ```bash
@@ -97,14 +86,6 @@ Links compartidos del seed (carpetas de alice):
 
 - Vigente: `/share/5f0c6a3e-7d1b-4b52-9c3a-2f6a0e1d8a01`
 - Vencido (responde 410): `/share/8b2e41c7-3a9d-4f6e-b1c5-9d7e5a2c4b02`
-
-## Interfaz
-
-- Identidad propia en `public/css/style.css`, sin frameworks: barra superior negra con el logo, botones rellenos (azul para la acción principal, negro para las secundarias, rojo para borrar) y listados en tabla con columnas Name, Type, Size y Created.
-- Tipografías Bricolage Grotesque (títulos) e Instrument Sans (texto), servidas desde `public/fonts/` en formato `.woff2`. No se cargan recursos de terceros. Ambas se distribuyen bajo SIL Open Font License 1.1.
-- Logo y favicon en SVG (`public/favicon.svg`). Los iconos por tipo de archivo salen del diccionario `src/lib/file-icons.js`.
-- El borrado de una carpeta se confirma en un `<dialog>` modal (`public/js/dialog.js`). Sin JavaScript, el mismo botón lleva a la página de confirmación `/folders/:id/delete`.
-- En pantallas de hasta 640 px el listado muestra sólo Name y Size, y los formularios pasan a una columna.
 
 ## Decisiones y limitaciones
 
