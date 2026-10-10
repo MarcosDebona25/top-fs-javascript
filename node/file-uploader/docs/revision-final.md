@@ -1,0 +1,69 @@
+# Revisión final
+
+## Auditoría de consultas por ownerId
+
+Toda consulta sobre datos privados filtra por `ownerId` en la misma sentencia. Un recurso ajeno responde 404.
+
+| Ubicación | Consulta | Filtro |
+| --- | --- | --- |
+| `controllers/folders.js` | `findOwnedFolder`, listados de subcarpetas y archivos, `count` | `{ id, ownerId }`, `{ parentId, ownerId }`, `{ folderId, ownerId }` |
+| `controllers/folders.js` | rename (`updateMany`), delete (`deleteMany`) | `{ id, ownerId }` |
+| `controllers/files.js` | `findFirst`, `updateMany`, `deleteMany` | `{ id, ownerId }` |
+| `controllers/shares.js` | carpeta, listado, `findFirst`, `deleteMany` | `ownerId: req.user.id` |
+| `services/folder-tree.js` | CTE recursivas | el ancla filtra `"ownerId"` |
+| `middlewares/locals.js`, `app.js` | carpeta raíz | `{ ownerId, parentId: null }` |
+| `controllers/public-share.js` | vistas públicas | `ownerId` del link, y pertenencia al subárbol compartido |
+
+Excepciones por diseño: `passport` (búsqueda por email y por id para autenticar), `shareLink.findUnique({ token })` (sólo distingue 404 de 410 y selecciona `id`), `AssetDeletionFailure` (no pertenece a un usuario) y `Session` (la gestiona el session store).
+
+Resultado: sin hallazgos.
+
+## Matriz de validaciones
+
+| Campo | Regla | Cliente | Servidor |
+| --- | --- | --- | --- |
+| username | 3 a 20, `[a-z0-9_]`, se guarda en minúsculas, único | `pattern`, `minlength`, `maxlength` | `matches`, P2002 sobre `User_username_key` |
+| email | requerido, válido, hasta 254, trim y minúsculas, único | `type=email`, requerido | `isEmail`, `isLength`, P2002 sobre `User_email_key` |
+| password (alta) | 8 caracteres mínimo, 72 bytes máximo, nunca se trunca | `minlength`, `maxlength=72`, conteo de bytes, pegado bloqueado | `custom` por caracteres y `Buffer.byteLength` |
+| passwordConfirmation | igual a password | `data-match` | `custom` |
+| password (login) | requerido, hasta 72 bytes | requerido, bytes | `notEmpty`, `custom` bytes |
+| nombre de carpeta | 1 a 100 tras trim, sin `/` ni `\`, único por padre (sensible a mayúsculas) | `maxlength`, `data-no-slashes` | `trim`, `isLength`, `custom`, P2002 sobre `Folder_parentId_name_key` |
+| archivo (subida) | uno, hasta 10485760 bytes, extensión y MIME permitidos | `data-max-size`, `data-allowed-ext` | multer `limits` y `fileFilter`, `req.uploadError` |
+| nombre base al subir | no vacío, hasta 200 | no | controlador |
+| nuevo nombre de archivo | 1 a 200, sin `/` ni `\`, no parece extensión; la extensión guardada se agrega en el servidor | `maxlength`, `data-no-slashes`, `data-no-extension` | `fileRenameRules` |
+| durationDays | uno de 1, 7, 15, 30 | `select` con esas opciones | `isIn` |
+| ids de ruta y token | entero positivo, token existente y vigente | no aplica | `parseId`, 404 o 410 |
+
+## Checklist de pruebas manuales ejecutado
+
+Se ejecutó con curl contra la app levantada (puerto 3111), con los datos del seed y Cloudinary real. Todos los resultados coincidieron con lo esperado.
+
+| Prueba | Esperado | Resultado |
+| --- | --- | --- |
+| Login válido | 302 | OK |
+| Contraseña incorrecta | 422 | OK |
+| Ruta privada sin sesión | 302 a /log-in | OK |
+| `GET /log-out` | 404 | OK |
+| Subcarpeta con nombre repetido | 422 | OK |
+| Mismo nombre con otra capitalización | 302 | OK |
+| Nombre con `/`, nombre de 101 caracteres | 422 | OK |
+| Renombrar o borrar la raíz | 403 | OK |
+| Otro usuario: carpeta, creación, links, archivo, descarga, borrado | 404 | OK |
+| Subir txt | 302 | OK |
+| Subir zip, subir sin archivo | 422 | OK |
+| Renombrar a `Plan.pdf` | 422 | OK |
+| Renombrar a `Plan final` | 302 | OK |
+| Descarga y URL de Cloudinary | 302 y 200 | OK |
+| Link con 5 días | 422 | OK |
+| Link con 7 días | 302 | OK |
+| Link público anónimo | 200 | OK |
+| Token inexistente | 404 | OK |
+| Link vencido | 410 | OK |
+| Carpeta fuera del subárbol compartido, raíz del dueño | 404 | OK |
+| Archivo dentro del subárbol y su descarga | 200 y 302 | OK |
+| Borrar archivo | 302 | OK |
+| Cerrar sesión (POST) y reintentar ruta privada | 302 y 302 | OK |
+
+Verificado en fases anteriores: límite de 10 MB + 1 byte, MIME que no coincide, compensación ante falla de base, borrado de carpeta con assets, registro y reintento de `AssetDeletionFailure`, descarga de los 9 tipos con nombre renombrado.
+
+No verificado en navegador real: los scripts de cliente (`validate.js`, `password-limit.js`, `copy.js`), la accesibilidad con lector de pantalla y el copiado al portapapeles.
