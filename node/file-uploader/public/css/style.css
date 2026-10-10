@@ -114,7 +114,9 @@ h2 { font-size: 1rem; margin: 0 0 0.5rem; }
 .listing th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
 .listing .num { text-align: right; white-space: nowrap; }
 .listing td:first-child { overflow-wrap: anywhere; }
-.listing .icon { vertical-align: -2px; margin-right: 0.35rem; color: var(--muted); }
+.listing .icon { vertical-align: -4px; margin-right: 0.35rem; }
+.listing a { text-decoration: none; }
+.listing a:hover { text-decoration: underline; }
 .col-date { white-space: nowrap; }
 
 .empty { border: 1px dashed var(--border); border-radius: var(--radius); padding: 1.5rem 1rem; color: var(--muted); }

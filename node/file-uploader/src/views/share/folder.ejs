@@ -38,7 +38,7 @@
         <% }) %>
         <% files.forEach((file) => { %>
           <tr>
-            <td><%- include('../partials/icon', { name: fileCategory(file.extension) }) %> <a href="/share/<%= token %>/files/<%= file.id %>"><%= file.name %></a></td>
+            <td><%- include('../partials/icon', { name: file.extension }) %> <a href="/share/<%= token %>/files/<%= file.id %>"><%= file.name %></a></td>
             <td class="num"><%= formatSize(file.size) %></td>
             <td class="col-date"><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDate(file.createdAt) %></time></td>
           </tr>

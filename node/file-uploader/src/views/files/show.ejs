@@ -9,7 +9,7 @@
 </nav>
 
 <div class="title-row">
-  <h1><%- include('../partials/icon', { name: fileCategory(file.extension) }) %> <%= file.name %></h1>
+  <h1><%- include('../partials/icon', { name: file.extension }) %> <%= file.name %></h1>
   <div class="actions">
     <a class="button button-primary" href="/files/<%= file.id %>/download">Download</a>
     <form method="post" action="/files/<%= file.id %>/delete">
