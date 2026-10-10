@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> - File Uploader</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="<%= locals.rootFolderId ? '/folders/' + rootFolderId : '/' %>">File Uploader</a>
+  <% if (locals.currentUser) { %>
+    <div class="user-menu">
+      <span class="username"><%= currentUser.username %></span>
+      <form method="post" action="/log-out">
+        <button type="submit" class="button button-quiet">Log out</button>
+      </form>
+    </div>
+  <% } %>
+</header>
+<main class="page">
+<%- include('flash') %>

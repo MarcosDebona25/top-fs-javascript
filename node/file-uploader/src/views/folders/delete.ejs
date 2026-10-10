@@ -1,0 +1,17 @@
+<%- include('../partials/head') %>
+<section class="card">
+  <h1>Delete "<%= folder.name %>"?</h1>
+  <p>This permanently deletes the folder and everything inside it:</p>
+  <ul class="counts">
+    <li><strong><%= folderCount %></strong> <%= folderCount === 1 ? 'subfolder' : 'subfolders' %></li>
+    <li><strong><%= fileCount %></strong> <%= fileCount === 1 ? 'file' : 'files' %></li>
+  </ul>
+  <p>This can't be undone.</p>
+  <div class="actions">
+    <form method="post" action="/folders/<%= folder.id %>/delete">
+      <button type="submit" class="button button-danger">Delete folder</button>
+    </form>
+    <a class="button" href="/folders/<%= folder.id %>">Cancel</a>
+  </div>
+</section>
+<%- include('../partials/foot') %>

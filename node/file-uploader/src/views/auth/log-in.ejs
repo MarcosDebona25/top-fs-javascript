@@ -1,0 +1,12 @@
+<%- include('../partials/head') %>
+<section class="card">
+  <h1>Log in</h1>
+  <% if (errors.form) { %><p class="form-error" role="alert"><%= errors.form %></p><% } %>
+  <form method="post" action="/log-in" novalidate data-validate>
+    <%- include('../partials/field', { id: 'email', label: 'Email', type: 'email', value: values.email, error: errors.email, autocomplete: 'email', attrs: { maxlength: 254 } }) %>
+    <%- include('../partials/field', { id: 'password', label: 'Password', type: 'password', error: errors.password, autocomplete: 'current-password' }) %>
+    <button type="submit" class="button button-primary">Log in</button>
+  </form>
+  <p class="aside">No account yet? <a href="/sign-up">Sign up</a></p>
+</section>
+<%- include('../partials/foot') %>

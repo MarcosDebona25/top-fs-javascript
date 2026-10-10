@@ -1,0 +1,28 @@
+<%
+  const fieldType = locals.type || 'text';
+  const fieldAttrs = locals.attrs || {};
+  const isPassword = fieldType === 'password';
+  const describedBy = [id + '-error'];
+  if (locals.hint) describedBy.push(id + '-hint');
+  if (isPassword) describedBy.push(id + '-warning');
+%>
+<div class="field<%= locals.error ? ' has-error' : '' %>">
+  <label for="<%= id %>"><%= label %></label>
+  <div class="control">
+    <input
+      id="<%= id %>"
+      name="<%= locals.name || id %>"
+      type="<%= fieldType %>"
+      <% if (!isPassword && locals.value) { %>value="<%= value %>"<% } %>
+      <% if (locals.autocomplete) { %>autocomplete="<%= autocomplete %>"<% } %>
+      <% if (locals.required !== false) { %>required<% } %>
+      <% if (locals.error) { %>aria-invalid="true"<% } %>
+      <% if (isPassword) { %>maxlength="72" data-max-bytes="72" data-password-limit<% } %>
+      <% for (const [key, val] of Object.entries(fieldAttrs)) { %><%= key %>="<%= val %>" <% } %>
+      aria-describedby="<%= describedBy.join(' ') %>">
+    <% if (locals.suffix) { %><span class="suffix"><%= suffix %></span><% } %>
+  </div>
+  <% if (locals.hint) { %><p id="<%= id %>-hint" class="hint"><%= hint %></p><% } %>
+  <% if (isPassword) { %><p id="<%= id %>-warning" class="field-warning" role="status" hidden></p><% } %>
+  <p id="<%= id %>-error" class="field-error" aria-live="polite"<%= locals.error ? '' : ' hidden' %>><%= locals.error || '' %></p>
+</div>

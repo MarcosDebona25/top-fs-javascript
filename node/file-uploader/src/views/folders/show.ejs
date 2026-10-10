@@ -1,0 +1,75 @@
+<%- include('../partials/head') %>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    <% breadcrumbs.forEach((crumb, index) => { %>
+      <li>
+        <% if (index === breadcrumbs.length - 1) { %>
+          <span aria-current="page"><%= crumb.name %></span>
+        <% } else { %>
+          <a href="/folders/<%= crumb.id %>"><%= crumb.name %></a>
+        <% } %>
+      </li>
+    <% }) %>
+  </ol>
+</nav>
+
+<div class="title-row">
+  <h1><%- include('../partials/icon', { name: 'folder' }) %> <%= folder.name %></h1>
+  <% if (!isRoot) { %>
+    <div class="actions">
+      <a class="button button-danger" href="/folders/<%= folder.id %>/delete">Delete folder</a>
+    </div>
+  <% } %>
+</div>
+
+<p class="notice">Files and folders can't be moved after creation.</p>
+
+<section class="panel">
+  <h2>New folder</h2>
+  <form method="post" action="/folders/<%= folder.id %>/folders" class="inline-form" novalidate data-validate>
+    <%- include('../partials/field', { id: 'name', label: 'Folder name', value: values.name, error: openForm === 'create' ? errors.name : null, attrs: { maxlength: 100, 'data-no-slashes': 'true' } }) %>
+    <button type="submit" class="button button-primary">Create folder</button>
+  </form>
+</section>
+
+<% if (!isRoot) { %>
+  <details class="panel"<%= openForm === 'rename' ? ' open' : '' %>>
+    <summary>Rename folder</summary>
+    <form method="post" action="/folders/<%= folder.id %>/rename" class="inline-form" novalidate data-validate>
+      <%- include('../partials/field', { id: 'rename-name', name: 'name', label: 'New name', value: values.renameName !== undefined ? values.renameName : folder.name, error: errors.renameName, attrs: { maxlength: 100, 'data-no-slashes': 'true' } }) %>
+      <button type="submit" class="button">Rename</button>
+    </form>
+  </details>
+<% } %>
+
+<% if (folders.length === 0 && files.length === 0) { %>
+  <div class="empty">
+    <p><strong>This folder is empty.</strong></p>
+    <p>Create a subfolder to start organizing your files.</p>
+  </div>
+<% } else { %>
+  <div class="table-wrap">
+    <table class="listing">
+      <thead>
+        <tr><th scope="col">Name</th><th scope="col" class="num">Size</th><th scope="col" class="col-date">Created</th></tr>
+      </thead>
+      <tbody>
+        <% folders.forEach((child) => { %>
+          <tr>
+            <td><%- include('../partials/icon', { name: 'folder' }) %> <a href="/folders/<%= child.id %>"><%= child.name %></a></td>
+            <td class="num">-</td>
+            <td class="col-date"><time datetime="<%= child.createdAt.toISOString() %>"><%= formatDate(child.createdAt) %></time></td>
+          </tr>
+        <% }) %>
+        <% files.forEach((file) => { %>
+          <tr>
+            <td><%- include('../partials/icon', { name: fileCategory(file.extension) }) %> <a href="/files/<%= file.id %>"><%= file.name %></a></td>
+            <td class="num"><%= formatSize(file.size) %></td>
+            <td class="col-date"><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDate(file.createdAt) %></time></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+<%- include('../partials/foot') %>
