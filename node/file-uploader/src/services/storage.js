@@ -5,6 +5,11 @@ async function destroyAsset() {
   throw new Error('Asset storage is not configured yet.');
 }
 
+// Replaced by the Cloudinary implementation in phase 4.
+function getDownloadUrl() {
+  throw new Error('Asset storage is not configured yet.');
+}
+
 async function recordFailure(asset, error) {
   console.error(`Failed to delete asset ${asset.publicId} (${asset.resourceType}):`, error.message);
   try {
@@ -31,4 +36,4 @@ async function deleteAssetsBestEffort(assets) {
   }
 }
 
-module.exports = { deleteAssetsBestEffort, recordFailure };
+module.exports = { deleteAssetsBestEffort, recordFailure, getDownloadUrl };

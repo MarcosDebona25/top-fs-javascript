@@ -8,6 +8,8 @@ const { HttpError } = require('./lib/http');
 const { flash, viewLocals } = require('./middlewares/locals');
 const authRoutes = require('./routes/auth');
 const folderRoutes = require('./routes/folders');
+const shareRoutes = require('./routes/shares');
+const publicShareRoutes = require('./routes/public-share');
 
 const app = express();
 const isProduction = process.env.NODE_ENV === 'production';
@@ -36,6 +38,8 @@ app.get('/', async (req, res) => {
 
 app.use(authRoutes);
 app.use('/folders', folderRoutes);
+app.use('/shares', shareRoutes);
+app.use('/share', publicShareRoutes);
 
 app.use((req, res, next) => next(new HttpError(404, 'Page not found')));
 

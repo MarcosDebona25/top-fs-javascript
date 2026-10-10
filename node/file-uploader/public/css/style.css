@@ -128,3 +128,25 @@ h2 { font-size: 1rem; margin: 0 0 0.5rem; }
   .col-date { display: none; }
   .inline-form > .button { margin-top: 0; }
 }
+
+.field select {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #8a919a;
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+.field select[aria-invalid="true"] { border-color: var(--danger); }
+
+.links { list-style: none; margin: 0; padding: 0; }
+.link-item { border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 0.75rem; }
+.link-url { margin: 0 0 0.25rem; overflow-wrap: anywhere; }
+.link-meta { margin: 0 0 0.6rem; color: var(--muted); font-size: 0.875rem; }
+.badge { display: inline-block; padding: 0 0.45rem; border-radius: var(--radius); font-size: 0.8rem; font-weight: 600; margin-right: 0.35rem; }
+.badge-active { background: var(--success-bg); color: var(--success-text); }
+.badge-expired { background: #f3e9e8; color: var(--danger); }
+
+.details { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1.25rem; margin: 1rem 0; }
+.details dt { color: var(--muted); }
+.details dd { margin: 0; overflow-wrap: anywhere; }

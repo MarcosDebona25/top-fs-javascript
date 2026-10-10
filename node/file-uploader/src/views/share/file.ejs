@@ -1,0 +1,23 @@
+<%- include('../partials/head') %>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    <% breadcrumbs.forEach((crumb) => { %>
+      <li><a href="<%= crumb.href %>"><%= crumb.name %></a></li>
+    <% }) %>
+    <li><span aria-current="page"><%= file.name %></span></li>
+  </ol>
+</nav>
+
+<div class="title-row">
+  <h1><%- include('../partials/icon', { name: fileCategory(file.extension) }) %> <%= file.name %></h1>
+  <div class="actions">
+    <a class="button button-primary" href="/share/<%= token %>/files/<%= file.id %>/download">Download</a>
+  </div>
+</div>
+
+<dl class="details">
+  <dt>Type</dt><dd><%= file.mimeType %></dd>
+  <dt>Size</dt><dd><%= formatSize(file.size) %></dd>
+  <dt>Uploaded</dt><dd><time datetime="<%= file.createdAt.toISOString() %>"><%= formatDate(file.createdAt) %></time></dd>
+</dl>
+<%- include('../partials/foot') %>

@@ -13,11 +13,20 @@ function flash(req, res, next) {
   next();
 }
 
+const dateTimeFormatter = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+});
+
 async function viewLocals(req, res, next) {
   res.locals.appName = 'File Uploader';
   res.locals.currentUser = req.user || null;
   res.locals.rootFolderId = null;
   res.locals.formatDate = (date) => dateFormatter.format(date);
+  res.locals.formatDateTime = (date) => dateTimeFormatter.format(date);
   res.locals.fileCategory = fileCategory;
   res.locals.formatSize = formatSize;
   if (req.user) {

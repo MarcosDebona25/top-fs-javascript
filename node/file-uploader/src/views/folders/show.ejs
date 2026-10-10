@@ -15,11 +15,12 @@
 
 <div class="title-row">
   <h1><%- include('../partials/icon', { name: 'folder' }) %> <%= folder.name %></h1>
-  <% if (!isRoot) { %>
-    <div class="actions">
+  <div class="actions">
+    <a class="button" href="/folders/<%= folder.id %>/shares">Share links</a>
+    <% if (!isRoot) { %>
       <a class="button button-danger" href="/folders/<%= folder.id %>/delete">Delete folder</a>
-    </div>
-  <% } %>
+    <% } %>
+  </div>
 </div>
 
 <p class="notice">Files and folders can't be moved after creation.</p>

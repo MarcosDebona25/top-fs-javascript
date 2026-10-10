@@ -8,8 +8,12 @@
 </head>
 <body>
 <header class="site-header">
-  <a class="brand" href="<%= locals.rootFolderId ? '/folders/' + rootFolderId : '/' %>">File Uploader</a>
-  <% if (locals.currentUser) { %>
+  <% if (locals.publicView) { %>
+    <span class="brand">File Uploader</span>
+  <% } else { %>
+    <a class="brand" href="<%= locals.rootFolderId ? '/folders/' + rootFolderId : '/' %>">File Uploader</a>
+  <% } %>
+  <% if (locals.currentUser && !locals.publicView) { %>
     <div class="user-menu">
       <span class="username"><%= currentUser.username %></span>
       <form method="post" action="/log-out">
