@@ -1,0 +1,31 @@
+{
+  "name": "blog-api",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "api",
+    "shared",
+    "reader",
+    "author"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w api",
+    "dev:reader": "npm run dev -w reader",
+    "build:reader": "npm run build -w reader",
+    "dev:author": "npm run dev -w author",
+    "build:author": "npm run build -w author",
+    "test": "npm run test:unit && npm run test:api && npm run test:e2e",
+    "test:unit": "vitest run",
+    "test:api": "npm test -w api",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "jsdom": "^30.1.3",
+    "vitest": "^5.0.5"
+  }
+}
