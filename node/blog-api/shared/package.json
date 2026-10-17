@@ -1,0 +1,25 @@
+{
+  "name": "@blog/shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./api": "./src/api.js",
+    "./auth": "./src/auth.jsx",
+    "./useFetch": "./src/useFetch.js",
+    "./markdown": "./src/Markdown.jsx",
+    "./format": "./src/format.js",
+    "./vite-csp": "./vite-csp.js",
+    "./styles.css": "./styles/marginalia.css",
+    "./states": "./src/States.jsx",
+    "./returnTo": "./src/returnTo.js",
+    "./useDocumentTitle": "./src/useDocumentTitle.js"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-router": "^8.0.0"
+  },
+  "dependencies": {
+    "react-markdown": "^10.1.0"
+  }
+}
