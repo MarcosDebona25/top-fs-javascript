@@ -1,0 +1,120 @@
+# Comments: run top to bottom. Each login replaces the stored cookie.
+# Nobody can edit or delete someone else's comment, not even the post's author.
+
+@baseUrl = http://localhost:3000
+@origin = http://localhost:5174
+@json = application/json
+
+### 1. Log in as author1 and create a post to comment on
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "author1", "password": "{{$dotenv AUTHOR_PASSWORD}}" }
+
+###
+# @name post
+POST {{baseUrl}}/api/posts
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "title": "A post to comment on", "content": "Say something." }
+
+### 2. Comment on a draft -> 404
+POST {{baseUrl}}/api/posts/{{post.response.body.$.post.id}}/comments
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "content": "Too early" }
+
+### 3. Publish it
+PATCH {{baseUrl}}/api/posts/{{post.response.body.$.post.id}}
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "published": true }
+
+### 4. Log out, then comment anonymously -> 401
+POST {{baseUrl}}/api/auth/logout
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+###
+POST {{baseUrl}}/api/posts/{{post.response.body.$.post.id}}/comments
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "content": "Who am I?" }
+
+### 5. Log in as reader1
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "reader1", "password": "{{$dotenv READER_PASSWORD}}" }
+
+### 6. Comment -> 201 + Location. HTML is stored as written and escaped by the frontends.
+# @name comment
+POST {{baseUrl}}/api/posts/{{post.response.body.$.post.id}}/comments
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "content": "<img src=x onerror=alert(1)> Great post!" }
+
+### 7. Blank comment -> 422
+POST {{baseUrl}}/api/posts/{{post.response.body.$.post.id}}/comments
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "content": "   " }
+
+### 8. Public list of the post's comments -> 200
+GET {{baseUrl}}/api/posts/{{post.response.body.$.post.id}}/comments
+
+### 9. Edit my comment -> 200, editedAt set
+PATCH {{baseUrl}}/api/comments/{{comment.response.body.$.comment.id}}
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "content": "Great post! (edited)" }
+
+### 10. My comments, with the title of each post -> 200
+GET {{baseUrl}}/api/me/comments
+
+### 11. Log in as author1, the post's author
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "author1", "password": "{{$dotenv AUTHOR_PASSWORD}}" }
+
+### 12. The post's author edits reader1's comment -> 403
+PATCH {{baseUrl}}/api/comments/{{comment.response.body.$.comment.id}}
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "content": "Censored" }
+
+### 13. The post's author deletes reader1's comment -> 403
+DELETE {{baseUrl}}/api/comments/{{comment.response.body.$.comment.id}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+### 14. Clean up: delete the post (its comments go by Cascade) -> 204
+DELETE {{baseUrl}}/api/posts/{{post.response.body.$.post.id}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+### 15. The comment is gone with its post -> 404
+GET {{baseUrl}}/api/posts/{{post.response.body.$.post.id}}/comments

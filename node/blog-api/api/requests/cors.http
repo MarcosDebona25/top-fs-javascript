@@ -1,0 +1,30 @@
+# CORS is enforced by the browser, not by REST Client: these requests only show
+# which headers the API answers with, which is what a browser would evaluate.
+
+@baseUrl = http://localhost:3000
+
+### 1. Preflight from the author site -> 204 with Access-Control-Allow-Origin, -Credentials, -Methods, -Headers
+OPTIONS {{baseUrl}}/api/posts
+Origin: http://localhost:5174
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: content-type, x-requested-with
+
+### 2. Preflight from the reader site -> same headers, echoing its own origin
+OPTIONS {{baseUrl}}/api/posts/1/comments
+Origin: http://localhost:5173
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: content-type, x-requested-with
+
+### 3. Preflight from an unknown origin -> no Access-Control-Allow-Origin: the browser would block
+OPTIONS {{baseUrl}}/api/posts
+Origin: http://evil.example
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: content-type, x-requested-with
+
+### 4. Simple GET from an allowed origin -> Access-Control-Allow-Origin echoes it, plus Vary: Origin
+GET {{baseUrl}}/api/posts
+Origin: http://localhost:5173
+
+### 5. Simple GET from an unknown origin -> 200 for REST Client, but without CORS headers the browser hides it
+GET {{baseUrl}}/api/posts
+Origin: http://evil.example

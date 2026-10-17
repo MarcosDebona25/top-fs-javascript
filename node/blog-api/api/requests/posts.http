@@ -1,0 +1,142 @@
+# Posts: run top to bottom. Each login replaces the stored cookie.
+# Passwords come from api/.env (requests/.env is a symlink to it).
+
+@baseUrl = http://localhost:3000
+@origin = http://localhost:5174
+@json = application/json
+
+### 1. Public list: only published posts, no content, with excerpt -> 200
+GET {{baseUrl}}/api/posts
+
+### 2. Log in as author1
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "author1", "password": "{{$dotenv AUTHOR_PASSWORD}}" }
+
+### 3. Create a post: always starts as a draft -> 201 + Location
+# @name createPost
+POST {{baseUrl}}/api/posts
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "title": "Written from REST Client", "content": "Some **Markdown**.\n\n- one\n- two" }
+
+### 4. My posts, drafts included -> 200
+GET {{baseUrl}}/api/me/posts
+
+### 5. My draft, read by me -> 200
+GET {{baseUrl}}/api/posts/{{createPost.response.body.$.post.id}}
+
+### 6. Invalid data -> 422 with details
+POST {{baseUrl}}/api/posts
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "title": "", "content": 5 }
+
+### 7. PATCH with no known field -> 422
+PATCH {{baseUrl}}/api/posts/{{createPost.response.body.$.post.id}}
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{}
+
+### 8. Edit the title only (PATCH keeps the rest) -> 200
+PATCH {{baseUrl}}/api/posts/{{createPost.response.body.$.post.id}}
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "title": "Written from REST Client, edited" }
+
+### 9. Publish -> 200, publishedAt set by the server
+PATCH {{baseUrl}}/api/posts/{{createPost.response.body.$.post.id}}
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "published": true }
+
+### 10. Publish again -> 200, publishedAt does NOT change
+PATCH {{baseUrl}}/api/posts/{{createPost.response.body.$.post.id}}
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "published": true }
+
+### 11. Unpublish -> 200, publishedAt back to null
+PATCH {{baseUrl}}/api/posts/{{createPost.response.body.$.post.id}}
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "published": false }
+
+### 12. Log in as author2 (replaces the cookie)
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "author2", "password": "{{$dotenv AUTHOR_PASSWORD}}" }
+
+### 13. author2 reads author1's draft -> 404 (its existence is a secret)
+GET {{baseUrl}}/api/posts/{{createPost.response.body.$.post.id}}
+
+### 14. author2 edits author1's post -> 404
+PATCH {{baseUrl}}/api/posts/{{createPost.response.body.$.post.id}}
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "title": "Not mine" }
+
+### 15. author2 deletes author1's post -> 404
+DELETE {{baseUrl}}/api/posts/{{createPost.response.body.$.post.id}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+### 16. Log in as reader1
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "reader1", "password": "{{$dotenv READER_PASSWORD}}" }
+
+### 17. A reader creates a post -> 403
+POST {{baseUrl}}/api/posts
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "title": "Readers cannot write", "content": "Nope" }
+
+### 18. A reader asks for /me/posts -> 403
+GET {{baseUrl}}/api/me/posts
+
+### 19. Log in as author1 again
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "author1", "password": "{{$dotenv AUTHOR_PASSWORD}}" }
+
+### 20. Delete my post -> 204 (its comments go too, by Cascade)
+DELETE {{baseUrl}}/api/posts/{{createPost.response.body.$.post.id}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+### 21. The deleted post -> 404
+GET {{baseUrl}}/api/posts/{{createPost.response.body.$.post.id}}
+
+### 22. Non-numeric id -> 404
+GET {{baseUrl}}/api/posts/abc

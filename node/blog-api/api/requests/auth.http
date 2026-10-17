@@ -1,0 +1,114 @@
+# Auth: run top to bottom. REST Client keeps the token cookie between requests.
+# Passwords come from api/.env (requests/.env is a symlink to it).
+
+@baseUrl = http://localhost:3000
+@origin = http://localhost:5174
+@json = application/json
+
+### 1. Sign up a new reader -> 201, Set-Cookie token (HttpOnly; Secure; SameSite=Strict), no token in the body
+# Change the username on every run, or expect 409 the second time.
+POST {{baseUrl}}/api/auth/signup
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "new_reader", "password": "a-long-password-123" }
+
+### 2. Same username again -> 409
+POST {{baseUrl}}/api/auth/signup
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "new_reader", "password": "a-long-password-123" }
+
+### 3. Invalid sign-up data -> 422 with details
+POST {{baseUrl}}/api/auth/signup
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "No Spaces!", "password": "short" }
+
+### 4. Log in as author1 -> 200, Set-Cookie, body { user, expiresAt }
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "author1", "password": "{{$dotenv AUTHOR_PASSWORD}}" }
+
+### 5. Who am I (uses the stored cookie) -> 200
+GET {{baseUrl}}/api/auth/me
+
+### 6. Wrong password -> 401 "Invalid username or password"
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "author1", "password": "wrong-password" }
+
+### 7. Unknown user -> 401 with the same message as the wrong password
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "nobody_here", "password": "wrong-password" }
+
+### 8. CSRF guard: write without Origin -> 403 "Origin not allowed"
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+X-Requested-With: blog-client
+
+{ "username": "author1", "password": "{{$dotenv AUTHOR_PASSWORD}}" }
+
+### 9. CSRF guard: write from an unknown origin -> 403 "Origin not allowed"
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: http://evil.example
+X-Requested-With: blog-client
+
+{ "username": "author1", "password": "{{$dotenv AUTHOR_PASSWORD}}" }
+
+### 10. CSRF guard: write without X-Requested-With -> 403 "Missing request header"
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+
+{ "username": "author1", "password": "{{$dotenv AUTHOR_PASSWORD}}" }
+
+### 11. CSRF guard: browser marks the request as cross-site -> 403
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+Sec-Fetch-Site: cross-site
+
+{ "username": "author1", "password": "{{$dotenv AUTHOR_PASSWORD}}" }
+
+### 12. Malformed JSON -> 400
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "author1",
+
+### 13. Log out -> 204, Set-Cookie with an expired token
+POST {{baseUrl}}/api/auth/logout
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+### 14. Who am I after logging out -> 401
+GET {{baseUrl}}/api/auth/me
+
+### 15. Rate limit: send this one more than 10 times in 15 minutes -> 429
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+Origin: {{origin}}
+X-Requested-With: blog-client
+
+{ "username": "author1", "password": "wrong-password" }
