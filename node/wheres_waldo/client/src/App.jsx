@@ -5,6 +5,7 @@ import Landing from './pages/Landing.jsx';
 import Login from './pages/Login.jsx';
 import NotFound from './pages/NotFound.jsx';
 import Ranking from './pages/Ranking.jsx';
+import Result from './pages/Result.jsx';
 import Register from './pages/Register.jsx';
 
 export default function App() {
@@ -12,6 +13,7 @@ export default function App() {
     <Routes>
       <Route element={<SiteLayout />}>
         <Route index element={<Landing />} />
+        <Route path="result/:id" element={<Result />} />
         <Route path="ranking" element={<Ranking />} />
         <Route path="ranking/:slug" element={<Ranking />} />
       </Route>
