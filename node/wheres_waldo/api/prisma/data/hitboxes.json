@@ -1,0 +1,116 @@
+{
+  "_warning": "PLACEHOLDERS ONLY. These rectangles are NOT the real positions of the characters: they are tiled along the top-left corner so the game can be exercised. Replace them with the output of the calibration tool and set \"calibrated\" to true. x/y is the top-left corner; x, y, width and height are fractions of the image (0 to 1).",
+  "maps": {
+    "beach": {
+      "waldo": {
+        "x": 0.02,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "woof": {
+        "x": 0.08,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "wenda": {
+        "x": 0.14,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "wizard": {
+        "x": 0.2,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "odlaw": {
+        "x": 0.26,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      }
+    },
+    "ski-slopes": {
+      "waldo": {
+        "x": 0.02,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "woof": {
+        "x": 0.08,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "wenda": {
+        "x": 0.14,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "wizard": {
+        "x": 0.2,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "odlaw": {
+        "x": 0.26,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      }
+    },
+    "moon-base": {
+      "waldo": {
+        "x": 0.02,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "woof": {
+        "x": 0.08,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "wenda": {
+        "x": 0.14,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "wizard": {
+        "x": 0.2,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      },
+      "odlaw": {
+        "x": 0.26,
+        "y": 0.02,
+        "width": 0.04,
+        "height": 0.04,
+        "calibrated": false
+      }
+    }
+  }
+}

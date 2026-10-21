@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum GameStatus {
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  username      String
+  // Lowercased copy of username: it carries the case-insensitive uniqueness ("Marcos" = "marcos").
+  usernameLower String   @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+  games         Game[]
+}
+
+model Map {
+  id          Int            @id @default(autoincrement())
+  slug        String         @unique
+  name        String
+  imageWidth  Int
+  imageHeight Int
+  position    Int            @unique
+  characters  MapCharacter[]
+  games       Game[]
+}
+
+model Character {
+  id       Int            @id @default(autoincrement())
+  slug     String         @unique
+  name     String
+  position Int            @unique
+  maps     MapCharacter[]
+  finds    GameFind[]
+}
+
+// Where a character is on a map: a rectangle in coordinates normalized to the image (0 to 1),
+// so it holds at any screen size. These values never leave the API.
+model MapCharacter {
+  mapId       Int
+  characterId Int
+  x           Float
+  y           Float
+  width       Float
+  height      Float
+  // False while the rectangle is a placeholder that nobody has drawn with the calibration tool.
+  calibrated  Boolean   @default(false)
+  map         Map       @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@id([mapId, characterId])
+}
+
+// One attempt at a map. Guests have no user: their game is played and timed, but never ranked.
+model Game {
+  id         String     @id @default(uuid()) @db.Uuid
+  mapId      Int
+  userId     Int?
+  startedAt  DateTime
+  finishedAt DateTime?
+  wrongCount Int        @default(0)
+  penaltyMs  Int        @default(0)
+  // Real elapsed time plus penalties, computed on the server when the last character is found.
+  durationMs Int?
+  status     GameStatus @default(IN_PROGRESS)
+  map        Map        @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  user       User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  finds      GameFind[]
+
+  @@index([mapId, status, durationMs])
+  @@index([userId, mapId])
+}
+
+model GameFind {
+  gameId      String    @db.Uuid
+  characterId Int
+  foundAt     DateTime
+  game        Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@id([gameId, characterId])
+}
+
+// Table read and written by connect-pg-simple (express-session store); the column names are its own.
+model Session {
+  sid    String   @id @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire])
+  @@map("session")
+}
