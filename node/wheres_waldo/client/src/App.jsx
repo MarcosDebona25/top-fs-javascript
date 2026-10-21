@@ -1,3 +1,4 @@
+import { Suspense, lazy } from 'react';
 import { Route, Routes } from 'react-router';
 import { SiteLayout } from './components/Layout.jsx';
 import Game from './pages/Game.jsx';
@@ -7,6 +8,9 @@ import NotFound from './pages/NotFound.jsx';
 import Ranking from './pages/Ranking.jsx';
 import Result from './pages/Result.jsx';
 import Register from './pages/Register.jsx';
+
+// The calibration tool only exists in development: in a production build this branch is removed.
+const Calibrate = import.meta.env.DEV ? lazy(() => import('./pages/Calibrate.jsx')) : null;
 
 export default function App() {
   return (
@@ -22,6 +26,16 @@ export default function App() {
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Register />} />
       </Route>
+      {Calibrate && (
+        <Route
+          path="dev/calibrate"
+          element={
+            <Suspense fallback={<p className="loading container">Loading…</p>}>
+              <Calibrate />
+            </Suspense>
+          }
+        />
+      )}
       <Route element={<SiteLayout variant="bare" />}>
         <Route path="*" element={<NotFound />} />
       </Route>

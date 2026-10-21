@@ -585,3 +585,249 @@ a.pagination__item.is-current:hover {
     padding-left: 18px;
   }
 }
+
+/* Calibration tool (dev only) */
+
+.calibrate__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1240px;
+  padding-top: 18px;
+  padding-bottom: 8px;
+}
+
+.calibrate__title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.calibrate__title h1 {
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+
+.dev-badge {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--white);
+  background: var(--navy);
+  border-radius: 999px;
+}
+
+.calibrate__tabs {
+  border-bottom: 0;
+  gap: 4px 24px;
+}
+
+.calibrate__tab {
+  margin-bottom: 0;
+  padding: 10px 2px;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  background: transparent;
+  font-size: 16px;
+}
+
+.calibrate__main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 32px;
+  max-width: 1240px;
+  padding-top: 28px;
+  padding-bottom: 56px;
+}
+
+.calibrate__stage {
+  flex: 999 1 640px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calibrate__help {
+  font-size: 15px;
+  color: var(--ink-3);
+}
+
+.calibrate__help strong {
+  color: var(--navy);
+}
+
+.calibrate__frame {
+  position: relative;
+  width: 100%;
+  background: var(--navy);
+}
+
+.calibrate__viewport {
+  cursor: crosshair;
+}
+
+.hitbox {
+  position: absolute;
+  box-sizing: border-box;
+  border-width: 3px;
+  box-shadow: 0 0 0 1px var(--white);
+}
+
+.hitbox__label {
+  position: absolute;
+  left: -3px;
+  bottom: 100%;
+  padding: 2px 8px;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+.calibrate__readout {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--white);
+  background: rgba(18, 35, 63, 0.85);
+  border-radius: 6px;
+}
+
+.calibrate__side {
+  flex: 1 1 300px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.calibrate__heading {
+  margin-bottom: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+}
+
+.calibrate__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.calibrate__char {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 8px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: transparent;
+  text-align: left;
+  color: var(--navy);
+}
+
+.calibrate__char.is-active {
+  background: #fceef0;
+}
+
+.calibrate__char img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
+  border: 2px solid var(--navy);
+  background: var(--white);
+}
+
+.calibrate__char-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.calibrate__char-name {
+  font-weight: 700;
+}
+
+.calibrate__coords {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.calibrate__status {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.calibrate__status.is-done {
+  color: var(--green);
+}
+
+.calibrate__status.is-selected {
+  color: var(--red);
+}
+
+.calibrate__tools {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.calibrate__reset {
+  color: var(--red);
+}
+
+.calibrate__output {
+  flex: 1 1 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.calibrate__output-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.calibrate__output-head .calibrate__heading {
+  margin-bottom: 0;
+}
+
+.calibrate__json {
+  margin: 0;
+  max-height: 360px;
+  padding: 16px 0;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--navy);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border-top: 2px solid var(--navy);
+  border-bottom: 1px solid var(--line);
+}
+
+.hint code {
+  font-family: var(--font-mono);
+}
