@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router';
 import { SiteLayout } from './components/Layout.jsx';
+import Game from './pages/Game.jsx';
 import Landing from './pages/Landing.jsx';
 import Login from './pages/Login.jsx';
 import NotFound from './pages/NotFound.jsx';
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="ranking" element={<Ranking />} />
         <Route path="ranking/:slug" element={<Ranking />} />
       </Route>
+      <Route path="play/:slug" element={<Game />} />
       <Route element={<SiteLayout variant="back" />}>
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Register />} />
