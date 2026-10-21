@@ -36,3 +36,4 @@ Repositorio con los proyectos realizados del módulo Full Stack Javascript de [T
 | 16 | Members Only | Pendiente de deploy |
 | 17 | File Uploader | Pendiente de deploy |
 | 18 | Blog API | Pendiente de deploy |
+| 19 | Where's Waldo | Pendiente de deploy |
