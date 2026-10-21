@@ -12,6 +12,7 @@ Proyecto de The Odin Project: un juego de fotos para encontrar personajes. El ju
 - La imagen se ajusta al ancho y admite zoom y desplazamiento (rueda, botones, teclado y pellizco en móvil). Se sirve en AVIF/WebP con `srcset`.
 - Un click abre un círculo (anillo rojo y blanco) con el menú de personajes; en móvil el menú es una hoja inferior. Los personajes encontrados quedan marcados.
 - Al encontrar los cinco, la pantalla de resultado muestra el tiempo (`m:ss.mmm`), las penalizaciones y la posición en la escena y en el ranking global.
+- Salir con **Quit** o **Scenes** abandona la partida en el servidor: no se guarda ningún tiempo y esa partida no puede completarse después.
 
 **Cuentas (opcionales)**
 
@@ -20,7 +21,7 @@ Proyecto de The Odin Project: un juego de fotos para encontrar personajes. El ju
 
 **Rankings**
 
-- La portada muestra la tabla global (`Player | Beach | Ski Slopes | Moon Base | Total`; los jugadores con escenas sin completar van al final con "—") y el top 10 de cada escena. Se actualizan en vivo por Server-Sent Events.
+- La portada muestra la tabla global (`Player | Beach | Ski Slopes | Moon Base | Total`; los jugadores con escenas sin completar van al final con "n/a") y el top 10 de cada escena. Se actualizan en vivo por Server-Sent Events.
 - Rankings completos y paginados, global y por escena.
 
 **Anti-trampa**
@@ -56,6 +57,8 @@ sudo -u postgres psql -c "CREATE DATABASE wheres_waldo OWNER wheres_waldo"
 
 `CREATEDB` hace falta para la base de tests (`wheres_waldo_test`) y la de los e2e (`..._e2e`).
 
+El seed crea las escenas, los personajes y también 12 jugadores ficticios con partidas completas, para que los rankings tengan datos creíbles desde el primer arranque.
+
 ## Variables de entorno
 
 Copiar `api/.env.example` a `api/.env` y generar el secreto como explica el archivo. Las más importantes:
@@ -79,11 +82,11 @@ El resto (límites de intentos, latido del SSE, puerto) está comentado en `.env
 npm install
 cd api && npx prisma migrate deploy && npm run seed && cd ..
 
-npm run dev:api      # PostgreSQL + API en http://localhost:3000
-npm run dev:client   # http://localhost:5173 (proxy de /api hacia la API; API_URL lo cambia)
+npm run dev:api      # inicia PostgreSQL y la API en http://localhost:3000
+npm run dev:client   # inicia PostgreSQL si hace falta y el cliente en http://localhost:5173 (proxy de /api hacia la API; API_URL lo cambia)
 ```
 
-`npm run dev:api` inicia PostgreSQL con `sudo service postgresql start` y lo detiene al salir. `npm run build:client` genera `client/dist/`.
+Ambos comandos arrancan PostgreSQL cuando no está en marcha (`scripts/start-db.sh`); `dev:api` además lo detiene al salir. `npm run build:client` genera `client/dist/`.
 
 ## Calibrar los hitboxes
 

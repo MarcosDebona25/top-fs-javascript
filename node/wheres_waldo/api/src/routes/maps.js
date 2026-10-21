@@ -8,6 +8,7 @@ function createMapsRoutes(ctx) {
   const router = Router();
 
   router.get('/', maps.list);
+  router.get('/:slug', maps.show);
   router.post('/:slug/games', ctx.limiters.start, games.start);
 
   return router;

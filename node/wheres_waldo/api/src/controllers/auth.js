@@ -50,13 +50,14 @@ function createAuthController({ prisma, passport, config, sessionCookieName }) {
 
   // Guests are a normal case, not an error: the client asks on every page load.
   function me(req, res) {
-    res.json({ user: req.user ? publicUser(req.user) : null });
+    res.set('Cache-Control', 'private, no-store').json({ user: req.user ? publicUser(req.user) : null });
   }
 
   // Backs the inline check while typing; the registration itself still handles the race.
   async function usernameAvailable(req, res) {
     const { username } = validated(req);
     const existing = await prisma.user.findUnique({ where: { usernameLower: username.toLowerCase() }, select: { id: true } });
+    res.set('Cache-Control', 'private, no-store');
     if (existing) return res.json({ username, available: false, errors: { username: TAKEN_MESSAGE } });
     return res.json({ username, available: true });
   }

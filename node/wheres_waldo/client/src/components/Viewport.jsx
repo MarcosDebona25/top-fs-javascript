@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import { clampOffset, clampScale, imageToStage, stageToImage, wheelScale, zoomAt } from '../lib/viewport.js';
 
 const TAP_SLOP = 8; // pixels a pointer may move and still count as a tap
@@ -10,8 +10,8 @@ const midpoint = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
 // A stage showing a picture fit to its width, which can be zoomed (wheel, buttons, pinch, keys) and dragged.
 // `image` is the picture, `overlay({ view, content, toStage })` draws things in screen pixels on top of it
 // (so rings and labels keep their size while zooming). `onPick(point)` fires on a tap, with image fractions.
-export const Viewport = forwardRef(function Viewport(
-  { aspect, image, overlay, onPick, shouldPan, onViewChange, label, className = '', ...pointerHandlers },
+export const Viewport = memo(forwardRef(function Viewport(
+  { aspect, image, overlay, onPick, onPanStart, shouldPan, onViewChange, label, className = '', ...pointerHandlers },
   ref,
 ) {
   const stageRef = useRef(null);
@@ -116,15 +116,18 @@ export const Viewport = forwardRef(function Viewport(
 
   function onPointerDown(event) {
     pointerHandlers.onPointerDown?.(event);
-    if (event.target.closest?.('[data-no-pan]')) return;
+    // A press on the picker can still become a drag: once it moves past the tap slop we take the
+    // pointer over, close the picker and pan. A tap stays with the control underneath.
+    const fromControl = Boolean(event.target.closest?.('[data-no-pan]'));
     if (shouldPan && !shouldPan(event)) return;
     if (event.pointerType === 'mouse' && event.button !== 0 && event.button !== 1) return;
-    stageRef.current.setPointerCapture?.(event.pointerId);
+    if (!fromControl) stageRef.current.setPointerCapture?.(event.pointerId);
     pointers.current.set(event.pointerId, local(event));
     const points = [...pointers.current.values()];
     if (points.length === 1) {
-      gesture.current = { kind: 'drag', start: points[0], startView: viewRef.current, moved: false };
+      gesture.current = { kind: 'drag', start: points[0], startView: viewRef.current, moved: false, fromControl };
     } else if (points.length === 2) {
+      onPanStart?.();
       gesture.current = {
         kind: 'pinch',
         startDistance: Math.max(1, distance(points[0], points[1])),
@@ -145,7 +148,11 @@ export const Viewport = forwardRef(function Viewport(
       const dx = here.x - current.start.x;
       const dy = here.y - current.start.y;
       if (!current.moved && Math.hypot(dx, dy) < TAP_SLOP) return;
-      current.moved = true;
+      if (!current.moved) {
+        current.moved = true;
+        if (current.fromControl) stageRef.current.setPointerCapture?.(event.pointerId);
+        onPanStart?.();
+      }
       setDragging(true);
       apply({ scale: current.startView.scale, tx: current.startView.tx + dx, ty: current.startView.ty + dy });
     } else if (current.kind === 'pinch') {
@@ -161,7 +168,7 @@ export const Viewport = forwardRef(function Viewport(
   function endPointer(event, cancelled) {
     pointerHandlers.onPointerUp?.(event);
     if (!pointers.current.has(event.pointerId)) return;
-    const wasTap = gesture.current?.kind === 'drag' && !gesture.current.moved && !cancelled && event.button <= 0;
+    const wasTap = gesture.current?.kind === 'drag' && !gesture.current.moved && !gesture.current.fromControl && !cancelled && event.button <= 0;
     pointers.current.delete(event.pointerId);
     stageRef.current.releasePointerCapture?.(event.pointerId);
     if (pointers.current.size === 0) {
@@ -243,4 +250,4 @@ export const Viewport = forwardRef(function Viewport(
       <div className="viewport__overlay">{overlay?.({ view, content, stage, toStage: (x, y) => imageToStage(view, content, x, y) })}</div>
     </div>
   );
-});
+}));

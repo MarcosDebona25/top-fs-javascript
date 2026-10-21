@@ -1,4 +1,5 @@
-import { screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { mockApi, renderPage } from '../../test/helpers.jsx';
 import Ranking, { parsePage } from './Ranking.jsx';
@@ -62,6 +63,68 @@ describe('<Ranking>', () => {
     expect(await screen.findByText('0:49.660')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Ski Slopes' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByText('Showing 1–1 of 1 player')).toBeInTheDocument();
+  });
+
+  it('keeps the previous board visible while another tab loads', async () => {
+    let release;
+    const beach = new Promise((resolve) => {
+      release = () =>
+        resolve({
+          __reply: true,
+          status: 200,
+          body: {
+            map: { slug: 'beach', name: 'Beach' },
+            page: 1,
+            pageSize: 10,
+            total: 1,
+            totalPages: 1,
+            rows: [{ rank: 1, username: 'beach_player', timeMs: 49660 }],
+          },
+        });
+    });
+    mockApi({
+      'GET /api/leaderboards/global?page=1&pageSize=10': globalPage(1),
+      'GET /api/leaderboards/maps/beach?page=1&pageSize=10': () => beach,
+    });
+    renderPage(<Ranking />, { route: '/ranking', path: '/ranking/:slug?' });
+    expect(await screen.findByText('player_1', { selector: 'td' })).toBeInTheDocument();
+
+    await userEvent.setup().click(screen.getByRole('link', { name: 'Beach' }));
+    expect(screen.getByText('player_1', { selector: 'td' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Loading leaderboard');
+    expect(screen.getByRole('navigation', { name: 'Leaderboards' })).toHaveAttribute('aria-busy', 'true');
+
+    await act(async () => release());
+    expect(await screen.findByText('beach_player', { selector: 'td' })).toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('keeps the scene board visible while going back to Global', async () => {
+    let release;
+    const global = new Promise((resolve) => {
+      release = () => resolve({ __reply: true, status: 200, body: globalPage(1) });
+    });
+    mockApi({
+      'GET /api/leaderboards/global?page=1&pageSize=10': () => global,
+      'GET /api/leaderboards/maps/beach?page=1&pageSize=10': {
+        map: { slug: 'beach', name: 'Beach' },
+        page: 1,
+        pageSize: 10,
+        total: 1,
+        totalPages: 1,
+        rows: [{ rank: 1, username: 'beach_player', timeMs: 49660 }],
+      },
+    });
+    renderPage(<Ranking />, { route: '/ranking/beach', path: '/ranking/:slug?' });
+    expect(await screen.findByText('beach_player', { selector: 'td' })).toBeInTheDocument();
+
+    await userEvent.setup().click(screen.getByRole('link', { name: 'Global' }));
+    expect(screen.getByText('beach_player', { selector: 'td' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Loading leaderboard');
+
+    await act(async () => release());
+    expect(await screen.findByText('player_1', { selector: 'td' })).toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('says there is nothing yet when the board is empty', async () => {

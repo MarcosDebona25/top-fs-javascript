@@ -53,9 +53,9 @@ describe('GET /api/leaderboards/summary', () => {
       mapCount: 3,
       global: { rows: [], total: 0 },
       maps: [
-        { slug: 'beach', name: 'Beach', rows: [], total: 0 },
-        { slug: 'ski-slopes', name: 'Ski Slopes', rows: [], total: 0 },
-        { slug: 'moon-base', name: 'Moon Base', rows: [], total: 0 },
+        { slug: 'beach', name: 'Beach', rows: [], total: 0, bestTimeMs: null },
+        { slug: 'ski-slopes', name: 'Ski Slopes', rows: [], total: 0, bestTimeMs: null },
+        { slug: 'moon-base', name: 'Moon Base', rows: [], total: 0, bestTimeMs: null },
       ],
     });
   });

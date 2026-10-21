@@ -8,6 +8,7 @@ function createGamesRoutes(ctx) {
 
   router.get('/:id', controller.show);
   router.post('/:id/guesses', ctx.limiters.guess, guessRules, controller.guess);
+  router.post('/:id/quit', controller.quit);
 
   return router;
 }

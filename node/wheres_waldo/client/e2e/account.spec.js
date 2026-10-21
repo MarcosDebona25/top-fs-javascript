@@ -32,7 +32,7 @@ test.describe('a registered player', () => {
     await page.goto('/');
     const row = page.locator('tr.is-you');
     await expect(row).toContainText(username);
-    await expect(row).toContainText('—'); // the other two scenes are not done yet
+    await expect(row).toContainText('n/a'); // the other two scenes are not done yet
   });
 
   test('tells the modal the time will be saved', async ({ page }) => {
@@ -78,7 +78,6 @@ test.describe('a registered player', () => {
 
   test('sees a ranking update live when another player finishes', async ({ page, browser }) => {
     await page.goto('/ranking/beach');
-    await expect(page.getByText('Updating live')).toBeVisible();
 
     const rival = await browser.newPage();
     const name = uniqueName('rival');

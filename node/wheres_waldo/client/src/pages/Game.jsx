@@ -22,6 +22,18 @@ function Portrait({ slug, size = 40, ...rest }) {
   return <img src={characterImage(slug, 'webp')} alt="" width={size} height={size} {...rest} />;
 }
 
+// The stopwatch is the only thing that changes every few milliseconds. Keeping it in its own
+// component means the picture, the viewport, the picker and the rest of the HUD do not re-render
+// 20 times per second while the player is searching.
+function GameClock({ startedAt, serverTime, penaltyMs, running }) {
+  const elapsed = useStopwatch({ startedAt, serverTime, penaltyMs, running });
+  return (
+    <span className="hud__time num" role="timer" aria-label="Elapsed time">
+      {formatTime(elapsed)}
+    </span>
+  );
+}
+
 // What went wrong with a guess or a start, in words for the player.
 export function describeGameError(error) {
   if (error.status === 429) return 'Slow down a little, then try again.';
@@ -102,7 +114,7 @@ function ReadyModal({ map, user, authReady, onStart, starting, error, devWarning
         )}
         <div className="btn-row">
           <button ref={startRef} type="button" className="btn btn--primary ready__start" onClick={onStart} disabled={!authReady || starting}>
-            {starting ? 'Starting…' : 'Start — the clock begins now'}
+            {starting ? 'Starting…' : 'Start: the clock begins now'}
           </button>
           <Link to="/" className="btn btn--text">
             Back to scenes
@@ -162,8 +174,9 @@ export default function Game() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user, status: authStatus } = useAuth();
-  const { data: mapsData, error: mapsError } = useResource((signal) => api.maps({ signal }), []);
-  const map = mapsData?.maps.find((entry) => entry.slug === slug);
+  // Only the scene being played: the other maps and their characters stay in the API.
+  const { data: mapData, error: mapsError } = useResource((signal) => api.map(slug, { signal }), [slug]);
+  const map = mapData?.map;
 
   const [phase, setPhase] = useState('ready'); // ready | starting | playing
   const [startError, setStartError] = useState(null);
@@ -173,6 +186,7 @@ export default function Game() {
   const [misses, setMisses] = useState({ count: 0, penaltyMs: 0 });
   const [selection, setSelection] = useState(null);
   const [sending, setSending] = useState(false);
+  const [quitting, setQuitting] = useState(false);
   const [toast, setToast] = useState(null);
   const [missMark, setMissMark] = useState(null);
   const [scale, setScale] = useState(1);
@@ -180,7 +194,6 @@ export default function Game() {
   const narrow = useMediaQuery('(max-width: 700px)');
 
   const playing = phase === 'playing';
-  const elapsed = useStopwatch({ startedAt: game?.startedAt, serverTime: game?.serverTime, penaltyMs: misses.penaltyMs, running: playing });
 
   useEffect(() => {
     if (map) document.title = `${map.name} · Where's Waldo?`;
@@ -220,6 +233,23 @@ export default function Game() {
     }
   }, [slug]);
 
+  // Leaving closes the game on the server, so the time spent is never recorded as a result.
+  const quit = useCallback(async () => {
+    if (!game || game.status !== 'in_progress') {
+      navigate('/');
+      return;
+    }
+    if (quitting) return;
+    setQuitting(true);
+    try {
+      await api.quitGame(game.id);
+      navigate('/');
+    } catch (error) {
+      setQuitting(false);
+      setToast({ kind: 'error', text: describeGameError(error), key: Date.now() });
+    }
+  }, [game, quitting, navigate]);
+
   const onPick = useCallback(
     (point, stagePoint, stageSize) => {
       if (!playing || sending) return;
@@ -252,7 +282,7 @@ export default function Game() {
           setToast({ kind: 'found', text: `Found ${character.name}!`, key: Date.now() });
         } else {
           setMissMark({ ...point, key: Date.now() });
-          setToast({ kind: 'miss', text: `Not here — ${formatSecondsShort(game.wrongGuessPenaltyMs)}`, key: Date.now() });
+          setToast({ kind: 'miss', text: `Not here: ${formatSecondsShort(game.wrongGuessPenaltyMs)}`, key: Date.now() });
         }
       } catch (error) {
         if (error.code === 'GAME_TOO_FAST' || error.code === 'GAME_FINISHED') {
@@ -269,7 +299,64 @@ export default function Game() {
 
   const pending = useMemo(() => (map ? map.characters.filter((character) => !found.includes(character.slug)) : []), [map, found]);
 
-  if (mapsError && !mapsData) {
+  const cancelSelection = useCallback(() => setSelection(null), []);
+  const handleViewChange = useCallback((view) => setScale(view.scale), []);
+
+  const renderImage = useCallback(
+    ({ view, content }) => (
+      <MapPicture
+        slug={map.slug}
+        alt={`${map.name} scene to search`}
+        width={map.imageWidth}
+        height={map.imageHeight}
+        eager
+        fetchPriority="high"
+        sizes={`${Math.ceil((content.width * view.scale) / 100) * 100}px`}
+        className="viewport__picture"
+        imgClassName="viewport__image"
+      />
+    ),
+    [map],
+  );
+
+  const renderOverlay = useCallback(
+    ({ toStage, stage }) => (
+      <>
+        {markers.map((marker) => {
+          const at = toStage(marker.x, marker.y);
+          return (
+            <div key={marker.slug} className="marker" style={{ left: at.x, top: at.y }}>
+              <span className="marker__ring" />
+              <span className="marker__label">{marker.name}</span>
+            </div>
+          );
+        })}
+        {missMark && (
+          <span key={missMark.key} className="miss-mark" style={{ left: toStage(missMark.x, missMark.y).x, top: toStage(missMark.x, missMark.y).y }}>
+            <CrossIcon size={22} />
+          </span>
+        )}
+        {selection && (
+          <>
+            <span className="ring" aria-hidden="true" style={{ left: toStage(selection.x, selection.y).x - RING / 2, top: toStage(selection.x, selection.y).y - RING / 2 }} />
+            <span className="ring-dot" aria-hidden="true" style={{ left: toStage(selection.x, selection.y).x - 3, top: toStage(selection.x, selection.y).y - 3 }} />
+            <CharacterMenu
+              pending={pending}
+              onChoose={choose}
+              onCancel={cancelSelection}
+              stageSize={stage}
+              anchor={toStage(selection.x, selection.y)}
+              narrow={narrow}
+            />
+          </>
+        )}
+      </>
+    ),
+    [markers, missMark, selection, pending, narrow, choose, cancelSelection],
+  );
+
+  if (mapsError?.status === 404) return <NotFound />;
+  if (mapsError && !mapData) {
     return (
       <div className="container load-error" role="alert" style={{ paddingTop: 48 }}>
         <p>{mapsError.message}</p>
@@ -279,7 +366,7 @@ export default function Game() {
       </div>
     );
   }
-  if (mapsData && !map) return <NotFound />;
+  if (mapData && !map) return <NotFound />;
   if (!map) {
     return (
       <p className="loading container" role="status" style={{ paddingTop: 48 }}>
@@ -294,7 +381,16 @@ export default function Game() {
     <div className="game">
       <header className="hud">
         <div className="hud__left">
-          <Link to="/" className="hud__back" aria-label="Back to scenes">
+          <Link
+            to="/"
+            className="hud__back"
+            aria-label="Back to scenes"
+            onClick={(event) => {
+              if (!playing) return;
+              event.preventDefault();
+              quit();
+            }}
+          >
             <BackIcon />
             <span className="hud__back-text">Scenes</span>
           </Link>
@@ -318,9 +414,7 @@ export default function Game() {
 
         <div className="hud__right">
           <div className="hud__clock">
-            <span className="hud__time num" role="timer" aria-label="Elapsed time">
-              {formatTime(elapsed)}
-            </span>
+            <GameClock startedAt={game?.startedAt} serverTime={game?.serverTime} penaltyMs={misses.penaltyMs} running={playing} />
             <span className={`hud__penalty num${misses.count ? ' has-misses' : ''}`}>
               {misses.count ? (
                 <>
@@ -343,8 +437,8 @@ export default function Game() {
               <PlusIcon />
             </button>
           </div>
-          <button type="button" className="btn btn--outline btn--small hud__quit" onClick={() => navigate('/')}>
-            Quit
+          <button type="button" className="btn btn--outline btn--small hud__quit" onClick={quit} disabled={quitting}>
+            {quitting ? 'Quitting…' : 'Quit'}
           </button>
         </div>
       </header>
@@ -357,51 +451,10 @@ export default function Game() {
           label={`${map.name} scene to search. Drag to move, scroll or pinch to zoom, press Enter to pick the centre.`}
           className={playing ? 'is-playing' : ''}
           onPick={playing ? onPick : undefined}
-          onViewChange={(view) => setScale(view.scale)}
-          image={({ view, content }) => (
-            <MapPicture
-              slug={map.slug}
-              alt={`${map.name} scene to search`}
-              width={map.imageWidth}
-              height={map.imageHeight}
-              eager
-              sizes={`${Math.ceil((content.width * view.scale) / 100) * 100}px`}
-              className="viewport__picture"
-              imgClassName="viewport__image"
-            />
-          )}
-          overlay={({ toStage, stage }) => (
-            <>
-              {markers.map((marker) => {
-                const at = toStage(marker.x, marker.y);
-                return (
-                  <div key={marker.slug} className="marker" style={{ left: at.x, top: at.y }}>
-                    <span className="marker__ring" />
-                    <span className="marker__label">{marker.name}</span>
-                  </div>
-                );
-              })}
-              {missMark && (
-                <span key={missMark.key} className="miss-mark" style={{ left: toStage(missMark.x, missMark.y).x, top: toStage(missMark.x, missMark.y).y }}>
-                  <CrossIcon size={22} />
-                </span>
-              )}
-              {selection && (
-                <>
-                  <span className="ring" aria-hidden="true" style={{ left: toStage(selection.x, selection.y).x - RING / 2, top: toStage(selection.x, selection.y).y - RING / 2 }} />
-                  <span className="ring-dot" aria-hidden="true" style={{ left: toStage(selection.x, selection.y).x - 3, top: toStage(selection.x, selection.y).y - 3 }} />
-                  <CharacterMenu
-                    pending={pending}
-                    onChoose={choose}
-                    onCancel={() => setSelection(null)}
-                    stageSize={stage}
-                    anchor={toStage(selection.x, selection.y)}
-                    narrow={narrow}
-                  />
-                </>
-              )}
-            </>
-          )}
+          onPanStart={cancelSelection}
+          onViewChange={handleViewChange}
+          image={renderImage}
+          overlay={renderOverlay}
         />
         <div className="zoom-float" role="group" aria-label="Zoom">
           <button type="button" aria-label="Zoom in" onClick={() => viewport.current?.zoomBy(1.25)}>

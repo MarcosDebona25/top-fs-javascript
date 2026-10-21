@@ -361,6 +361,58 @@ describe('who can play a game', () => {
   });
 });
 
+describe('POST /api/games/:id/quit', () => {
+  it('abandons the game without recording a time and never ranks it', async () => {
+    const { agent } = await registerAgent(app);
+    const game = await startGame(agent);
+    await find(agent, game.id, 'waldo').expect(200);
+    clock.advance(12000);
+
+    const res = await agent.post(`/api/games/${game.id}/quit`).expect(200);
+    expect(res.body.game).toMatchObject({ status: 'abandoned', finishedAt: '2026-01-01T00:00:12.000Z' });
+    expect(res.body.game.result).toBeUndefined();
+
+    const stored = await prisma.game.findUnique({ where: { id: game.id } });
+    expect(stored).toMatchObject({ status: 'ABANDONED', durationMs: null });
+
+    const loaded = await agent.get(`/api/games/${game.id}`).expect(200);
+    expect(loaded.body.game.status).toBe('abandoned');
+    expect(loaded.body.game.result).toBeUndefined();
+    expect((await find(agent, game.id, 'woof').expect(409)).body.code).toBe('GAME_FINISHED');
+
+    const board = await request(app).get('/api/leaderboards/global').expect(200);
+    expect(board.body.total).toBe(0);
+    expect((await agent.post(`/api/games/${game.id}/quit`).expect(200)).body.game.status).toBe('abandoned');
+  });
+
+  it('leaves a completed game and its time untouched', async () => {
+    const { agent } = await registerAgent(app);
+    const game = await startGame(agent);
+    await findAll(agent, game.id, 20000);
+    clock.advance(5000);
+
+    const res = await agent.post(`/api/games/${game.id}/quit`).expect(200);
+    expect(res.body.game.status).toBe('completed');
+    expect(await prisma.game.findUnique({ where: { id: game.id } })).toMatchObject({ status: 'COMPLETED', durationMs: 20000 });
+  });
+
+  it('lets a guest quit a game using its id', async () => {
+    const game = await startGame(request.agent(app));
+    const res = await request(app).post(`/api/games/${game.id}/quit`).expect(200);
+    expect(res.body.game.status).toBe('abandoned');
+  });
+
+  it('only lets the owner quit a registered player game', async () => {
+    const { agent } = await registerAgent(app);
+    const game = await startGame(agent);
+
+    await request(app).post(`/api/games/${game.id}/quit`).expect(401);
+    const stranger = (await registerAgent(app)).agent;
+    await stranger.post(`/api/games/${game.id}/quit`).expect(404);
+    expect((await prisma.game.findUnique({ where: { id: game.id } })).status).toBe('IN_PROGRESS');
+  });
+});
+
 describe('GET /api/games/:id', () => {
   it('shows the progress of a game in play, without a result', async () => {
     const agent = request.agent(app);

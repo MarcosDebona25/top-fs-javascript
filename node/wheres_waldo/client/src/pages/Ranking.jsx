@@ -25,11 +25,12 @@ export default function Ranking() {
   const page = parsePage(searchParams.get('page'));
   const known = slug === undefined || MAP_SLUGS.includes(slug);
 
-  const { data, error, loading, reload } = useResource(
+  const { data, error, loading, pending, reload } = useResource(
     (signal) => (slug ? api.mapBoard(slug, { page, pageSize: PAGE_SIZE }, { signal }) : api.globalBoard({ page, pageSize: PAGE_SIZE }, { signal })),
     [slug ?? 'global', page, known],
+    { keepPreviousData: true },
   );
-  const live = useLeaderboardStream(reload);
+  useLeaderboardStream(reload);
 
   const title = slug ? `${mapName(slug)} ranking` : 'Leaderboard';
   useEffect(() => {
@@ -42,20 +43,18 @@ export default function Ranking() {
   const hrefFor = (target) => (target === 1 ? base : `${base}?page=${target}`);
   const first = data && data.total > 0 ? (data.page - 1) * data.pageSize + 1 : 0;
   const last = data ? Math.min(data.total, (data.page - 1) * data.pageSize + data.rows.length) : 0;
+  // While a tab change is in flight the old rows are still on screen: draw the board those rows
+  // belong to, not the incoming one, so a global table never receives scene rows (or the reverse).
+  const boardSlug = data?.map?.slug;
+  const noteSlug = data ? boardSlug : slug;
 
   return (
     <div className="container ranking">
       <div className="ranking__head">
         <h1 className="display ranking__title">Leaderboard</h1>
-        {live && (
-          <span className="live-badge" role="status">
-            <span className="live-badge__dot" aria-hidden="true" />
-            Updating live
-          </span>
-        )}
       </div>
 
-      <nav className="tabs" aria-label="Leaderboards">
+      <nav className="tabs" aria-label="Leaderboards" aria-busy={pending || undefined}>
         {TABS.map((tab) => {
           const current = tab.slug === slug;
           return (
@@ -64,7 +63,13 @@ export default function Ranking() {
             </Link>
           );
         })}
+        {pending && <span className="tabs__progress" aria-hidden="true" />}
       </nav>
+      {pending && (
+        <p className="sr-only" role="status">
+          Loading leaderboard
+        </p>
+      )}
 
       {error && !data ? (
         <div className="load-error" role="alert">
@@ -78,9 +83,9 @@ export default function Ranking() {
           {loading ? 'Loading the ranking…' : ''}
         </p>
       ) : (
-        <>
-          {slug ? (
-            <MapBoard rows={data.rows} username={user?.username} name={mapName(slug)} />
+        <div className={`ranking__view${pending ? ' is-pending' : ''}`} aria-busy={pending || undefined}>
+          {boardSlug ? (
+            <MapBoard rows={data.rows} username={user?.username} name={mapName(boardSlug)} />
           ) : (
             <GlobalBoard rows={data.rows} username={user?.username} className="board--ranking" />
           )}
@@ -90,13 +95,13 @@ export default function Ranking() {
             </p>
             <Pagination page={data.page} totalPages={data.totalPages} hrefFor={hrefFor} />
           </div>
-        </>
+        </div>
       )}
 
       <p className="hint ranking__note">
-        {slug
-          ? `Each player's fastest time on ${mapName(slug)} counts, wrong guesses included.`
-          : 'Players are ranked by how many scenes they completed, then by their total time. A "—" means that scene hasn\'t been completed yet.'}
+        {noteSlug
+          ? `Each player's fastest time on ${mapName(noteSlug)} counts, wrong guesses included.`
+          : 'Players are ranked by how many scenes they completed, then by their total time. "n/a" means that scene hasn\'t been completed yet.'}
       </p>
     </div>
   );

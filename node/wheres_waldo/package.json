@@ -7,12 +7,14 @@
     "client"
   ],
   "scripts": {
+    "predev:api": "bash scripts/start-db.sh",
     "dev:api": "npm run dev -w api",
+    "predev:client": "bash scripts/start-db.sh",
+    "dev:client": "npm run dev -w client",
     "build:images": "node scripts/build-images.mjs",
+    "build:client": "npm run build -w client",
     "test": "npm run test:client && npm run test:api",
     "test:api": "npm test -w api",
-    "dev:client": "npm run dev -w client",
-    "build:client": "npm run build -w client",
     "test:client": "npm test -w client",
     "test:e2e": "npm run test:e2e -w client"
   },

@@ -9,8 +9,9 @@ export function useStopwatch({ startedAt, serverTime, penaltyMs, running, interv
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    setNow(Date.now());
     if (!running) return undefined;
+    // One sync when the clock starts; after that only the interval updates it.
+    setNow(Date.now());
     const timer = setInterval(() => setNow(Date.now()), intervalMs);
     return () => clearInterval(timer);
   }, [running, intervalMs, startedAt]);

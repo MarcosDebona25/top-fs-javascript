@@ -12,7 +12,7 @@ const characters = [
   { slug: 'wizard', name: 'Wizard Whitebeard' },
   { slug: 'odlaw', name: 'Odlaw' },
 ];
-const maps = { maps: [{ slug: 'beach', name: 'Beach', imageWidth: 2560, imageHeight: 1644, calibrated: true, characters, bestTimeMs: null }] };
+const map = { map: { slug: 'beach', name: 'Beach', imageWidth: 2560, imageHeight: 1644, calibrated: true, characters, bestTimeMs: null } };
 const game = (overrides = {}) => ({
   id: 'g1',
   mapSlug: 'beach',
@@ -45,7 +45,7 @@ beforeEach(() => {
 
 async function startGame(handlers = {}, { login } = {}) {
   const api = mockApi({
-    'GET /api/maps': maps,
+    'GET /api/maps/beach': map,
     'POST /api/maps/beach/games': reply(201, { game: game() }),
     ...(login ? { 'GET /api/auth/me': user('pompom') } : {}),
     ...handlers,
@@ -67,7 +67,7 @@ async function pickCenter(person, stage) {
 
 describe('<Game> before the start', () => {
   it('announces the rule, the five characters and that a guest\'s time is not saved', async () => {
-    mockApi({ 'GET /api/maps': maps });
+    mockApi({ 'GET /api/maps/beach': map });
     renderRoutes(routes, { route: '/play/beach' });
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getByRole('heading', { name: 'Find all five characters' })).toBeInTheDocument();
@@ -78,14 +78,14 @@ describe('<Game> before the start', () => {
   });
 
   it('tells a registered player their time counts', async () => {
-    mockApi({ 'GET /api/maps': maps, 'GET /api/auth/me': user('pompom') });
+    mockApi({ 'GET /api/maps/beach': map, 'GET /api/auth/me': user('pompom') });
     renderRoutes(routes, { route: '/play/beach' });
     expect(await screen.findByText(/Your best time goes on the leaderboard/)).toBeInTheDocument();
     expect(screen.getByText('pompom')).toBeInTheDocument();
   });
 
   it('does not start the game, or the clock, until the player says so', async () => {
-    const api = mockApi({ 'GET /api/maps': maps });
+    const api = mockApi({ 'GET /api/maps/beach': map });
     renderRoutes(routes, { route: '/play/beach' });
     await screen.findByRole('dialog');
     expect(api.called('POST', '/api/maps/beach/games')).toHaveLength(0);
@@ -93,13 +93,13 @@ describe('<Game> before the start', () => {
   });
 
   it('shows the 404 page for a scene that does not exist', async () => {
-    mockApi({ 'GET /api/maps': maps });
+    mockApi({ 'GET /api/maps/beach': map });
     renderRoutes(<Route path="/play/:slug" element={<Game />} />, { route: '/play/mars' });
     expect(await screen.findByRole('heading', { name: /Even Waldo can't find this page/ })).toBeInTheDocument();
   });
 
   it('says so when the game cannot be started', async () => {
-    mockApi({ 'GET /api/maps': maps, 'POST /api/maps/beach/games': reply(429, { error: 'Too many requests', code: 'RATE_LIMITED' }) });
+    mockApi({ 'GET /api/maps/beach': map, 'POST /api/maps/beach/games': reply(429, { error: 'Too many requests', code: 'RATE_LIMITED' }) });
     renderRoutes(routes, { route: '/play/beach' });
     const person = userEvent.setup();
     const start = await screen.findByRole('button', { name: /Start/ });
@@ -118,6 +118,13 @@ describe('<Game> playing', () => {
     expect(screen.getByText('No misses yet')).toBeInTheDocument();
   });
 
+  it('abandons the game before going back to the scenes', async () => {
+    const { api, person } = await startGame({ 'POST /api/games/g1/quit': reply(200, { game: { id: 'g1', status: 'abandoned' } }) });
+    await person.click(screen.getByRole('button', { name: 'Quit' }));
+    expect(await screen.findByText('HOME')).toBeInTheDocument();
+    expect(api.called('POST', '/api/games/g1/quit')).toHaveLength(1);
+  });
+
   it('opens the picker where the player clicked and lists only who is still hidden', async () => {
     const { person, stage } = await startGame({}, { login: true });
     const menu = await pickCenter(person, stage);
@@ -134,7 +141,7 @@ describe('<Game> playing', () => {
     expect(call.body.character).toBe('waldo');
     expect(call.body.x).toBeCloseTo(0.5);
     expect(call.body.y).toBeCloseTo(0.5);
-    expect(await screen.findByText('Not here — +1.0 s')).toBeInTheDocument();
+    expect(await screen.findByText('Not here: +1.0 s')).toBeInTheDocument();
     expect(screen.getByText(/\+1\.000/)).toHaveTextContent('+1.000 penalty · 1 miss');
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });

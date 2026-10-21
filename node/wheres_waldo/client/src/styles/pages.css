@@ -197,6 +197,15 @@
   .map-card__image {
     transition: none;
   }
+
+  .ranking__view {
+    transition: none;
+  }
+
+  .tabs__progress::after {
+    animation: none;
+    transform: none;
+  }
 }
 
 @media (max-width: 560px) {
@@ -240,27 +249,49 @@
   font-size: clamp(36px, 6vw, 48px);
 }
 
-.live-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--green);
-}
-
-.live-badge__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--green-2);
-}
-
 .tabs {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 4px 28px;
   border-bottom: 2px solid var(--line);
+}
+
+.tabs__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.tabs__progress::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--red), transparent);
+  animation: tabs-progress 900ms ease-in-out infinite;
+}
+
+@keyframes tabs-progress {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.ranking__view {
+  transition: opacity 160ms ease;
+}
+
+.ranking__view.is-pending {
+  opacity: 0.55;
 }
 
 .tabs__link {

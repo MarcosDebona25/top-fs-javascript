@@ -1,4 +1,4 @@
-# Where's Waldo — API
+# Where's Waldo API
 
 REST API for the game: Express 5, express-validator, Prisma 7 and PostgreSQL. Players can play as guests or
 create an account; accounts get their best time per map on the leaderboards. Every time is measured and
@@ -18,6 +18,9 @@ cp .env.example .env
 npx prisma migrate deploy
 npm run seed
 ```
+
+`npm run seed` also creates a small set of fictional players and completed games, so the leaderboards are not empty
+on a fresh install.
 
 `npm run dev` starts PostgreSQL (`sudo service postgresql start`), runs the API with `node --watch` and stops
 PostgreSQL on exit. For plain `http://localhost` development set `COOKIE_SECURE=false`, otherwise the browser
@@ -53,6 +56,8 @@ tests drive the clock by hand and change the game rules (penalty, minimum time, 
 - When the fifth character is found the server closes the game: `durationMs` = real elapsed time + penalties.
   The client never sends a time.
 - If the real elapsed time (without penalties) is under `MIN_GAME_MS` the game is `rejected`: kept, never ranked.
+- Leaving before the fifth character is found (`POST /api/games/:id/quit`) marks the game `abandoned`: `finishedAt` is
+  set, `durationMs` stays empty, and the game can never be completed or ranked.
 - Guests (no session) get their time back but nothing is recorded in the leaderboards. A guest's game is played
   with its unguessable id; a registered player's game only from their own session.
 - Leaderboards use each player's best completed game per map. The global ranking orders players by how many
@@ -71,10 +76,12 @@ validation failures are `422` with one message per field.
 | GET | `/api/auth/me` | `200 { user }`, `user` is `null` for a guest |
 | GET | `/api/auth/username-available?username=` | `200 { username, available, errors? }`; `422` if the format is invalid |
 | GET | `/api/maps` | `{ maps: [{ slug, name, imageWidth, imageHeight, calibrated, characters: [{ slug, name }], bestTimeMs }] }` |
+| GET | `/api/maps/:slug` | `{ map }`; one scene with its characters and best time, used by the play page |
 | POST | `/api/maps/:slug/games` | `201 { game }` |
-| GET | `/api/games/:id` | `{ game }`; includes `result` once the game is over |
+| GET | `/api/games/:id` | `{ game }`; includes `result` for completed or rejected games |
 | POST | `/api/games/:id/guesses` | `{ character, x, y }` → `{ correct, alreadyFound?, completed, character, found, wrongCount, penaltyMs, result? }` |
-| GET | `/api/leaderboards/summary` | Landing data: `{ mapCount, global: { rows, total }, maps: [{ slug, name, rows, total }] }` (top 10 each) |
+| POST | `/api/games/:id/quit` | `200 { game }`; abandons an in-progress game without recording a time |
+| GET | `/api/leaderboards/summary` | Landing data: `{ mapCount, global: { rows, total }, maps: [{ slug, name, rows, total, bestTimeMs }] }` (top 10 each) |
 | GET | `/api/leaderboards/global?page=&pageSize=` | `{ rows, page, pageSize, total, totalPages }` |
 | GET | `/api/leaderboards/maps/:slug?page=&pageSize=` | Same, plus `map: { slug, name }` |
 | GET | `/api/leaderboards/stream` | Server-Sent Events; `event: leaderboard` when a ranked game completes |

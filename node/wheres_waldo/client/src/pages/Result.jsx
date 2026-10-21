@@ -81,8 +81,25 @@ export default function Result() {
   }
   if (game.status === 'in_progress') return <Navigate to={`/play/${game.mapSlug}`} replace />;
 
-  const { result } = game;
   const name = mapName(game.mapSlug);
+  if (game.status === 'abandoned') {
+    return (
+      <div className="container result-message">
+        <h1 className="display">No time recorded</h1>
+        <p>You left {name} before finding all five characters, so this run was not saved.</p>
+        <div className="btn-row">
+          <Link to={`/play/${game.mapSlug}`} className="btn btn--primary">
+            Play {name} again
+          </Link>
+          <Link to="/" className="btn btn--outline">
+            Back to scenes
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const { result } = game;
   const rejected = game.status === 'rejected';
   const next = nextMapSlug(game.mapSlug);
   const best = data.board.rows[0];
@@ -104,7 +121,7 @@ export default function Result() {
               {result.personalBest && <BigCheckIcon />}
               {result.personalBest
                 ? 'New personal best'
-                : `Not your best — your fastest run on ${name} is still the one on the board.`}
+                : `Not your best: your fastest run on ${name} is still the one on the board.`}
             </p>
           )}
           {!registered && !rejected && (
@@ -162,7 +179,7 @@ export default function Result() {
           <div className="result__aside result__aside--guest">
             <h2 className="result__aside-title">You played as a guest, so this time isn't saved.</h2>
             <p>
-              Create a free account — just a username and a password — and your best time on each scene goes on the global leaderboard. Your next run will
+              Create a free account (just a username and a password) and your best time on each scene goes on the global leaderboard. Your next run will
               count.
             </p>
             <div className="btn-row">
@@ -170,7 +187,7 @@ export default function Result() {
                 Create account
               </Link>
               <Link to="/login" state={{ from: `/play/${game.mapSlug}` }} className="btn btn--text">
-                I already have one — log in
+                I already have one, log in
               </Link>
             </div>
           </div>

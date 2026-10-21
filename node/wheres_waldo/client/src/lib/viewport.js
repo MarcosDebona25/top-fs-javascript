@@ -19,7 +19,7 @@ export function clampScale(scale) {
   return clamp(scale, MIN_SCALE, MAX_SCALE);
 }
 
-// Zooms so the point under (px, py) — in stage pixels — stays where it is.
+// Zooms so the point under (px, py), in stage pixels, stays where it is.
 export function zoomAt(view, nextScale, px, py, stage, content) {
   const scale = clampScale(nextScale);
   const ratio = scale / view.scale;

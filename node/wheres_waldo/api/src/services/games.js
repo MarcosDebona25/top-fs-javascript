@@ -82,7 +82,8 @@ function createGames({ prisma, now, config, leaderboards, maps, events }) {
   async function get(id, user) {
     const game = await loadFor(id, user);
     const body = present(game);
-    if (game.status !== 'IN_PROGRESS') body.result = await presentResult(game);
+    // An abandoned game has no result: its time was never recorded.
+    if (game.status === 'COMPLETED' || game.status === 'REJECTED') body.result = await presentResult(game);
     return body;
   }
 
@@ -140,6 +141,10 @@ function createGames({ prisma, now, config, leaderboards, maps, events }) {
 
     const outcome = await finish(game);
     const finished = await load(id);
+    if (finished.status === 'ABANDONED') {
+      // The player left while the last guess was in flight: the game is no longer playable.
+      throw new HttpError(409, 'This game is already finished.', { code: 'GAME_FINISHED' });
+    }
     if (finished.status === 'REJECTED') {
       // Too fast to be human: the game is kept (so it cannot be replayed) but never ranked.
       throw new HttpError(422, 'That was too fast to be ranked.', {
@@ -155,7 +160,20 @@ function createGames({ prisma, now, config, leaderboards, maps, events }) {
     return { status: 200, body };
   }
 
-  return { start, get, guess };
+  // Leaving before the fifth character closes the game without a duration. The conditional update
+  // keeps a completion that won the race intact.
+  async function quit(id, user) {
+    const game = await loadFor(id, user);
+    if (game.status === 'IN_PROGRESS') {
+      await prisma.game.updateMany({
+        where: { id, status: 'IN_PROGRESS' },
+        data: { status: 'ABANDONED', finishedAt: now() },
+      });
+    }
+    return present(await load(id));
+  }
+
+  return { start, get, guess, quit };
 }
 
 module.exports = createGames;

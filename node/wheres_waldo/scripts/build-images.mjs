@@ -12,7 +12,7 @@ const charactersIn = path.join(root, 'assets', 'characters');
 const mapsOut = path.join(root, 'client', 'public', 'img', 'maps');
 const charactersOut = path.join(root, 'client', 'public', 'img', 'characters');
 
-const MAP_WIDTHS = [640, 1024, 1600, 2560];
+const MAP_WIDTHS = [480, 640, 1024, 1600, 2560];
 const CHARACTER_HEIGHT = 320;
 
 await mkdir(mapsOut, { recursive: true });

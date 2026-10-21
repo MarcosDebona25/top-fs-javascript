@@ -42,9 +42,11 @@ export const api = {
   logout: () => request('/auth/logout', { method: 'POST' }),
   usernameAvailable: (username, options) => request(`/auth/username-available?username=${encodeURIComponent(username)}`, options),
   maps: (options) => request('/maps', options),
+  map: (slug, options) => request(`/maps/${slug}`, options),
   startGame: (slug) => request(`/maps/${slug}/games`, { method: 'POST' }),
   game: (id, options) => request(`/games/${id}`, options),
   guess: (id, body) => request(`/games/${id}/guesses`, { method: 'POST', body }),
+  quitGame: (id) => request(`/games/${id}/quit`, { method: 'POST' }),
   summary: (options) => request('/leaderboards/summary', options),
   globalBoard: ({ page = 1, pageSize = 10 } = {}, options) => request(`/leaderboards/global?page=${page}&pageSize=${pageSize}`, options),
   mapBoard: (slug, { page = 1, pageSize = 10 } = {}, options) =>

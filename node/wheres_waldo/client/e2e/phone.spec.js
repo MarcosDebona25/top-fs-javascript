@@ -31,6 +31,8 @@ test.describe('on a phone', () => {
     await startGame(page, 'Moon Base');
     await clickPicture(page, 'moon-base', { x: 0.125, y: 0.125 }, { mobile: true });
     await chooseCharacter(page, 'Waldo', { mobile: true });
+    // Wait for the guess to finish: the viewport ignores taps while a guess is in flight.
+    await expect(page.getByText('Waldo found')).toBeVisible();
     await clickPicture(page, 'moon-base', { x: 0.5, y: 0.5 }, { mobile: true });
     const sheet = page.getByRole('dialog', { name: 'Who is here?' });
     await expect(sheet.getByRole('button', { name: 'Waldo' })).toHaveCount(0);

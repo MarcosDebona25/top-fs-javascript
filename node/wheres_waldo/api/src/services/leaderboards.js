@@ -31,41 +31,65 @@ const GLOBAL = Prisma.sql`
     FROM per_user p JOIN "User" u ON u.id = p."userId"
   )`;
 
+const bestForMap = (mapId) => Prisma.sql`
+  best AS (
+    SELECT DISTINCT ON (g."userId")
+           g."userId", g."mapId", g.id AS "gameId", g."durationMs", g."finishedAt"
+    FROM "Game" g
+    WHERE g."status" = 'COMPLETED' AND g."userId" IS NOT NULL AND g."mapId" = ${mapId}
+    ORDER BY g."userId", g."durationMs", g."finishedAt", g.id
+  )`;
+
 const mapRanked = (mapId) => Prisma.sql`
-  ${BEST},
+  ${bestForMap(mapId)},
   ranked AS (
     SELECT b."userId", b."gameId", b."durationMs", u.username,
            ROW_NUMBER() OVER (ORDER BY b."durationMs", b."finishedAt", b."userId") AS rank,
            COUNT(*) OVER () AS total
     FROM best b JOIN "User" u ON u.id = b."userId"
-    WHERE b."mapId" = ${mapId}
   )`;
 
+const MAP_SLUGS_TTL_MS = 60_000;
 const toNumber = (value) => (value === null || value === undefined ? null : Number(value));
 
 // Standings are computed from the games on every request: cheap at this scale and never out of date.
 function createLeaderboards({ prisma }) {
+  // Map metadata changes only when the database is seeded, so one lookup per minute is enough.
+  let cachedMapSlugs = null;
   async function mapSlugs() {
-    return prisma.map.findMany({ orderBy: { position: 'asc' }, select: { id: true, slug: true, name: true } });
+    const now = Date.now();
+    if (cachedMapSlugs && now - cachedMapSlugs.at < MAP_SLUGS_TTL_MS) return cachedMapSlugs.value;
+    const value = await prisma.map.findMany({ orderBy: { position: 'asc' }, select: { id: true, slug: true, name: true } });
+    cachedMapSlugs = { at: now, value };
+    return value;
+  }
+
+  // `rows[0].total` is the window count that `ranked` already computes, so the usual page is one
+  // query. Only an out-of-range page needs a separate count to keep the pagination honest.
+  async function totalFrom(rows, countQuery) {
+    if (rows.length) return Number(rows[0].total);
+    const [{ count }] = await countQuery();
+    return Number(count);
   }
 
   async function mapPage(mapId, { limit, offset }) {
     const rows = await prisma.$queryRaw`
       WITH ${mapRanked(mapId)}
       SELECT rank, username, "durationMs", total FROM ranked ORDER BY rank LIMIT ${limit} OFFSET ${offset}`;
-    const [{ count }] = await prisma.$queryRaw`WITH ${BEST} SELECT COUNT(*) AS count FROM best WHERE "mapId" = ${mapId}`;
+    const total = await totalFrom(rows, () => prisma.$queryRaw`WITH ${bestForMap(mapId)} SELECT COUNT(*) AS count FROM best`);
     return {
       rows: rows.map((row) => ({ rank: Number(row.rank), username: row.username, timeMs: row.durationMs })),
-      total: Number(count),
+      total,
     };
   }
 
-  async function globalPage({ limit, offset }) {
-    const slugs = (await mapSlugs()).map((map) => map.slug);
+  async function globalPage({ limit, offset, maps: knownMaps }) {
+    const maps = knownMaps ?? (await mapSlugs());
+    const slugs = maps.map((map) => map.slug);
     const rows = await prisma.$queryRaw`
       WITH ${GLOBAL}
-      SELECT rank, username, "mapsCompleted", "totalMs", times FROM ranked ORDER BY rank LIMIT ${limit} OFFSET ${offset}`;
-    const [{ count }] = await prisma.$queryRaw`WITH ${GLOBAL} SELECT COUNT(*) AS count FROM ranked`;
+      SELECT rank, username, "mapsCompleted", "totalMs", times, total FROM ranked ORDER BY rank LIMIT ${limit} OFFSET ${offset}`;
+    const total = await totalFrom(rows, () => prisma.$queryRaw`WITH ${GLOBAL} SELECT COUNT(*) AS count FROM ranked`);
     return {
       rows: rows.map((row) => ({
         rank: Number(row.rank),
@@ -75,7 +99,7 @@ function createLeaderboards({ prisma }) {
         totalMs: Number(row.totalMs),
         mapsCompleted: Number(row.mapsCompleted),
       })),
-      total: Number(count),
+      total,
     };
   }
 
@@ -101,15 +125,40 @@ function createLeaderboards({ prisma }) {
     return Object.fromEntries(rows.map((row) => [row.mapId, toNumber(row.best)]));
   }
 
-  // Everything the landing page shows: the global top and each map's top.
+  // Everything the landing page shows: the global top, each map's top and each map's best time.
+  // The global page and the per-map top rows are fetched in parallel: three queries in total.
   async function summary(limit) {
     const maps = await mapSlugs();
-    const global = await globalPage({ limit, offset: 0 });
-    const perMap = [];
-    for (const map of maps) {
-      const page = await mapPage(map.id, { limit, offset: 0 });
-      perMap.push({ slug: map.slug, name: map.name, rows: page.rows, total: page.total });
+    const [global, topRows] = await Promise.all([
+      globalPage({ limit, offset: 0, maps }),
+      prisma.$queryRaw`
+        WITH ${BEST},
+        ranked AS (
+          SELECT b."mapId", b."userId", b."durationMs", u.username,
+                 ROW_NUMBER() OVER (PARTITION BY b."mapId" ORDER BY b."durationMs", b."finishedAt", b."userId") AS rank,
+                 COUNT(*) OVER (PARTITION BY b."mapId") AS total
+          FROM best b JOIN "User" u ON u.id = b."userId"
+        )
+        SELECT "mapId", rank, username, "durationMs", total
+        FROM ranked WHERE rank <= ${limit} ORDER BY "mapId", rank`,
+    ]);
+
+    const byMap = new Map();
+    for (const row of topRows) {
+      if (!byMap.has(row.mapId)) byMap.set(row.mapId, { rows: [], total: Number(row.total) });
+      byMap.get(row.mapId).rows.push({ rank: Number(row.rank), username: row.username, timeMs: row.durationMs });
     }
+
+    const perMap = maps.map((map) => {
+      const page = byMap.get(map.id) ?? { rows: [], total: 0 };
+      return {
+        slug: map.slug,
+        name: map.name,
+        rows: page.rows,
+        total: page.total,
+        bestTimeMs: page.rows[0]?.timeMs ?? null,
+      };
+    });
     return { mapCount: maps.length, global, maps: perMap };
   }
 

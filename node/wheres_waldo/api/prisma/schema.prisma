@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -10,6 +11,7 @@ enum GameStatus {
   IN_PROGRESS
   COMPLETED
   REJECTED
+  ABANDONED
 }
 
 model User {
@@ -76,7 +78,9 @@ model Game {
   finds      GameFind[]
 
   @@index([mapId, status, durationMs])
-  @@index([userId, mapId])
+  // Cover the "best game per player and map" lookups without a sort on the duration.
+  @@index([userId, mapId, durationMs, finishedAt])
+  @@index([mapId, userId, durationMs, finishedAt])
 }
 
 model GameFind {

@@ -30,7 +30,7 @@ test.describe('a guest', () => {
     await clickPicture(page, 'ski-slopes', { x: 0.5, y: 0.7 });
     await expect(page.getByRole('menu', { name: 'Who is here?' })).toBeVisible();
     await chooseCharacter(page, 'Woof');
-    await expect(page.getByText('Not here — +1.0 s')).toBeVisible();
+    await expect(page.getByText('Not here: +1.0 s')).toBeVisible();
     await expect(page.getByText('+1.000 penalty · 1 miss')).toBeVisible();
     // The character is still hidden: Woof is still in the picker.
     await clickPicture(page, 'ski-slopes', { x: 0.5, y: 0.7 });

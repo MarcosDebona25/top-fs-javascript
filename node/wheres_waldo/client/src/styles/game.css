@@ -15,27 +15,27 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px 24px;
-  min-height: 52px;
-  padding: 10px 20px;
+  gap: 8px 16px;
+  min-height: 44px;
+  padding: 4px 16px;
 }
 
 .hud__left,
 .hud__right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .hud__right {
-  gap: 20px;
+  gap: 14px;
 }
 
 .hud__back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 44px;
+  min-height: 36px;
   padding: 0 4px;
   font-weight: 700;
   text-decoration: none;
@@ -49,14 +49,14 @@
 .hud__map {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 20px;
+  font-size: 18px;
   letter-spacing: -0.02em;
 }
 
 .hud__cast {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -69,8 +69,8 @@
 
 .hud__char img {
   display: block;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   object-fit: cover;
   object-position: top;
   border-radius: 50%;
@@ -99,14 +99,14 @@
 .hud__time {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 30px;
+  font-size: 24px;
   letter-spacing: -0.02em;
-  min-width: 7.2ch;
+  min-width: 6.4ch;
   text-align: right;
 }
 
 .hud__penalty {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--muted);
 }
@@ -123,14 +123,22 @@
 
 .hud__zoom button,
 .zoom-float button {
-  width: 44px;
-  height: 44px;
   border: 0;
   background: transparent;
   color: var(--navy);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.hud__zoom button {
+  width: 36px;
+  height: 36px;
+}
+
+.zoom-float button {
+  width: 44px;
+  height: 44px;
 }
 
 .hud__zoom button:hover,
@@ -573,6 +581,10 @@
   font-size: 18px;
 }
 
+.ready .btn-row {
+  justify-content: center;
+}
+
 @media (max-width: 700px) {
   .hud {
     display: grid;
@@ -581,7 +593,7 @@
       'left clock quit'
       'cast cast cast';
     gap: 0 8px;
-    padding: 6px 8px 6px 4px;
+    padding: 2px 8px 2px 4px;
   }
 
   .hud__left {
@@ -618,14 +630,14 @@
   }
 
   .hud__time {
-    font-size: 28px;
+    font-size: 24px;
   }
 
   .hud__cast {
     grid-area: cast;
     justify-content: center;
-    gap: 12px;
-    padding: 4px 0 10px;
+    gap: 8px;
+    padding: 2px 0 6px;
   }
 
   .zoom-float {

@@ -6,7 +6,7 @@ function YouBadge() {
   return <span className="you-badge">You</span>;
 }
 
-// Player | Beach | Ski Slopes | Moon Base | Total — "—" where a scene is not finished yet.
+// Player | Beach | Ski Slopes | Moon Base | Total, with "n/a" where a scene is not finished yet.
 export function GlobalBoard({ rows, username, className = '' }) {
   return (
     <div className="table-wrap">

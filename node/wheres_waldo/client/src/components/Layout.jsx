@@ -1,5 +1,7 @@
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useAuth } from '../auth.jsx';
+import { prefetchLogin, prefetchRanking, prefetchRegister } from '../lib/prefetch.js';
+import { GitHubIcon } from './icons.jsx';
 
 export function Brand() {
   return (
@@ -18,7 +20,10 @@ export function SiteFooter() {
   return (
     <footer className="site-footer">
       <span>
-        Made by <a href="https://github.com/MarcosDebona25">MarcosDebona25</a> on GitHub
+        <a href="https://github.com/MarcosDebona25" className="site-footer__link">
+          <GitHubIcon />
+          MarcosDebona25
+        </a>
       </span>
     </footer>
   );
@@ -33,7 +38,7 @@ function AccountNav() {
   if (user) {
     return (
       <>
-        <span className="nav__user">{user.username}</span>
+        <span className="nav__user btn btn--primary btn--small">{user.username}</span>
         <button
           type="button"
           className="btn btn--outline btn--small"
@@ -49,10 +54,22 @@ function AccountNav() {
   }
   return (
     <>
-      <Link to="/login" state={{ from: location.pathname }} className="nav__link">
+      <Link
+        to="/login"
+        state={{ from: location.pathname }}
+        className="nav__link"
+        onMouseEnter={prefetchLogin}
+        onFocus={prefetchLogin}
+      >
         Log in
       </Link>
-      <Link to="/signup" state={{ from: location.pathname }} className="btn btn--primary btn--small">
+      <Link
+        to="/signup"
+        state={{ from: location.pathname }}
+        className="btn btn--primary btn--small"
+        onMouseEnter={prefetchRegister}
+        onFocus={prefetchRegister}
+      >
         Sign up
       </Link>
     </>
@@ -70,7 +87,7 @@ export function SiteLayout({ variant = 'full' }) {
         <Brand />
         {variant === 'full' && (
           <nav className="nav" aria-label="Main">
-            <NavLink to="/ranking" className="nav__link">
+            <NavLink to="/ranking" className="nav__link" onMouseEnter={prefetchRanking} onFocus={prefetchRanking}>
               Leaderboard
             </NavLink>
             <AccountNav />

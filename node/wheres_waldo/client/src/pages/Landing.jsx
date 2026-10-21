@@ -7,9 +7,12 @@ import { useLeaderboardStream } from '../hooks/useLeaderboardStream.js';
 import { useResource } from '../hooks/useResource.js';
 import { api } from '../lib/api.js';
 import { CHARACTER_SLUGS, MAP_SLUGS, mapName } from '../lib/maps.js';
+import { prefetchGame, prefetchRanking, prefetchRegister } from '../lib/prefetch.js';
 import { formatTime } from '../lib/time.js';
 
 const CHARACTER_NAMES = { waldo: 'Waldo', woof: 'Woof', wenda: 'Wenda', wizard: 'Wizard Whitebeard', odlaw: 'Odlaw' };
+// A stable array so the memoized card picture is not invalidated by a new array on every render.
+const CARD_WIDTHS = [480, 640, 1024, 1600];
 
 function LoadError({ error, onRetry }) {
   return (
@@ -24,20 +27,16 @@ function LoadError({ error, onRetry }) {
 
 export default function Landing() {
   const { user } = useAuth();
-  const { data, error, reload } = useResource(
-    async (signal) => {
-      const [summary, maps] = await Promise.all([api.summary({ signal }), api.maps({ signal })]);
-      return { summary, maps: maps.maps };
-    },
-    [],
-  );
+  // The summary already carries each scene's best time, so the landing page does not need a second
+  // request to /api/maps just to fill the cards.
+  const { data: summary, error, reload } = useResource((signal) => api.summary({ signal }), []);
   useLeaderboardStream(reload);
 
   useEffect(() => {
     document.title = "Where's Waldo? Find all five before the clock does";
   }, []);
 
-  const bestTimes = Object.fromEntries((data?.maps ?? []).map((map) => [map.slug, map.bestTimeMs]));
+  const bestTimes = Object.fromEntries((summary?.maps ?? []).map((map) => [map.slug, map.bestTimeMs]));
   const username = user?.username;
 
   return (
@@ -57,13 +56,23 @@ export default function Landing() {
                 <a href="#maps" className="btn btn--primary">
                   Pick a scene
                 </a>
-                <Link to="/ranking" className="btn btn--outline">
+                <Link
+                  to="/ranking"
+                  className="btn btn--outline"
+                  onMouseEnter={prefetchRanking}
+                  onFocus={prefetchRanking}
+                >
                   See the leaderboard
                 </Link>
               </>
             ) : (
               <>
-                <Link to="/signup" className="btn btn--primary">
+                <Link
+                  to="/signup"
+                  className="btn btn--primary"
+                  onMouseEnter={prefetchRegister}
+                  onFocus={prefetchRegister}
+                >
                   Create account
                 </Link>
                 <a href="#maps" className="btn btn--outline">
@@ -92,14 +101,20 @@ export default function Landing() {
         </h2>
         <div className="map-cards">
           {MAP_SLUGS.map((slug) => (
-            <Link key={slug} to={`/play/${slug}`} className="map-card">
+            <Link
+              key={slug}
+              to={`/play/${slug}`}
+              className="map-card"
+              onMouseEnter={prefetchGame}
+              onFocus={prefetchGame}
+            >
               <MapPicture
                 slug={slug}
                 alt=""
                 sizes="(min-width: 1000px) 380px, (min-width: 640px) 45vw, 92vw"
                 width="1024"
                 height="683"
-                widths={[640, 1024, 1600]}
+                widths={CARD_WIDTHS}
                 imgClassName="map-card__image"
               />
               <span className="map-card__meta">
@@ -116,25 +131,30 @@ export default function Landing() {
         <h2 id="global-title" className="section-title">
           Global leaderboard
         </h2>
-        {error && !data ? (
+        {error && !summary ? (
           <LoadError error={error} onRetry={reload} />
-        ) : !data ? (
+        ) : !summary ? (
           <p className="loading" role="status">
             Loading the leaderboard…
           </p>
         ) : (
           <>
-            <GlobalBoard rows={data.summary.global.rows} username={username} />
-            <Link to="/ranking" className="more-link">
+            <GlobalBoard rows={summary.global.rows} username={username} />
+            <Link
+              to="/ranking"
+              className="more-link"
+              onMouseEnter={prefetchRanking}
+              onFocus={prefetchRanking}
+            >
               View full ranking
             </Link>
           </>
         )}
       </section>
 
-      {data && (
+      {summary && (
         <section className="container top-lists" aria-label="Fastest times per scene">
-          {data.summary.maps.map((map) => (
+          {summary.maps.map((map) => (
             <TopList key={map.slug} slug={map.slug} name={map.name} rows={map.rows} username={username} />
           ))}
         </section>

@@ -23,9 +23,9 @@ describe('formatTime', () => {
   });
 
   it('shows a dash when there is no time', () => {
-    expect(formatTime(null)).toBe('—');
-    expect(formatTime(undefined)).toBe('—');
-    expect(formatTime(Number.NaN)).toBe('—');
+    expect(formatTime(null)).toBe('n/a');
+    expect(formatTime(undefined)).toBe('n/a');
+    expect(formatTime(Number.NaN)).toBe('n/a');
   });
 });
 

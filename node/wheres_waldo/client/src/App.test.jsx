@@ -45,7 +45,7 @@ describe('<App>', () => {
     const api = mockApi({ ...leaderboards, 'GET /api/auth/me': user('pompom'), 'POST /api/auth/logout': null });
     renderApp('/');
     const nav = await screen.findByRole('navigation', { name: 'Main' });
-    expect(await screen.findByText('pompom', { selector: '.nav__user' })).toBeInTheDocument();
+    expect(await screen.findByText('pompom', { selector: '.nav__user' })).toHaveClass('btn', 'btn--primary', 'btn--small');
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Log out' }));
     expect(api.called('POST', '/api/auth/logout')).toHaveLength(1);
     expect(await screen.findByRole('link', { name: 'Log in' })).toBeInTheDocument();

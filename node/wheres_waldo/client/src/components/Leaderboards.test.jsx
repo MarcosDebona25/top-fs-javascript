@@ -13,7 +13,7 @@ describe('<GlobalBoard>', () => {
     render(<GlobalBoard rows={globalRows} />);
     const second = screen.getByText('odlaw_fan').closest('tr');
     const cells = within(second).getAllByRole('cell').map((cell) => cell.textContent);
-    expect(cells).toEqual(['2', 'odlaw_fan', '0:39.874', '1:15.002', '—', '1:54.876']);
+    expect(cells).toEqual(['2', 'odlaw_fan', '0:39.874', '1:15.002', 'n/a', '1:54.876']);
   });
 
   it('labels the columns with the scene names', () => {

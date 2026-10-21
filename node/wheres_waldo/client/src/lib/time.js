@@ -1,6 +1,6 @@
 // Every time in the app is a whole number of milliseconds, shown as m:ss.mmm (minutes are not capped at 59).
 export function formatTime(ms) {
-  if (ms === null || ms === undefined || Number.isNaN(ms)) return '—';
+  if (ms === null || ms === undefined || Number.isNaN(ms)) return 'n/a';
   const total = Math.max(0, Math.round(ms));
   const minutes = Math.floor(total / 60000);
   const seconds = Math.floor((total % 60000) / 1000);

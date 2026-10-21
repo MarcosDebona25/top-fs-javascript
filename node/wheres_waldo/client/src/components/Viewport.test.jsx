@@ -52,6 +52,35 @@ describe('<Viewport>', () => {
     expect(lastView().tx).toBeGreaterThan(before.tx); // looking left moves the picture right
   });
 
+  it('turns a press on a control into a pan once it moves, and reports the gesture', () => {
+    const onPanStart = vi.fn();
+    const onPick = vi.fn();
+    const { stage, lastView } = setup({ onPanStart, onPick, overlay: () => <button type="button" data-no-pan>Pick</button> });
+    fireEvent.wheel(stage, { deltaY: -400, clientX: 500, clientY: 300 });
+    const before = lastView();
+
+    const control = screen.getByRole('button', { name: 'Pick' });
+    fireEvent.pointerDown(control, { pointerId: 1, pointerType: 'mouse', button: 0, clientX: 100, clientY: 100 });
+    fireEvent.pointerMove(stage, { pointerId: 1, clientX: 130, clientY: 120 });
+    fireEvent.pointerUp(stage, { pointerId: 1, clientX: 130, clientY: 120 });
+
+    expect(onPanStart).toHaveBeenCalledTimes(1);
+    expect(lastView().tx).toBeGreaterThan(before.tx);
+    expect(lastView().ty).toBeGreaterThan(before.ty);
+    expect(onPick).not.toHaveBeenCalled();
+  });
+
+  it('does not pick when a press on a control is only a tap', () => {
+    const onPick = vi.fn();
+    setup({ onPick, overlay: () => <button type="button" data-no-pan>Pick</button> });
+    const control = screen.getByRole('button', { name: 'Pick' });
+
+    fireEvent.pointerDown(control, { pointerId: 1, pointerType: 'mouse', button: 0, clientX: 100, clientY: 100 });
+    fireEvent.pointerUp(control, { pointerId: 1, pointerType: 'mouse', button: 0, clientX: 100, clientY: 100 });
+
+    expect(onPick).not.toHaveBeenCalled();
+  });
+
   it('picks the centre of the stage on Enter, as image fractions', async () => {
     const onPick = vi.fn();
     const { stage, person } = setup({ onPick });
