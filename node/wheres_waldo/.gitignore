@@ -1,0 +1,12 @@
+node_modules/
+.env
+dist/
+coverage/
+test-results/
+playwright-report/
+
+# Loose source files at the project root: the originals live in assets/ and the brief stays private
+/Prompt.txt
+/Waldo.txt
+/Characters.jpg
+/IMG (*).jpg

@@ -1,0 +1,17 @@
+{
+  "name": "wheres-waldo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "api"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w api",
+    "build:images": "node scripts/build-images.mjs",
+    "test": "npm run test:api",
+    "test:api": "npm test -w api"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5"
+  }
+}
