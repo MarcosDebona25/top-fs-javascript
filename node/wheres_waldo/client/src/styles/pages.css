@@ -1,0 +1,49 @@
+/* 404 */
+
+.not-found {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 56px;
+  align-items: center;
+  padding-top: 56px;
+  padding-bottom: 72px;
+  max-width: 1100px;
+}
+
+.not-found__text {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.not-found__code {
+  font-size: clamp(80px, 16vw, 120px);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  color: var(--red);
+}
+
+.not-found__title {
+  font-size: clamp(32px, 5vw, 44px);
+  line-height: 1.05;
+}
+
+.not-found__copy {
+  max-width: 460px;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+.not-found__actions {
+  padding-top: 8px;
+}
+
+.not-found__art {
+  width: 100%;
+  max-width: 300px;
+  height: 340px;
+  justify-self: center;
+  object-fit: contain;
+  object-position: bottom;
+}

@@ -3,13 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "api"
+    "api",
+    "client"
   ],
   "scripts": {
     "dev:api": "npm run dev -w api",
     "build:images": "node scripts/build-images.mjs",
-    "test": "npm run test:api",
-    "test:api": "npm test -w api"
+    "test": "npm run test:client && npm run test:api",
+    "test:api": "npm test -w api",
+    "dev:client": "npm run dev -w client",
+    "build:client": "npm run build -w client",
+    "test:client": "npm test -w client",
+    "test:e2e": "npm run test:e2e -w client"
   },
   "devDependencies": {
     "sharp": "^0.35.5"
