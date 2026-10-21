@@ -8,7 +8,12 @@ const createCors = require('./config/cors');
 const createSession = require('./config/session');
 const createPassport = require('./config/passport');
 const createLimiters = require('./middlewares/rate-limit');
+const createLeaderboards = require('./services/leaderboards');
+const createMaps = require('./services/maps');
+const createGames = require('./services/games');
 const createAuthRoutes = require('./routes/auth');
+const createMapsRoutes = require('./routes/maps');
+const createGamesRoutes = require('./routes/games');
 
 // Builds the app. `now` is the clock every game timestamp comes from (the tests drive it by hand);
 // `config` overrides the environment (the tests use it to change the game rules).
@@ -26,6 +31,9 @@ function createApp({ now = () => new Date(), config: overrides = {}, prisma = de
     limiters: createLimiters(config),
     sessionCookieName: session.cookieName,
   };
+  ctx.leaderboards = createLeaderboards(ctx);
+  ctx.maps = createMaps(ctx);
+  ctx.games = createGames(ctx);
 
   const app = express();
   if (config.TRUST_PROXY) app.set('trust proxy', config.TRUST_PROXY);
@@ -40,6 +48,8 @@ function createApp({ now = () => new Date(), config: overrides = {}, prisma = de
 
   app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
   app.use('/api/auth', createAuthRoutes(ctx));
+  app.use('/api/maps', createMapsRoutes(ctx));
+  app.use('/api/games', createGamesRoutes(ctx));
 
   app.use((req, res, next) => next(new HttpError(404, 'Not found')));
 
