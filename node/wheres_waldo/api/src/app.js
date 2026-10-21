@@ -14,6 +14,7 @@ const createGames = require('./services/games');
 const createAuthRoutes = require('./routes/auth');
 const createMapsRoutes = require('./routes/maps');
 const createGamesRoutes = require('./routes/games');
+const createLeaderboardsRoutes = require('./routes/leaderboards');
 
 // Builds the app. `now` is the clock every game timestamp comes from (the tests drive it by hand);
 // `config` overrides the environment (the tests use it to change the game rules).
@@ -36,6 +37,7 @@ function createApp({ now = () => new Date(), config: overrides = {}, prisma = de
   ctx.games = createGames(ctx);
 
   const app = express();
+  app.locals.events = events;
   if (config.TRUST_PROXY) app.set('trust proxy', config.TRUST_PROXY);
 
   // Order matters: CORS answers preflights before anything asks for a session.
@@ -50,6 +52,7 @@ function createApp({ now = () => new Date(), config: overrides = {}, prisma = de
   app.use('/api/auth', createAuthRoutes(ctx));
   app.use('/api/maps', createMapsRoutes(ctx));
   app.use('/api/games', createGamesRoutes(ctx));
+  app.use('/api/leaderboards', createLeaderboardsRoutes(ctx));
 
   app.use((req, res, next) => next(new HttpError(404, 'Not found')));
 
