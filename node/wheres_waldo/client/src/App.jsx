@@ -1,8 +1,10 @@
 import { Route, Routes } from 'react-router';
 import { SiteLayout } from './components/Layout.jsx';
 import Landing from './pages/Landing.jsx';
+import Login from './pages/Login.jsx';
 import NotFound from './pages/NotFound.jsx';
 import Ranking from './pages/Ranking.jsx';
+import Register from './pages/Register.jsx';
 
 export default function App() {
   return (
@@ -11,6 +13,10 @@ export default function App() {
         <Route index element={<Landing />} />
         <Route path="ranking" element={<Ranking />} />
         <Route path="ranking/:slug" element={<Ranking />} />
+      </Route>
+      <Route element={<SiteLayout variant="back" />}>
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Register />} />
       </Route>
       <Route element={<SiteLayout variant="bare" />}>
         <Route path="*" element={<NotFound />} />
