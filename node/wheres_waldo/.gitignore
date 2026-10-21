@@ -5,8 +5,5 @@ coverage/
 test-results/
 playwright-report/
 
-# Loose source files at the project root: the originals live in assets/ and the brief stays private
-/Prompt.txt
-/Waldo.txt
-/Characters.jpg
-/IMG (*).jpg
+# Reference material (original source images and the private brief): the usable copies live in assets/
+/reference/
