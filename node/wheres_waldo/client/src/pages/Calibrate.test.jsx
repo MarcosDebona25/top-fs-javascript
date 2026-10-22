@@ -32,4 +32,16 @@ describe('<Calibrate>', () => {
     await userEvent.setup().click(wenda);
     expect(wenda).toHaveAttribute('aria-pressed', 'true');
   });
+
+  it('starts in Move mode and switches to Draw box mode', async () => {
+    mockApi();
+    renderPage(<Calibrate />);
+    const move = screen.getByRole('button', { name: 'Move' });
+    const draw = screen.getByRole('button', { name: 'Draw box' });
+    expect(move).toHaveAttribute('aria-pressed', 'true');
+    expect(draw).toHaveAttribute('aria-pressed', 'false');
+    await userEvent.setup().click(draw);
+    expect(move).toHaveAttribute('aria-pressed', 'false');
+    expect(draw).toHaveAttribute('aria-pressed', 'true');
+  });
 });

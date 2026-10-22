@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import existingFile from '../../../api/prisma/data/hitboxes.json';
 import { MapPicture } from '../components/MapPicture.jsx';
 import { Viewport } from '../components/Viewport.jsx';
+import { MinusIcon, PlusIcon } from '../components/icons.jsx';
 import { buildHitboxes, calibratedRects, formatCoords } from '../lib/hitboxes.js';
 import { CHARACTER_COLORS, CHARACTER_SLUGS, MAP_SLUGS, characterImage, mapName } from '../lib/maps.js';
 import { isUsableRect, rectFromPoints } from '../lib/rect.js';
@@ -37,7 +38,10 @@ export default function Calibrate() {
   const [pointer, setPointer] = useState(null);
   const [sizes, setSizes] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [mode, setMode] = useState('pan');
+  const [scale, setScale] = useState(1);
   const viewport = useRef(null);
+  const frame = useRef(null);
   const drawing = useRef(null);
   const spaceDown = useRef(false);
 
@@ -86,10 +90,27 @@ export default function Calibrate() {
     });
   }, []);
 
-  const shouldPan = (event) => spaceDown.current || event.button === 1;
+  const shouldPan = (event) => mode === 'pan' || spaceDown.current || event.button === 1;
+
+  const handleViewChange = useCallback((next) => setScale(next.scale), []);
+
+  const cancelDraft = useCallback(() => {
+    drawing.current = null;
+    setDraft(null);
+  }, []);
+
+  const focusViewport = useCallback(() => {
+    frame.current?.querySelector('.viewport')?.focus({ preventScroll: true });
+  }, []);
+
+  const chooseMode = (next) => {
+    setMode(next);
+    cancelDraft();
+    focusViewport();
+  };
 
   function onPointerDown(event) {
-    if (spaceDown.current || event.button !== 0 || event.target.closest('[data-no-pan]')) return;
+    if (mode !== 'draw' || spaceDown.current || event.button !== 0 || event.target.closest('[data-no-pan]')) return;
     event.currentTarget.setPointerCapture?.(event.pointerId);
     const start = viewport.current.toImage(event.clientX, event.clientY);
     drawing.current = { start, pointerId: event.pointerId };
@@ -144,7 +165,7 @@ export default function Calibrate() {
 
   return (
     <div className="calibrate">
-      <header className="container calibrate__head">
+      <header className="calibrate__hud">
         <div className="calibrate__title">
           <h1 className="display">Hitbox calibration</h1>
           <span className="dev-badge">DEV ONLY</span>
@@ -160,141 +181,187 @@ export default function Calibrate() {
                 setMap(slug);
                 setDraft(null);
                 viewport.current?.reset();
+                focusViewport();
               }}
             >
               {mapName(slug)}
             </button>
           ))}
         </nav>
+        <Link to="/" className="calibrate__back">
+          Back to the game
+        </Link>
       </header>
       <div className="stripes stripes--thin" aria-hidden="true" />
 
-      <main className="container calibrate__main">
-        <div className="calibrate__stage">
+      <main className="calibrate__main">
+        <div className="calibrate__toolbar">
           <p className="calibrate__help">
-            Pick a character on the right, then <strong>drag a rectangle</strong> around them. Scroll to zoom, hold space to pan. Coordinates are saved as fractions of the image (0–1).
+            Drag to move the scene, scroll or pinch to zoom. Switch to <strong>Draw box</strong> to mark the selected character. Hold Space to move while drawing.
           </p>
-          <div className="calibrate__frame" style={{ aspectRatio: size ? `${size.width} / ${size.height}` : '2560 / 1644' }}>
-            <Viewport
-              ref={viewport}
-              aspect={aspect}
-              label={`${mapName(map)} scene. Drag to draw a rectangle around ${CHARACTER_NAMES[character]}.`}
-              className="calibrate__viewport"
-              shouldPan={shouldPan}
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerUp}
-              image={({ view, content }) => (
-                <MapPicture
-                  slug={map}
-                  alt=""
-                  eager
-                  sizes={`${Math.ceil((content.width * view.scale) / 100) * 100}px`}
-                  className="viewport__picture"
-                  imgClassName="viewport__image"
-                />
-              )}
-              overlay={({ toStage }) => (
-                <>
-                  {CHARACTER_SLUGS.map((slug) => {
-                    const rect = slug === character && draft ? draft : mapRects[slug];
-                    if (!rect) return null;
-                    const topLeft = toStage(rect.x, rect.y);
-                    const bottomRight = toStage(rect.x + rect.width, rect.y + rect.height);
-                    const color = CHARACTER_COLORS[slug];
-                    return (
-                      <div
-                        key={slug}
-                        className="hitbox"
-                        style={{
-                          left: topLeft.x,
-                          top: topLeft.y,
-                          width: bottomRight.x - topLeft.x,
-                          height: bottomRight.y - topLeft.y,
-                          borderColor: color,
-                          borderStyle: slug === character && draft ? 'dashed' : 'solid',
-                        }}
-                      >
-                        <span className="hitbox__label" style={{ background: color }}>
-                          {CHARACTER_NAMES[slug]}
-                        </span>
-                      </div>
-                    );
-                  })}
-                  {pointer && (
-                    <span className="calibrate__readout num">
-                      x {pointer.x.toFixed(3)} · y {pointer.y.toFixed(3)}
-                    </span>
-                  )}
-                </>
-              )}
-            />
-          </div>
-        </div>
-
-        <aside className="calibrate__side">
-          <h2 className="calibrate__heading">Characters</h2>
-          <ul className="calibrate__list">
-            {CHARACTER_SLUGS.map((slug) => {
-              const { text, tone } = status(slug);
-              return (
-                <li key={slug}>
-                  <button
-                    type="button"
-                    className={`calibrate__char${slug === character ? ' is-active' : ''}`}
-                    aria-pressed={slug === character}
-                    onClick={() => setCharacter(slug)}
-                  >
-                    <img src={characterImage(slug, 'webp')} alt="" style={{ borderColor: CHARACTER_COLORS[slug] }} />
-                    <span className="calibrate__char-text">
-                      <span className="calibrate__char-name">{CHARACTER_NAMES[slug]}</span>
-                      <span className="calibrate__coords num">{slug === character && draft ? 'drawing…' : formatCoords(mapRects[slug]) || 'not drawn'}</span>
-                    </span>
-                    <span className={`calibrate__status ${tone}`}>{text}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="btn-row calibrate__tools">
-            <button type="button" className="btn btn--outline btn--small" onClick={() => setRect(map, character, null)} disabled={!mapRects[character]}>
-              Clear selected
-            </button>
-            <button
-              type="button"
-              className="btn btn--text btn--small calibrate__reset"
-              onClick={() => setRects((current) => ({ ...current, [map]: {} }))}
-            >
-              Reset scene
-            </button>
-          </div>
-        </aside>
-
-        <section className="calibrate__output" aria-labelledby="json-title">
-          <div className="calibrate__output-head">
-            <h2 id="json-title" className="calibrate__heading">
-              hitboxes.json
-            </h2>
-            <div className="btn-row">
-              <button type="button" className="btn btn--outline btn--small" onClick={copy}>
-                {copied ? 'Copied' : 'Copy JSON'}
+          <div className="calibrate__actions">
+            <div className="calibrate__modes" role="group" aria-label="Pointer mode">
+              <button
+                type="button"
+                className={`calibrate__mode${mode === 'pan' ? ' is-active' : ''}`}
+                aria-pressed={mode === 'pan'}
+                onClick={() => chooseMode('pan')}
+              >
+                Move
               </button>
-              <button type="button" className="btn btn--primary btn--small" onClick={download}>
-                Download file
+              <button
+                type="button"
+                className={`calibrate__mode${mode === 'draw' ? ' is-active' : ''}`}
+                aria-pressed={mode === 'draw'}
+                onClick={() => chooseMode('draw')}
+              >
+                Draw box
+              </button>
+            </div>
+            <div className="btn-row calibrate__tools">
+              <button type="button" className="btn btn--outline btn--small" onClick={() => { setRect(map, character, null); focusViewport(); }} disabled={!mapRects[character]}>
+                Clear selected
+              </button>
+              <button
+                type="button"
+                className="btn btn--text btn--small calibrate__reset"
+                onClick={() => {
+                  setRects((current) => ({ ...current, [map]: {} }));
+                  focusViewport();
+                }}
+              >
+                Reset scene
               </button>
             </div>
           </div>
-          <pre className="calibrate__json" tabIndex={0}>
-            {json}
-          </pre>
-          <p className="hint">
-            {placeholders > 0 ? `${placeholders} of ${MAP_SLUGS.length * CHARACTER_SLUGS.length} rectangles are still placeholders (calibrated: false). ` : 'Every rectangle is calibrated. '}
-            Replace <code>api/prisma/data/hitboxes.json</code> with the downloaded file and run <code>npm run seed -w api</code>. This page only exists in development.
-          </p>
-          <Link to="/" className="more-link">
-            Back to the game
-          </Link>
-        </section>
+        </div>
+
+        <div className="calibrate__cast" role="group" aria-label="Character to calibrate">
+          {CHARACTER_SLUGS.map((slug) => {
+            const { text, tone } = status(slug);
+            return (
+              <button
+                key={slug}
+                type="button"
+                className={`calibrate__char${slug === character ? ' is-active' : ''}`}
+                aria-pressed={slug === character}
+                onClick={() => {
+                  setCharacter(slug);
+                  focusViewport();
+                }}
+              >
+                <img src={characterImage(slug, 'webp')} alt="" style={{ borderColor: CHARACTER_COLORS[slug] }} />
+                <span className="calibrate__char-text">
+                  <span className="calibrate__char-line">
+                    <span className="calibrate__char-name">{CHARACTER_NAMES[slug]}</span>
+                    <span className={`calibrate__status ${tone}`}>{text}</span>
+                  </span>
+                  <span className="calibrate__coords num">{slug === character && draft ? 'drawing…' : formatCoords(mapRects[slug]) || 'not drawn'}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="calibrate__frame" ref={frame}>
+          <Viewport
+            ref={viewport}
+            aspect={aspect}
+            label={`${mapName(map)} scene. ${mode === 'draw' ? `Drag to draw a rectangle around ${CHARACTER_NAMES[character]}` : 'Drag to move'}. Scroll or pinch to zoom.`}
+            className={`calibrate__viewport${mode === 'draw' ? ' is-drawing' : ''}`}
+            shouldPan={shouldPan}
+            onPanStart={cancelDraft}
+            onViewChange={handleViewChange}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            image={({ view, content }) => (
+              <MapPicture
+                slug={map}
+                alt=""
+                eager
+                sizes={`${Math.ceil((content.width * view.scale) / 100) * 100}px`}
+                className="viewport__picture"
+                imgClassName="viewport__image"
+              />
+            )}
+            overlay={({ toStage }) => (
+              <>
+                {CHARACTER_SLUGS.map((slug) => {
+                  const rect = slug === character && draft ? draft : mapRects[slug];
+                  if (!rect) return null;
+                  const topLeft = toStage(rect.x, rect.y);
+                  const bottomRight = toStage(rect.x + rect.width, rect.y + rect.height);
+                  const color = CHARACTER_COLORS[slug];
+                  return (
+                    <div
+                      key={slug}
+                      className="hitbox"
+                      style={{
+                        left: topLeft.x,
+                        top: topLeft.y,
+                        width: bottomRight.x - topLeft.x,
+                        height: bottomRight.y - topLeft.y,
+                        borderColor: color,
+                        borderStyle: slug === character && draft ? 'dashed' : 'solid',
+                      }}
+                    >
+                      <span className="hitbox__label" style={{ background: color }}>
+                        {CHARACTER_NAMES[slug]}
+                      </span>
+                    </div>
+                  );
+                })}
+                {pointer && (
+                  <span className="calibrate__readout num">
+                    x {pointer.x.toFixed(3)} · y {pointer.y.toFixed(3)}
+                  </span>
+                )}
+              </>
+            )}
+          />
+          <div className="calibrate__zoom" role="group" aria-label="Zoom">
+            <button type="button" aria-label="Zoom out" onClick={() => viewport.current?.zoomBy(0.8)}>
+              <MinusIcon />
+            </button>
+            <span className="num calibrate__zoom-level" aria-live="off">
+              {Math.round(scale * 100)}%
+            </span>
+            <button type="button" aria-label="Zoom in" onClick={() => viewport.current?.zoomBy(1.25)}>
+              <PlusIcon />
+            </button>
+          </div>
+          <details className="calibrate__output">
+            <summary className="calibrate__output-toggle">
+              <span>Export JSON</span>
+              <span className="calibrate__output-count num">
+                {placeholders === 0 ? 'ready' : `${MAP_SLUGS.length * CHARACTER_SLUGS.length - placeholders}/${MAP_SLUGS.length * CHARACTER_SLUGS.length}`}
+              </span>
+            </summary>
+            <div className="calibrate__output-body">
+              <div className="calibrate__output-head">
+                <h2 id="json-title" className="calibrate__heading">
+                  hitboxes.json
+                </h2>
+                <div className="btn-row">
+                  <button type="button" className="btn btn--outline btn--small" onClick={copy}>
+                    {copied ? 'Copied' : 'Copy JSON'}
+                  </button>
+                  <button type="button" className="btn btn--primary btn--small" onClick={download}>
+                    Download file
+                  </button>
+                </div>
+              </div>
+              <pre className="calibrate__json" tabIndex={0}>
+                {json}
+              </pre>
+              <p className="hint">
+                {placeholders > 0 ? `${placeholders} of ${MAP_SLUGS.length * CHARACTER_SLUGS.length} rectangles are still placeholders (calibrated: false). ` : 'Every rectangle is calibrated. '}
+                Replace <code>api/prisma/data/hitboxes.json</code> with the downloaded file and run <code>npm run seed -w api</code>. This page only exists in development.
+              </p>
+            </div>
+          </details>
+        </div>
       </main>
     </div>
   );

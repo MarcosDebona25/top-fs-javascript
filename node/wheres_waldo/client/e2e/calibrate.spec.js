@@ -13,6 +13,7 @@ test.describe("calibration tool (development only)", () => {
   test('draws a rectangle and writes it into the JSON as calibrated', async ({ page }) => {
     await page.goto('/dev/calibrate');
     await expect(page.getByText('DEV ONLY')).toBeVisible();
+    await page.getByRole('button', { name: 'Draw box' }).click();
     const stage = page.locator('.calibrate__viewport');
     const box = await stage.boundingBox();
     await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.45);
@@ -23,6 +24,7 @@ test.describe("calibration tool (development only)", () => {
     await expect(page.getByRole('button', { name: /Waldo/ })).toContainText('Saved');
     // The next character that still needs a rectangle is selected.
     await expect(page.getByRole('button', { name: /Woof/ })).toHaveAttribute('aria-pressed', 'true');
+    await page.getByText('Export JSON').click();
     const json = JSON.parse(await page.locator('.calibrate__json').innerText());
     expect(json.maps.beach.waldo.calibrated).toBe(true);
     expect(json.maps.beach.waldo.x).toBeCloseTo(0.6, 1);
@@ -30,8 +32,27 @@ test.describe("calibration tool (development only)", () => {
     expect(Object.keys(json.maps)).toEqual(['beach', 'ski-slopes', 'moon-base']);
   });
 
+  test('pans in Move mode without drawing a rectangle', async ({ page }) => {
+    await page.goto('/dev/calibrate');
+    await expect(page.getByRole('button', { name: 'Move' })).toHaveAttribute('aria-pressed', 'true');
+    const stage = page.locator('.calibrate__viewport');
+    const box = await stage.boundingBox();
+    const content = page.locator('.viewport__content');
+    const before = await content.evaluate((element) => element.style.transform);
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.65);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.35, { steps: 8 });
+    await page.mouse.up();
+
+    const after = await content.evaluate((element) => element.style.transform);
+    expect(after).not.toBe(before);
+    await expect(page.locator('.hitbox')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Waldo/ })).toContainText('not drawn');
+  });
+
   test('keeps the drawing after a reload', async ({ page }) => {
     await page.goto('/dev/calibrate');
+    await page.getByRole('button', { name: 'Draw box' }).click();
     const box = await page.locator('.calibrate__viewport').boundingBox();
     await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.3);
     await page.mouse.down();

@@ -400,6 +400,17 @@ button {
   text-align: right;
 }
 
+/* The global board is a matrix of scenes and totals: center every column, header and cell. */
+.board--global th,
+.board--global td {
+  text-align: center;
+}
+
+.board--global th.right,
+.board--global td.right {
+  text-align: center;
+}
+
 .board tbody tr:nth-child(odd) {
   background: var(--zebra);
 }

@@ -93,7 +93,7 @@ Ambos comandos arrancan PostgreSQL cuando no está en marcha (`scripts/start-db.
 `api/prisma/data/hitboxes.json` trae un rectángulo por personaje y escena, pero **los valores del repositorio son provisorios** (`"calibrated": false`): están apilados en la esquina superior izquierda de cada imagen y no son las posiciones reales. Mientras tanto, `GET /api/maps` informa `calibrated: false` y el modal de inicio lo avisa en desarrollo.
 
 1. Con la API y el cliente corriendo, abrir `http://localhost:5173/dev/calibrate` (la ruta sólo existe en desarrollo).
-2. Elegir la escena y el personaje, y arrastrar un rectángulo alrededor de él. Rueda para zoom y espacio para desplazar.
+2. Elegir la escena y el personaje. La vista arranca en **Move**: arrastrar desplaza y la rueda hace zoom. Pasar a **Draw box** y arrastrar un rectángulo alrededor del personaje. También se puede mantener Espacio para desplazar mientras se dibuja.
 3. Pulsar **Download file** (o **Copy JSON**) y reemplazar `api/prisma/data/hitboxes.json` con el resultado.
 4. Volver a sembrar: `npm run seed -w api`.
 
