@@ -90,9 +90,9 @@ Ambos comandos arrancan PostgreSQL cuando no está en marcha (`scripts/start-db.
 
 ## Calibrar los hitboxes
 
-`api/prisma/data/hitboxes.json` trae un rectángulo por personaje y escena, pero **los valores del repositorio son provisorios** (`"calibrated": false`): están apilados en la esquina superior izquierda de cada imagen y no son las posiciones reales. Mientras tanto, `GET /api/maps` informa `calibrated: false` y el modal de inicio lo avisa en desarrollo.
+`api/prisma/data/hitboxes.json` trae un rectángulo por personaje y escena, y los 15 están calibrados (`"calibrated": true`) con las posiciones reales. Si alguno vuelve a quedar como provisorio (`"calibrated": false`), `GET /api/maps` informa `calibrated: false` para esa escena y el modal de inicio lo avisa en desarrollo. Para corregir un rectángulo:
 
-1. Con la API y el cliente corriendo, abrir `http://localhost:5173/dev/calibrate` (la ruta sólo existe en desarrollo).
+1. Con la API y el cliente corriendo, abrir `http://localhost:5173/dev/calibrate` (la ruta sólo existe en desarrollo). La herramienta arranca con los rectángulos del archivo; **Clear selected** borra el del personaje elegido para volver a dibujarlo.
 2. Elegir la escena y el personaje. La vista arranca en **Move**: arrastrar desplaza y la rueda hace zoom. Pasar a **Draw box** y arrastrar un rectángulo alrededor del personaje. También se puede mantener Espacio para desplazar mientras se dibuja.
 3. Pulsar **Download file** (o **Copy JSON**) y reemplazar `api/prisma/data/hitboxes.json` con el resultado.
 4. Volver a sembrar: `npm run seed -w api`.

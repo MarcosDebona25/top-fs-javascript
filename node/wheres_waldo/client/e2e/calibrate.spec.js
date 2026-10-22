@@ -10,9 +10,11 @@ test.describe("calibration tool (development only)", () => {
     });
   });
 
-  test('draws a rectangle and writes it into the JSON as calibrated', async ({ page }) => {
+  test('redraws a rectangle and writes it into the JSON as calibrated', async ({ page }) => {
     await page.goto('/dev/calibrate');
     await expect(page.getByText('DEV ONLY')).toBeVisible();
+    await page.getByRole('button', { name: 'Clear selected' }).click();
+    await expect(page.getByRole('button', { name: /Waldo/ })).toContainText('not drawn');
     await page.getByRole('button', { name: 'Draw box' }).click();
     const stage = page.locator('.calibrate__viewport');
     const box = await stage.boundingBox();
@@ -22,13 +24,14 @@ test.describe("calibration tool (development only)", () => {
     await page.mouse.up();
 
     await expect(page.getByRole('button', { name: /Waldo/ })).toContainText('Saved');
-    // The next character that still needs a rectangle is selected.
-    await expect(page.getByRole('button', { name: /Woof/ })).toHaveAttribute('aria-pressed', 'true');
+    // Every other character already has a rectangle, so the selection stays put.
+    await expect(page.getByRole('button', { name: /Waldo/ })).toHaveAttribute('aria-pressed', 'true');
     await page.getByText('Export JSON').click();
     const json = JSON.parse(await page.locator('.calibrate__json').innerText());
     expect(json.maps.beach.waldo.calibrated).toBe(true);
     expect(json.maps.beach.waldo.x).toBeCloseTo(0.6, 1);
-    expect(json.maps.beach.woof.calibrated).toBe(false);
+    expect(json.maps.beach.woof.calibrated).toBe(true);
+    expect(json).not.toHaveProperty('_warning');
     expect(Object.keys(json.maps)).toEqual(['beach', 'ski-slopes', 'moon-base']);
   });
 
@@ -46,12 +49,13 @@ test.describe("calibration tool (development only)", () => {
 
     const after = await content.evaluate((element) => element.style.transform);
     expect(after).not.toBe(before);
-    await expect(page.locator('.hitbox')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /Waldo/ })).toContainText('not drawn');
+    await expect(page.locator('.hitbox')).toHaveCount(5);
+    await expect(page.getByRole('button', { name: /Waldo/ })).toContainText('0.605 · 0.358');
   });
 
   test('keeps the drawing after a reload', async ({ page }) => {
     await page.goto('/dev/calibrate');
+    await page.getByRole('button', { name: 'Clear selected' }).click();
     await page.getByRole('button', { name: 'Draw box' }).click();
     const box = await page.locator('.calibrate__viewport').boundingBox();
     await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.3);
@@ -60,5 +64,6 @@ test.describe("calibration tool (development only)", () => {
     await page.mouse.up();
     await page.reload();
     await expect(page.getByRole('button', { name: /Waldo/ })).toContainText('Saved');
+    await expect(page.getByRole('button', { name: /Waldo/ })).not.toContainText('0.605 · 0.358');
   });
 });

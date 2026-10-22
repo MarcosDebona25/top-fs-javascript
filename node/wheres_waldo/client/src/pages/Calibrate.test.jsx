@@ -16,12 +16,20 @@ describe('<Calibrate>', () => {
     for (const name of characters) expect(screen.getByRole('button', { name: new RegExp(name) })).toBeInTheDocument();
   });
 
-  it('starts with every rectangle pending and a JSON that still flags the placeholders', () => {
+  it('starts from the calibrated rectangles in the file and a JSON that is ready to save', () => {
     mockApi();
     renderPage(<Calibrate />);
-    expect(screen.getAllByText('Pending').length + screen.getAllByText('Selected').length).toBe(5);
-    expect(screen.getByText(/15 of 15 rectangles are still placeholders/)).toBeInTheDocument();
-    expect(document.querySelector('.calibrate__json').textContent).toContain('"calibrated": false');
+    expect(screen.getAllByText('Saved')).toHaveLength(5);
+    expect(screen.getByText(/Every rectangle is calibrated/)).toBeInTheDocument();
+    expect(document.querySelector('.calibrate__json').textContent).not.toContain('"calibrated": false');
+  });
+
+  it('marks a cleared rectangle as a placeholder again', async () => {
+    mockApi();
+    renderPage(<Calibrate />);
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Clear selected' }));
+    expect(screen.getByRole('button', { name: /Waldo/ })).toHaveTextContent('not drawn');
+    expect(screen.getByText(/1 of 15 rectangles are still placeholders/)).toBeInTheDocument();
   });
 
   it('selects the character to draw', async () => {
